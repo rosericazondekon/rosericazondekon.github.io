@@ -1,0 +1,365 @@
+<!doctype html><html lang=en><head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3TBYJJHRP3"></script>
+<style>:root{--accent-color:#FF4D4D}</style>
+<title>RNA-seq Read Alignment and Quantification</title>
+<meta name=description content="A tutorial to RNA sequence read alignment and quantification.">
+<meta name=keywords content="blog,rosericazondekon,gazondekon,razondekon,gbedegnon,roseric,azondekon,rna-seq,salmon,star,fastq,bam,alignment,quantification">
+<meta property="og:url" content="https://rosericazondekon.github.io/blog/posts/rnaseq-read-align-quant/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="RNA-seq Read Alignment and Quantification">
+<meta property="og:description" content="A tutorial to RNA sequence read alignment and quantification.">
+<meta property="og:image" content="https://rosericazondekon.github.io/blog/images/roz.webp">
+<meta name=twitter:card content="summary_large_image">
+<meta name=twitter:title content="RNA-seq Read Alignment and Quantification">
+<meta name=twitter:description content="A tutorial to RNA sequence read alignment and quantification.">
+<meta property="twitter:domain" content="https://rosericazondekon.github.io/blog/posts/rnaseq-read-align-quant/">
+<meta property="twitter:url" content="https://rosericazondekon.github.io/blog/posts/rnaseq-read-align-quant/">
+<meta name=twitter:image content="https://rosericazondekon.github.io/blog/images/roz.webp">
+<link rel=canonical href=https://rosericazondekon.github.io/blog/posts/rnaseq-read-align-quant/>
+<link rel=stylesheet type=text/css href=https://rosericazondekon.github.io/blog/css/normalize.min.css media=print onload="this.media='all'">
+<link rel=stylesheet type=text/css href=https://rosericazondekon.github.io/blog/css/main.css>
+<link disabled id=dark-theme rel=stylesheet href=https://rosericazondekon.github.io/blog/css/dark.css>
+<script src=https://rosericazondekon.github.io/blog/js/svg-injector.min.js></script>
+<script src=https://rosericazondekon.github.io/blog/js/feather-icons.min.js></script>
+<script src=https://rosericazondekon.github.io/blog/js/main.js></script>
+<link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.13.16/dist/katex.min.css integrity=sha384-6LkG2wmY8FK9E0vU9OOr8UvLwsaqUg9SETfpq4uTCN1agNe8HRdE9ABlk+fVx6gZ crossorigin=anonymous>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.13.16/dist/katex.min.js integrity=sha384-31El76TwmbHj4rF9DyLsygbq6xoIobG0W+jqXim+a3dU9W53tdH3A/ngRPxOzzaB crossorigin=anonymous></script>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.13.16/dist/contrib/auto-render.min.js integrity=sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl crossorigin=anonymous onload=renderMathInElement(document.body)></script>
+</head>
+<body>
+<script type=text/javascript>setThemeByUserPref()</script><header class=header>
+<nav class=header-nav>
+<div class=avatar>
+<a href=https://rosericazondekon.github.io/blog/>
+<img src=https://rosericazondekon.github.io/blog/images/roz.webp alt=avatar>
+</a>
+</div>
+<div class=nav-title>
+<a class=nav-brand href=https://rosericazondekon.github.io/blog/>Gbedegnon Roseric Azondekon</a>
+</div>
+<div class=nav-links>
+<div class=nav-link>
+<a href=/blog/> Home </a>
+</div>
+<div class=nav-link>
+<a href=/blog/posts/> Posts </a>
+</div>
+<div class=nav-link>
+<a href=/blog/projects/> Projects </a>
+</div>
+<div class=nav-link>
+<a href=/blog/tags/> Tags </a>
+</div>
+<div class=nav-link>
+<a href=/blog/about/> About </a>
+</div>
+<div class=nav-link>
+<a href=https://github.com/rosericazondekon><span data-feather=github></span> </a>
+</div>
+<div class=nav-link>
+<a href=https://www.buymeacoffee.com/gazondekon><span data-feather=coffee></span> </a>
+</div>
+<div class=nav-link>
+<a href=/blog/index.xml><span data-feather=rss></span> </a>
+</div>
+<span class=nav-icons-divider></span>
+<div class="nav-link dark-theme-toggle">
+<a>
+<span id=theme-toggle-icon data-feather=moon></span>
+</a>
+</div>
+<div class=nav-link id=hamburger-menu-toggle>
+<a>
+<span data-feather=menu></span>
+</a>
+</div>
+<ul class="nav-hamburger-list visibility-hidden">
+<li class=nav-item>
+<a href=/blog/> Home </a>
+</li>
+<li class=nav-item>
+<a href=/blog/posts/> Posts </a>
+</li>
+<li class=nav-item>
+<a href=/blog/projects/> Projects </a>
+</li>
+<li class=nav-item>
+<a href=/blog/tags/> Tags </a>
+</li>
+<li class=nav-item>
+<a href=/blog/about/> About </a>
+</li>
+<li class=nav-item>
+<a href=https://github.com/rosericazondekon><span data-feather=github></span> </a>
+</li>
+<li class=nav-item>
+<a href=https://www.buymeacoffee.com/gazondekon><span data-feather=coffee></span> </a>
+</li>
+<li class=nav-item>
+<a href=/blog/index.xml><span data-feather=rss></span> </a>
+</li>
+<li class="nav-item dark-theme-toggle">
+<a>
+<span id=theme-toggle-icon data-feather=moon></span>
+</a>
+</li>
+</ul>
+</div>
+</nav>
+</header>
+<main id=content>
+<div class="post container">
+<div class=post-header-section>
+<h1>RNA-seq Read Alignment and Quantification</h1>
+<small role=doc-subtitle>A tutorial to RNA sequence read alignment and quantification.</small>
+<p class=post-date>
+December 18, 2021
+</p>
+<ul class=post-tags>
+<li class=post-tag><a href=/blog/tags/rna-seq>rna-seq</a></li>
+<li class=post-tag><a href=/blog/tags/salmon>salmon</a></li>
+<li class=post-tag><a href=/blog/tags/star>star</a></li>
+<li class=post-tag><a href=/blog/tags/fastq>fastq</a></li>
+<li class=post-tag><a href=/blog/tags/bam>bam</a></li>
+<li class=post-tag><a href=/blog/tags/alignment>alignment</a></li>
+<li class=post-tag><a href=/blog/tags/quantification>quantification</a></li>
+</ul>
+</div>
+<div class=post-content>
+<p>
+<p><strong>Disclaimer:</strong> This tutorial was originally written on March 26th, 2019.</p>
+<h2 id=introduction>Introduction</h2>
+<p>In this tutorial, I show you how to download raw sequence data from the European instance of the SRA, which can be accessed via <a href=https://www.ebi.ac.uk/ena>https://www.ebi.ac.uk/ena</a>. At ENA, the sequencing reads are directly available in FASTQ or SRA formats, which will be explained below.</p>
+<p>For this tutorial, we need <a href=https://www.bioinformatics.babraham.ac.uk/projects/fastqc/><code>FastQC</code></a>, <a href=https://multiqc.info/><code>multiQC</code></a>, the <a href=https://sourceforge.net/projects/subread/files/><code>SRA toolkit</code></a>, the <a href=https://sourceforge.net/projects/subread/files/subread-1.6.4/><code>subread</code></a> package, a powerful suite of tools designed to interact with SAM and BAM files called <a href=https://sourceforge.net/projects/samtools/files/><code>samtools</code></a>, <a href=https://combine-lab.github.io/salmon/><code>salmon</code></a>, and <a href=https://github.com/alexdobin/STAR><code>STAR</code></a> installed and referenced in the environment variable <code>PATH</code>.</p>
+<p>Let&rsquo;s first check if these requirements are met:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>fastqc --version
+</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>multiqc --version
+</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>fastq-dump --version
+</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>samtools --version
+</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>salmon -v
+</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>STAR --version
+</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#75715e># Checking if the package is properly installed</span>
+featureCounts -v
+</code></pre></div><p>If at least one of the above commands produces an error, please, check your installation of the tool and try again.</p>
+<p>Now let&rsquo;s create a working directory for our RNA-seq project (let&rsquo;s call it <code>tuto</code>).</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>mkdir -p tuto <span style=color:#f92672>&amp;&amp;</span> cd tuto
+</code></pre></div><h2 id=1-data-download>1. Data Download</h2>
+<p>To download a set of SRA files:</p>
+<ol>
+<li>
+<p>Go to <a href=https://www.ebi.ac.uk/ena>https://www.ebi.ac.uk/ena</a>.</p>
+</li>
+<li>
+<p>Search for the accession number of the project, e.g., SRP053046 (should be indicated in the published paper).</p>
+</li>
+<li>
+<p>There are several ways to start the download, here we show you how to do it through the command line interface on GNU/Linux.</p>
+<ul>
+<li>copy the link’s address of the &ldquo;SRA files&rdquo; column (right mouse click), go to the command line, move to the target directory, type: <code>wget &lt; link copied from the ENA website ></code></li>
+<li>If there are many samples as it is the case for the project referenced here (accession number: SRP053046), you can download the summary of the sample information from ENA by right-clicking on &ldquo;TEXT&rdquo; or &ldquo;TSV&rdquo; and copying the link location.</li>
+</ul>
+</li>
+</ol>
+<p>Now let&rsquo;s download the file from the link copied earlier.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>wget -O all_samples.txt <span style=color:#e6db74>&#34;https://www.ebi.ac.uk/ena/portal/api/filereport?\
+</span><span style=color:#e6db74>accession=PRJNA274258&amp;result=read_run&amp;fields=study_accession,sample_accession,\
+</span><span style=color:#e6db74>experiment_accession,run_accession,tax_id,scientific_name,fastq_ftp,\
+</span><span style=color:#e6db74>submitted_ftp,sra_ftp&amp;format=tsv&amp;download=true&amp;limit=0&#34;</span>
+</code></pre></div><p>You may try to open the <code>all_samples.txt</code> file with LibreOffice or Excel to view it. For this project, we are only interested in the paired-end first 9 RNA-seq samples. Since the first line in <code>all_samples.txt</code> contains the header, we will generate another file containing only the first 10 lines of <code>all_samples.txt</code> with the following command:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>sed <span style=color:#e6db74>&#39;1d&#39;</span> all_samples.txt &gt; all_samples.txt2
+head -9 all_samples.txt2 &gt; samples.txt
+rm all_samples.txt2
+</code></pre></div><p>Now, let&rsquo;s create a new folder for our SRA files.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>mkdir -p sra_files
+</code></pre></div><p>Since the decommission of the SRA Fuse/FTP site on December 1, 2019, the <code>prefetch</code> utility included in the <code>SRA toolkit</code> is recommended.</p>
+<p>Notice that the accession number for the SRA files are located in the fourth column <code>run_accession</code> in all_samples.txt. We proceed to the download of the SRA files of the samples listed in samples.txt with the following code: (<strong>Attention: The download may take a long time!</strong>)</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#75715e># The command below may take too long to download.</span>
+cut -f4 samples.txt | xargs -i sh -c <span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span><span style=color:#e6db74>&#39;run_accession={}; \
+</span><span style=color:#e6db74>prefetch $run_accession --output-directory sra_files&#39;</span>
+</code></pre></div><h2 id=2-converting-sra-files-to-fastq-files>2. Converting SRA files to FASTQ files</h2>
+<p>Now that the download is complete, let&rsquo;s convert the SRA files into FASTQ files with the following command: (<strong>Attention: This may take a long time!</strong>)</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>cut -f4 samples.txt | xargs -i sh -c <span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span><span style=color:#e6db74>&#39;run_accession={}; fastq-dump --outdir fastq/${run_accession} --gzip \
+</span><span style=color:#e6db74>--skip-technical --split-3 sra_files/${run_accession}/${run_accession}.sra&#39;</span>
+</code></pre></div><p>This should be the file structure of your working directory up to this point:</p>
+<pre tabindex=0><code>.
+├── all_samples.txt
+├── samples.txt
+├── fastq
+│   ├── SRR1784137
+│   │   ├── SRR1784137_1.fastq.gz
+│   │   └── SRR1784137_2.fastq.gz
+│   ├── SRR1784138
+│   │   ├── SRR1784138_1.fastq.gz
+│   │   └── SRR1784138_2.fastq.gz
+│   ├── SRR1784139
+│   │   ├── SRR1784139_1.fastq.gz
+│   │   └── SRR1784139_2.fastq.gz
+│   ├── SRR1784140
+│   │   ├── SRR1784140_1.fastq.gz
+│   │   └── SRR1784140_2.fastq.gz
+│   ├── SRR1784141
+│   │   ├── SRR1784141_1.fastq.gz
+│   │   └── SRR1784141_2.fastq.gz
+│   ├── SRR1784142
+│   │   ├── SRR1784142_1.fastq.gz
+│   │   └── SRR1784142_2.fastq.gz
+│   ├── SRR1784143
+│   │   ├── SRR1784143_1.fastq.gz
+│   │   └── SRR1784143_2.fastq.gz
+│   ├── SRR1784144
+│   │   ├── SRR1784144_1.fastq.gz
+│   │   └── SRR1784144_2.fastq.gz
+│   └── SRR1784145
+│       ├── SRR1784145_1.fastq.gz
+│       └── SRR1784145_2.fastq.gz
+└── sra_files
+    ├── SRR1784137
+    ├── SRR1784137.sra
+    ├── SRR1784138
+    ├── SRR1784138.1
+    ├── SRR1784138.sra
+    ├── SRR1784139
+    ├── SRR1784139.sra
+    ├── SRR1784140.sra
+    ├── SRR1784141.sra
+    ├── SRR1784142.sra
+    ├── SRR1784143.sra
+    ├── SRR1784144.sra
+    └── SRR1784145.sra
+</code></pre><h2 id=3-quality-control-of-the-fastq-files>3. Quality Control of the FASTQ files</h2>
+<p>Up to this point, we have all our RNA-seq FASTQ files ready for Quality Control (QC) check. This is done with the <code>fastqc</code> tools developed by the Babraham Institute. Run the following command to perform QC check for all the samples: (<strong>This may take some time!</strong>)</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>cut -f4 samples.txt | xargs -i sh -c <span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span><span style=color:#e6db74>&#39;run_accession={}; mkdir -p fastqc_reports/${run_accession}; fastqc\
+</span><span style=color:#e6db74>fastq/${run_accession}/*fastq.gz -o fastqc_reports/${run_accession}&#39;</span>
+</code></pre></div><p>Next, let&rsquo;s summarize the QC reports (for all the samples) into one unique report using <code>multiqc</code>:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>multiqc fastqc_reports --dirs -o multiQC_report/
+</code></pre></div><p>Let&rsquo;s examine the summary <code>multiqc</code> report either by double-clicking on <code>multiQC_report/multiqc_report.html</code> or by executing the following code:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>xdg-open multiQC_report/multiqc_report.html
+</code></pre></div><h2 id=4-read-alignment>4. Read Alignment</h2>
+<p>In order to identify the transcripts that are present in a specific sample, the genomic origin of the sequenced cDNA fragments must be determined. The assignment of sequencing reads to the most likely locus of origin is called read alignment or mapping and it is a crucial step in most types of high-throughput sequencing experiments.</p>
+<p>The general challenge of short read alignment is to map millions of reads accurately and in a reasonable time, despite the presence of sequencing errors, genomic variation and repetitive elements. The different alignment programs employ various strategies that are meant to speed up the process (e.g., by indexing the reference genome) and find a balance between mapping fidelity and error tolerance.</p>
+<h3 id=41-reference-genomes-and-annotation>4.1. Reference genomes and annotation</h3>
+<p>Genome sequences and annotation are often generated by consortia such as (mod)ENCODE, The Mouse Genome Project, The Berkeley Drosophila Genome Project, and many more. The results of these efforts can either be downloaded from individual websites set up by the respective consortia or from more comprehensive data bases such as the one hosted by the University of California, Santa Cruz (<a href=https://genome.ucsc.edu/>UCSC</a>) or the European genome resource (<a href=http://www.ensembl.org/>Ensembl</a>).</p>
+<p>Reference sequences are usually stored in plain text FASTA files that can either be compressed with the generic gzip command. The annotation file is often stored as a GTF (Gene Transfer Format) despite the availability of several other file formats.</p>
+<p>Both reference sequences and GTF annotation file can be obtained either from <a href=https://www.ncbi.nlm.nih.gov/genome/51>NCBI</a>, <a href=https://www.ensembl.org/info/data/ftp/index.html>ENSEMBL</a> or <a href=http://hgdownload.soe.ucsc.edu/downloads.html#human>UCSC Genome Browser</a>.</p>
+<p>While it is usually faster to align against a cDNA reference sequence (cDNA), in this tutorial, we will align the reads against the genome (DNA) reference sequences. We obtain both the genome refernce sequences and our gene annotation files from <a href=https://www.ensembl.org/info/data/ftp/index.html>ENSEMBL</a>.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#75715e># Download the latest human genome</span>
+wget -P reference <span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>ftp://ftp.ensembl.org/pub/release-93/fasta/homo_sapiens<span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
+</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#75715e># Decompress genome sequence file and rename it</span>
+gzip -dk &lt; reference/Homo_sapiens.GRCh38.dna.<span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>primary_assembly.fa.gz &gt; reference/human_genome.fa
+</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#75715e># Download GTF annotation file</span>
+wget -P annotation ftp://ftp.ensembl.org/pub/release-95<span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>/gtf/homo_sapiens/Homo_sapiens.GRCh38.95.gtf.gz
+</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#75715e># Decompress gene annotation file and rename it</span>
+gzip -dk &lt; annotation/Homo_sapiens.GRCh38.95.gtf.gz<span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>&gt; annotation/gene_annotation.gtf
+</code></pre></div><h3 id=42-aligning-reads-using-star>4.2. Aligning reads using STAR</h3>
+<h4 id=421-generate-genome-index>4.2.1. Generate genome index</h4>
+<p><strong>This step has to be done only once per genome type (and alignment program)</strong>. The index files will comprise the genome sequence, suffix arrays (i.e., tables of k-mers), chromosome names and lengths, splice junctions coordinates, and information about the genes (e.g. the strand). Therefore, the main input for this step encompasses the reference genome and an annotation file.</p>
+<p><strong>The index creation may take a long time!</strong></p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#75715e># create a directory to store the index in</span>
+mkdir -p STARindex
+</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#75715e># Run STAR in &#34;genomeGenerate&#34; mode with 10 threads</span>
+<span style=color:#75715e># Feel free to change the &#39;runThreadN&#39; parameter </span>
+<span style=color:#75715e># depending on the number of cores available on your computer</span>
+STAR --runThreadN <span style=color:#ae81ff>10</span> <span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>--runMode genomeGenerate --genomeDir STARindex <span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>--genomeFastaFiles reference/human_genome.fa <span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>--genomeChrBinNbits <span style=color:#ae81ff>15</span> <span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>--sjdbGTFfile annotation/gene_annotation.gtf <span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>--sjdbOverhang <span style=color:#ae81ff>49</span>
+</code></pre></div><h4 id=422-alignment>4.2.2. Alignment</h4>
+<p>This step has to be done for each individual FASTQ file.</p>
+<p><strong>This step may take a long time!</strong></p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#75715e># create a directory to store the alignment files</span>
+mkdir -p alignment_STAR
+</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#75715e># execute STAR in the runMode &#34;alignReads&#34;</span>
+cut -f5 samples.txt | xargs -i sh -c <span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span><span style=color:#e6db74>&#39;v={}; STAR --genomeDir STARindex \
+</span><span style=color:#e6db74>--readFilesIn fastq/${v}/*fastq.gz \
+</span><span style=color:#e6db74>--readFilesCommand zcat \
+</span><span style=color:#e6db74>--outFileNamePrefix alignment_STAR/${v}\
+</span><span style=color:#e6db74>--outFilterMultimapNmax 1 \
+</span><span style=color:#e6db74>--outReadsUnmapped Fastx \
+</span><span style=color:#e6db74>--outSAMtype BAM SortedByCoordinate \
+</span><span style=color:#e6db74>--twopassMode Basic \
+</span><span style=color:#e6db74>--runThreadN 10&#39;</span>
+</code></pre></div><h4 id=423-bam-file-indexing>4.2.3. BAM file indexing</h4>
+<p>Most downstream applications like the <a href=https://software.broadinstitute.org/software/igv/>Integrative Genomics Viewer (IGV)</a> will require a .BAM.BAI file together with every BAM file to quickly access the BAM files without having to load them into memory.</p>
+<p>To obtain these index, let&rsquo;s now index all the BAM files within the &lsquo;alignment_STAR&rsquo; folder using <code>samtools</code>.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#66d9ef>for</span> i in alignment_STAR/*; <span style=color:#66d9ef>do</span>
+    <span style=color:#66d9ef>if</span> <span style=color:#f92672>[</span> <span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>i<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span> !<span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>i%.bam<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span> <span style=color:#f92672>]</span>;<span style=color:#66d9ef>then</span>
+        samtools index <span style=color:#e6db74>${</span>i<span style=color:#e6db74>}</span>
+    <span style=color:#66d9ef>fi</span>
+<span style=color:#66d9ef>done</span>
+</code></pre></div><h3 id=43-read-alignment-assessment>4.3. Read alignment assessment</h3>
+<p>There are numerous ways to do basic checks of the alignment success. An alignment of RNA-seq reads is usually considered to have succeeded if the mapping rate is >70%.</p>
+<p>The very first QC of aligned reads should be to generally check the aligner’s output. We can perform a basic assessment of the read alignment for all our samples with using the <code>samtools flagstat</code> command:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#66d9ef>for</span> i in alignment_STAR/*; <span style=color:#66d9ef>do</span>
+    <span style=color:#66d9ef>if</span> <span style=color:#f92672>[</span> <span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>i<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span> !<span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>i%.bam<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span> <span style=color:#f92672>]</span>;<span style=color:#66d9ef>then</span>
+        echo <span style=color:#e6db74>${</span>i:15:10<span style=color:#e6db74>}</span>
+        samtools flagstat <span style=color:#e6db74>${</span>i<span style=color:#e6db74>}</span>
+        echo <span style=color:#e6db74>&#39;############################################################&#39;</span>
+    <span style=color:#66d9ef>fi</span>
+<span style=color:#66d9ef>done</span>
+</code></pre></div><p>We can also inspect the final log file generated by STAR with the following command:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#66d9ef>for</span> i in alignment_STAR/*; <span style=color:#66d9ef>do</span>
+    <span style=color:#66d9ef>if</span> <span style=color:#f92672>[</span> <span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>i<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span> !<span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>i%.final.out<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span> <span style=color:#f92672>]</span>;<span style=color:#66d9ef>then</span>
+        echo <span style=color:#e6db74>${</span>i:15:10<span style=color:#e6db74>}</span>
+        cat <span style=color:#e6db74>${</span>i<span style=color:#e6db74>}</span>
+        echo
+        echo <span style=color:#e6db74>&#39;############################################################&#39;</span>
+        echo 
+    <span style=color:#66d9ef>fi</span>
+<span style=color:#66d9ef>done</span>
+</code></pre></div><h2 id=5-read-quantification>5. Read Quantification</h2>
+<h3 id=51-using-star-output>5.1. Using STAR output</h3>
+<p>To compare the expression of single genes between different conditions, an essential step is the quantification of reads per gene. The most popular tools for gene quantification are <code>htseq-count</code> and <code>featureCounts</code>. <code>featureCounts</code> is provided by the <code>subread</code> package.</p>
+<p>The <code>featureCounts</code> utility calls a hit if any overlap (1 bp or more) is found between the read and a feature and provides the option to either exclude multi-overlap reads or to count them for each feature that is overlapped.</p>
+<p>The nature and lengths of the reads, gene expression quantification will be strongly affected by the underlying gene annotation file that is supplied to the quantification programs.</p>
+<p>In the following command, <code>featureCounts</code> is used to count the number of reads overlapping with genes.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#75715e># Create a folder for read counts</span>
+mkdir -p read_counts
+</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#75715e># Count features using 10 threads (&#39;-T 10&#39;)</span>
+featureCounts -a annotation/gene_annotation.gtf<span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>              -o read_counts/featureCounts_results.txt<span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>                 alignment_STAR/*bam -T <span style=color:#ae81ff>10</span>
+</code></pre></div><h3 id=52-using-the-salmon-pseudoaligner>5.2. Using the salmon pseudoaligner</h3>
+<p><code>salmon</code> is a probabilistic RNA-seq quantification program. It pseudoailigns reads to a reference sequence, producing a list of transcripts that are compatible with each read while avoiding alignment of individual bases.</p>
+<p>The program circumvents the need for large alignment files, thus reducing storage needs while increasing speed and enabling the processing of large numbers of samples on modest computational resources. Pseudoaligners like <code>salmon</code> estimate <strong>transcript-level counts (not gene-level counts)</strong>.</p>
+<h4 id=521-transcriptome-indexing>5.2.1. Transcriptome Indexing</h4>
+<p>Let&rsquo;s now download the Homo sapiens transcriptome reference from <a href=https://www.ncbi.nlm.nih.gov/genome>NCBI</a>. Transcriptome reference sequence file can also be downloaded from <a href=https://www.ensembl.org/info/data/ftp/index.html>ENSEMBL</a>.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>wget -P reference ftp://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/annotation<span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>/GRCh38_latest/refseq_identifiers/GRCh38_latest_rna.fna.gz
+</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#75715e># Decompress transcriptome sequence file and rename it</span>
+gzip -dk &lt; reference/GRCh38_latest_rna.fna.gz &gt; reference/human_transcriptome.fna
+</code></pre></div><p>Next, let&rsquo;s build an index on our transcriptome (<strong>this may take some time!</strong>).</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#66d9ef>if</span> <span style=color:#f92672>[</span> ! -d salmon_index <span style=color:#f92672>]</span> ; <span style=color:#66d9ef>then</span>
+    salmon index -t reference/human_transcriptome.fna -i salmon_index
+<span style=color:#66d9ef>fi</span>
+</code></pre></div><h4 id=522-quantifying-reads-using-salmon>5.2.2. Quantifying reads using <code>salmon</code></h4>
+<p>Now that we have our index built, we are ready to quantify our samples using the following command (<strong>this may take some time!</strong>):</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#75715e># Read quantification using 8 threads (-p 8)</span>
+cut -f5 samples.txt | xargs -i sh -c <span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span><span style=color:#e6db74>&#39;v={}; salmon quant -i salmon_index -l A \
+</span><span style=color:#e6db74>         -1 fastq/${v}/${v}_1.fastq.gz \
+</span><span style=color:#e6db74>         -2 fastq/${v}/${v}_2.fastq.gz \
+</span><span style=color:#e6db74>         -p 8 -o quants/${v}_quant&#39;</span>
+</code></pre></div><p>The read counts file <code>featureCounts_results.txt</code> can be imported in <code>R</code> for downstream data analysis. Similarly, we can import transcript-level estimates into <code>R</code> from the quantification files generated by <code>salmon</code>.</p>
+<p>In another tutorial, we will show how to process <code>featureCounts_results.txt</code> and the transcript level files from <code>salmon</code> for Differential Gene Expression Analysis using <code>DESeq2</code>, <code>edgeR</code>, or <code>limma-voom</code> in <code>R</code>.</p>
+<p>Find the Original source code for this tutorial <a href=https://github.com/rosericazondekon/bioinformatics-tuto/blob/main/RNAseq%20analysis/RNAseq_tutorial.ipynb>here</a>.</p>
+</p>
+</div>
+</div>
+</main><footer class=footer>
+<span>&copy; 2021 Roseric Azondekon</span>
+</footer>
+</body>
+</html>

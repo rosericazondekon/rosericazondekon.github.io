@@ -1,0 +1,267 @@
+<!doctype html><html lang=en><head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3TBYJJHRP3"></script>
+<style>:root{--accent-color:#FF4D4D}</style>
+<title>Bisulfite Treated Sequence Read Alignment</title>
+<meta name=description content="A tutorial to Bisulfite-treated DNA Methylation read alignment">
+<meta name=keywords content="blog,rosericazondekon,gazondekon,razondekon,gbedegnon,roseric,azondekon,dna,methylation,cpg-islands,bisulfite-seq,bam,sam,fastq,alignment">
+<meta property="og:url" content="https://rosericazondekon.github.io/posts/bisulfite-treated-read-align/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Bisulfite Treated Sequence Read Alignment">
+<meta property="og:description" content="A tutorial to Bisulfite-treated DNA Methylation read alignment">
+<meta property="og:image" content="/images/roz.webp">
+<meta name=twitter:card content="summary_large_image">
+<meta name=twitter:title content="Bisulfite Treated Sequence Read Alignment">
+<meta name=twitter:description content="A tutorial to Bisulfite-treated DNA Methylation read alignment">
+<meta property="twitter:domain" content="https://rosericazondekon.github.io/posts/bisulfite-treated-read-align/">
+<meta property="twitter:url" content="https://rosericazondekon.github.io/posts/bisulfite-treated-read-align/">
+<meta name=twitter:image content="/images/roz.webp">
+<link rel=canonical href=https://rosericazondekon.github.io/posts/bisulfite-treated-read-align/>
+<link rel=stylesheet type=text/css href=/css/normalize.min.css media=print onload="this.media='all'">
+<link rel=stylesheet type=text/css href=/css/main.css>
+<link disabled id=dark-theme rel=stylesheet href=/css/dark.css>
+<script src=/js/svg-injector.min.js></script>
+<script src=/js/feather-icons.min.js></script>
+<script src=/js/main.js></script>
+<link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.13.16/dist/katex.min.css integrity=sha384-6LkG2wmY8FK9E0vU9OOr8UvLwsaqUg9SETfpq4uTCN1agNe8HRdE9ABlk+fVx6gZ crossorigin=anonymous>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.13.16/dist/katex.min.js integrity=sha384-31El76TwmbHj4rF9DyLsygbq6xoIobG0W+jqXim+a3dU9W53tdH3A/ngRPxOzzaB crossorigin=anonymous></script>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.13.16/dist/contrib/auto-render.min.js integrity=sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl crossorigin=anonymous onload=renderMathInElement(document.body)></script>
+</head>
+<body>
+<script type=text/javascript>setThemeByUserPref()</script><header class=header>
+<nav class=header-nav>
+<div class=avatar>
+<a href=https://rosericazondekon.github.io/>
+<img src=/images/roz.webp alt=avatar>
+</a>
+</div>
+<div class=nav-title>
+<a class=nav-brand href=https://rosericazondekon.github.io/>Gbedegnon Roseric Azondekon</a>
+</div>
+<div class=nav-links>
+<div class=nav-link>
+<a href=/> Home </a>
+</div>
+<div class=nav-link>
+<a href=/posts/> Posts </a>
+</div>
+<div class=nav-link>
+<a href=/projects/> Projects </a>
+</div>
+<div class=nav-link>
+<a href=/tags/> Tags </a>
+</div>
+<div class=nav-link>
+<a href=/about/> About </a>
+</div>
+<div class=nav-link>
+<a href=https://github.com/rosericazondekon><span data-feather=github></span> </a>
+</div>
+<div class=nav-link>
+<a href=https://www.buymeacoffee.com/gazondekon><span data-feather=coffee></span> </a>
+</div>
+<div class=nav-link>
+<a href=/index.xml><span data-feather=rss></span> </a>
+</div>
+<span class=nav-icons-divider></span>
+<div class="nav-link dark-theme-toggle">
+<a>
+<span id=theme-toggle-icon data-feather=moon></span>
+</a>
+</div>
+<div class=nav-link id=hamburger-menu-toggle>
+<a>
+<span data-feather=menu></span>
+</a>
+</div>
+<ul class="nav-hamburger-list visibility-hidden">
+<li class=nav-item>
+<a href=/> Home </a>
+</li>
+<li class=nav-item>
+<a href=/posts/> Posts </a>
+</li>
+<li class=nav-item>
+<a href=/projects/> Projects </a>
+</li>
+<li class=nav-item>
+<a href=/tags/> Tags </a>
+</li>
+<li class=nav-item>
+<a href=/about/> About </a>
+</li>
+<li class=nav-item>
+<a href=https://github.com/rosericazondekon><span data-feather=github></span> </a>
+</li>
+<li class=nav-item>
+<a href=https://www.buymeacoffee.com/gazondekon><span data-feather=coffee></span> </a>
+</li>
+<li class=nav-item>
+<a href=/index.xml><span data-feather=rss></span> </a>
+</li>
+<li class="nav-item dark-theme-toggle">
+<a>
+<span id=theme-toggle-icon data-feather=moon></span>
+</a>
+</li>
+</ul>
+</div>
+</nav>
+</header>
+<main id=content>
+<div class="post container">
+<div class=post-header-section>
+<h1>Bisulfite Treated Sequence Read Alignment</h1>
+<small role=doc-subtitle>A tutorial to Bisulfite-treated DNA Methylation read alignment</small>
+<p class=post-date>
+January 8, 2022
+</p>
+<ul class=post-tags>
+<li class=post-tag><a href=/tags/dna>dna</a></li>
+<li class=post-tag><a href=/tags/methylation>methylation</a></li>
+<li class=post-tag><a href=/tags/cpg-islands>cpg-islands</a></li>
+<li class=post-tag><a href=/tags/bisulfite-seq>bisulfite-seq</a></li>
+<li class=post-tag><a href=/tags/bam>bam</a></li>
+<li class=post-tag><a href=/tags/sam>sam</a></li>
+<li class=post-tag><a href=/tags/fastq>fastq</a></li>
+<li class=post-tag><a href=/tags/alignment>alignment</a></li>
+</ul>
+</div>
+<div class=post-content>
+<p>
+<p><strong>Disclaimer:</strong> This tutorial was originally written on May 30, 2019.</p>
+<h2 id=introduction>Introduction</h2>
+<p>In this tutorial, we show you how to download raw Bisulfite-seq DNA methylation sequence data from the European instance of the SRA, which can be accessed via <a href=https://www.ebi.ac.uk/ena>https://www.ebi.ac.uk/ena</a>. On the European Nucleotide Archive (ENA) website, the sequencing reads are directly available in FASTQ or SRA formats, which will be explained below.</p>
+<p>For this tutorial, we need <a href=https://www.bioinformatics.babraham.ac.uk/projects/fastqc/><code>FastQC</code></a>, <a href=https://multiqc.info/><code>multiQC</code></a>, the <a href=https://hpc.nih.gov/apps/sratoolkit.html><code>SRA toolkit</code></a>, a powerful suite of tools designed to interact with SAM and BAM files called <a href=https://sourceforge.net/projects/samtools/files/><code>samtools</code></a>, and the <a href=https://github.com/FelixKrueger/Bismark><code>Bismark</code></a> aligner to align the Bisulfite-seq reads to the reference genome.</p>
+<p>All the above mentioned tools need to be installed and referenced in the environment variable <code>PATH</code>.</p>
+<p>We set our working directory to the <code>tuto</code> folder created in our first tutorial.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#a6e22e>setwd</span>(<span style=color:#e6db74>&#39;./tuto&#39;</span>)
+</code></pre></div><p>Let&rsquo;s first check if these requirements are met:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>fastqc --version
+</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>multiqc --version
+</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>fastq-dump --version
+</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>samtools --version
+</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>bismark --version
+</code></pre></div><p>If at least one of the above commands produces an error, please, check your installation of the tool and try again.</p>
+<p>Now let&rsquo;s create a working directory for our bisulfite-seq DNA methylation project (let&rsquo;s call it <code>tuto</code>).</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>mkdir -p tuto <span style=color:#f92672>&amp;&amp;</span> cd tuto
+</code></pre></div><h2 id=1-data-download>1. Data Download</h2>
+<p>To download a set of SRA files:</p>
+<ol>
+<li>
+<p>Go to <a href=https://www.ebi.ac.uk/ena>https://www.ebi.ac.uk/ena</a>.</p>
+</li>
+<li>
+<p>Search for the accession number of the project, e.g., SRP041828 (should be indicated in the published paper).</p>
+</li>
+<li>
+<p>There are several ways to start the download, here we show you how to do it through the command line interface on GNU/Linux.</p>
+<ul>
+<li>copy the link’s address of the &ldquo;SRA files&rdquo; column (right mouse click), go to the command line, move to the target directory, type: <code>wget &lt; link copied from the ENA website ></code></li>
+<li>If there are many samples as it is the case for the project referenced here (accession number: SRP041828), you can download the summary of the sample information from ENA by right-clicking on &ldquo;TEXT&rdquo; or &ldquo;TSV&rdquo; and copying the link location.</li>
+</ul>
+</li>
+</ol>
+<p>Now let&rsquo;s download the file from the link copied earlier.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>wget -O all_samples.txt <span style=color:#e6db74>&#34;https://www.ebi.ac.uk/ena/portal/api/filereport?\
+</span><span style=color:#e6db74>accession=PRJNA274258&amp;result=read_run&amp;fields=study_accession,sample_accession,\
+</span><span style=color:#e6db74>experiment_accession,run_accession,tax_id,scientific_name,fastq_ftp,\
+</span><span style=color:#e6db74>submitted_ftp,sra_ftp&amp;format=tsv&amp;download=true&amp;limit=0&#34;</span>
+</code></pre></div><p>You may try to open the <code>all_samples.txt</code> file with LibreOffice or Excel to view it. For this project, we are only interested in the paired-end first 4 Bisulfite-seq samples (2 normal cells samples vs 2 breast cancer cells samples). Since the first line in <code>all_samples.txt</code> contains the header, we will generate another file containing only the first 4 lines of <code>all_samples.txt</code> with the following command:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>sed <span style=color:#e6db74>&#39;1d&#39;</span> all_samples.txt &gt; all_samples2.txt
+head -4 all_samples2.txt &gt; samples.txt
+rm all_samples2.txt
+</code></pre></div><p>Now, let&rsquo;s create a new folder for our SRA files.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>mkdir -p sra_files
+</code></pre></div><p>Since the decommission of the SRA Fuse/FTP site on December 1, 2019, the <code>prefetch</code> utility included in the <code>SRA toolkit</code> is recommended.</p>
+<p>Notice that the accession number for the SRA files are located in the fourth column <code>run_accession</code> in all_samples.txt. We proceed to the download of the SRA files of the samples listed in samples.txt with the following code: (<strong>Attention: The download may take a long time!</strong>)</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#75715e># The command below may take too long to download.</span>
+cut -f4 samples.txt | xargs -i sh -c <span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>        <span style=color:#e6db74>&#39;run_accession={}; \
+</span><span style=color:#e6db74>         prefetch $run_accession --output-directory sra_files&#39;</span>
+</code></pre></div><h2 id=2-converting-sra-files-to-fastq-files>2. Converting SRA files to FASTQ files</h2>
+<p>Now that the download is complete, let&rsquo;s convert the SRA files into FASTQ files with the following command: (<strong>Attention: This may take a long time!</strong>)</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>cut -f4 samples.txt | xargs -i sh -c <span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>    <span style=color:#e6db74>&#39;run_accession={}; \
+</span><span style=color:#e6db74>     fastq-dump --outdir fastq/${run_accession} \
+</span><span style=color:#e6db74>                --gzip \
+</span><span style=color:#e6db74>                --skip-technical \
+</span><span style=color:#e6db74>                --split-3 sra_files/${run_accession}/${run_accession}.sra&#39;</span>
+</code></pre></div><h2 id=3-quality-control-of-the-fastq-files>3. Quality Control of the FASTQ files</h2>
+<p>Up to this point, we have all our Bisulfite-seq DNA methylation FASTQ files ready for Quality Control (QC) check. This is done with the <code>fastqc</code> tools developed by the Babraham Institute. Run the following command to perform QC check for all the samples: (<strong>This may take some time!</strong>)</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>cut -f4 samples.txt | xargs -i sh -c 
+    <span style=color:#e6db74>&#39;run_accession={}; \
+</span><span style=color:#e6db74>     mkdir -p fastqc_reports/${run_accession}; \
+</span><span style=color:#e6db74>     fastqc fastq/${run_accession}/*fastq.gz -o fastqc_reports/${run_accession}&#39;</span>
+</code></pre></div><p>Next, let&rsquo;s summarize the QC reports (for all the samples) into one unique report using <code>multiqc</code>:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>multiqc fastqc_reports --dirs -o multiQC_report/
+</code></pre></div><p>Let&rsquo;s examine the summary <code>multiqc</code> report either by double-clicking on <code>multiQC_report/multiqc_report.html</code> or by executing the following code:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>xdg-open multiQC_report/multiqc_report.html
+</code></pre></div><h2 id=4-read-alignment>4. Read Alignment</h2>
+<p>The assignment of sequencing reads to the most likely locus of origin is called read alignment or mapping and it is a crucial step in most types of high-throughput sequencing experiments.</p>
+<p>The general challenge of short read alignment is to map millions of reads accurately and in a reasonable time, despite the presence of sequencing errors, genomic variation and repetitive elements. The different alignment programs employ various strategies that are meant to speed up the process (e.g., by indexing the reference genome) and find a balance between mapping fidelity and error tolerance.</p>
+<h3 id=41-reference-genomes-and-annotation>4.1. Reference genomes and annotation</h3>
+<p>Genome sequences and annotation are often generated by consortia such as (mod)ENCODE, The Mouse Genome Project, The Berkeley Drosophila Genome Project, and many more. The results of these efforts can either be downloaded from individual websites set up by the respective consortia or from more comprehensive data bases such as the one hosted by the University of California, Santa Cruz (<a href=https://genome.ucsc.edu/>UCSC</a>) or the European genome resource (<a href=http://www.ensembl.org/>Ensembl</a>).</p>
+<p>Reference sequences are usually stored in plain text FASTA files that can either be compressed with the generic gzip command.</p>
+<p>The reference sequences file can be obtained from <a href=https://www.ncbi.nlm.nih.gov/genome/51>NCBI</a>, <a href=https://www.ensembl.org/info/data/ftp/index.html>ENSEMBL</a> or <a href=http://hgdownload.soe.ucsc.edu/downloads.html#human>UCSC Genome Browser</a>.</p>
+<p>For this DNA methylation (Bisulfite-seq) tutorial, we will align the reads against the genome (DNA) reference sequences. We obtain both the genome refernce sequences and our gene annotation files from <a href=http://hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/>UCSC</a>. This is very important as we intend to perform all downstream DNA methylation analysis using the <a href=https://bioconductor.org/packages/release/bioc/html/methylKit.html><code>methylKit</code></a> Bioconductor R package which works nominally with UCSC genome references.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#75715e># Download the latest human genome</span>
+wget -P reference http://hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz
+</code></pre></div><h3 id=42-aligning-reads-using-bismark-aligner>4.2. Aligning reads using <code>Bismark</code> aligner</h3>
+<h4 id=421-generate-genome-index>4.2.1. Generate genome index</h4>
+<p><strong>This step has to be performed only once per genome type (and alignment program)</strong>.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>bismark_genome_preparation --verbose ./reference
+</code></pre></div><h4 id=422-alignment>4.2.2. Alignment</h4>
+<p>This step has to be performed for each individual FASTQ file.</p>
+<p><strong>This step may take a long time! (may take several days to complete).</strong></p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#75715e># execute Bismark aligner</span>
+cut -f4 samples.txt | xargs -i bash -c <span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>  <span style=color:#e6db74>&#39;run_accession={}; 
+</span><span style=color:#e6db74>  mkdir -p alignment_Bismark/${run_accession}; \
+</span><span style=color:#e6db74>  bismark --parallel 8 
+</span><span style=color:#e6db74>          --gzip \
+</span><span style=color:#e6db74>          --fastq \
+</span><span style=color:#e6db74>          --output_dir alignment_Bismark/${run_accession} \
+</span><span style=color:#e6db74>          --genome ./reference -1 fastq/${run_accession}/${run_accession}_1.fastq.gz \
+</span><span style=color:#e6db74>                               -2 fastq/${run_accession}/${run_accession}_2.fastq.gz&#39;</span>
+</code></pre></div><h4 id=423-sorting-bam-files-and-converting-to-sam-files>4.2.3. Sorting BAM files and converting to SAM files</h4>
+<p>We sort sort the <code>BAM</code> files using the <code>samtools sort</code> command:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#75715e># Sorting the bam files and converting to </span>
+<span style=color:#66d9ef>for</span> i in alignment_Bismark/*/*; <span style=color:#66d9ef>do</span>
+    <span style=color:#66d9ef>if</span> <span style=color:#f92672>[</span> <span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>i<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span> !<span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>i%pe.bam<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span> <span style=color:#f92672>]</span>;<span style=color:#66d9ef>then</span>
+        samtools sort -l <span style=color:#ae81ff>0</span> <span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>                      -T <span style=color:#66d9ef>$(</span>dirname <span style=color:#e6db74>${</span>i<span style=color:#e6db74>}</span><span style=color:#66d9ef>)</span>/<span style=color:#66d9ef>$(</span>basename <span style=color:#e6db74>${</span>i<span style=color:#e6db74>}</span> <span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>                                  _1_bismark_bt2_pe.bam<span style=color:#66d9ef>)</span>_temp <span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>                      -O sam -@ <span style=color:#ae81ff>8</span> <span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>                      -o <span style=color:#66d9ef>$(</span>dirname <span style=color:#e6db74>${</span>i<span style=color:#e6db74>}</span><span style=color:#66d9ef>)</span>/<span style=color:#66d9ef>$(</span>basename <span style=color:#e6db74>${</span>i<span style=color:#e6db74>}</span> .bam<span style=color:#66d9ef>)</span>.sort.sam <span style=color:#e6db74>${</span>i<span style=color:#e6db74>}</span>
+    <span style=color:#66d9ef>fi</span>
+<span style=color:#66d9ef>done</span>
+</code></pre></div><p>Either <a href=https://www.bioinformatics.babraham.ac.uk/projects/download.html#seqmonk>SeqMonk</a> or the the <a href=https://software.broadinstitute.org/software/igv/>Integrative Genomics Viewer (IGV)</a> can be used to visualize the resulting sorted <code>SAM</code> files.</p>
+<p>We will later use the <code>methylKit</code> Bioconductor R package to import the methylation data into <code>R</code> from the sorted <code>SAM</code> files.</p>
+<h2 id=5-methylation-extraction-using-bismark-methylation-extractor>5. Methylation extraction using Bismark methylation extractor</h2>
+<p>With the <code>bismark_methylation_extractor</code> command, we extract the methylation call for every single Cytosine analyzed. This process takes as input the resulting <code>BAM</code> file from <code>Bismark</code> aligner. The <code>bismark_methylation_extractor</code> command writes the position of every single Cytosine to a new output file, depending on its context (CpG, CHG or CHH), whereby methylated Cytosines are labelled as forward reads (+), non-methylated Cytosines as reverse reads (-).</p>
+<p><code>SeqMonk</code>, a genome viewer, can be used to visualize the output files.</p>
+<p>We store the output of the <code>Bismark</code> methylation extractor in the <code>methylation_data</code> folder.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#75715e># Extract methylation data</span>
+cut -f4 samples.txt | xargs -i bash -c <span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>        <span style=color:#e6db74>&#39;run_accession={}; \
+</span><span style=color:#e6db74>         mkdir -p bismark_methCalls/${run_accession}; \
+</span><span style=color:#e6db74>         bismark_methylation_extractor \
+</span><span style=color:#e6db74>              --parallel 8 \
+</span><span style=color:#e6db74>              --gzip \
+</span><span style=color:#e6db74>              --bedGraph \
+</span><span style=color:#e6db74>              --buffer_size 40G \
+</span><span style=color:#e6db74>              --merge_non_CpG \
+</span><span style=color:#e6db74>              --comprehensive \
+</span><span style=color:#e6db74>              --output bismark_methCalls/${run_accession} alignment_Bismark/${run_accession}/*_pe.bam&#39;</span>
+</code></pre></div><p>In another tutorial, we will analyze DNA methylation data from the generated sorted SAM files from this tutorial using the <code>MethylKit</code> Bioconductor package in R.</p>
+<p>Find the Original source code for this tutorial <a href=https://github.com/rosericazondekon/bioinformatics-tuto/blob/main/DNA%20methylation%20analysis/bisulfite_seq_tuto.ipynb>here</a>.</p>
+</p>
+</div>
+</div>
+</main><footer class=footer>
+<span>&copy; 2022 Roseric Azondekon</span>
+</footer>
+</body>
+</html>

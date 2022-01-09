@@ -253,12 +253,14 @@ cut -f4 samples.txt | xargs -i sh -c <span style=color:#ae81ff>\
 <p>Both reference sequences and GTF annotation file can be obtained either from <a href=https://www.ncbi.nlm.nih.gov/genome/51>NCBI</a>, <a href=https://www.ensembl.org/info/data/ftp/index.html>ENSEMBL</a> or <a href=http://hgdownload.soe.ucsc.edu/downloads.html#human>UCSC Genome Browser</a>.</p>
 <p>While it is usually faster to align against a cDNA reference sequence (cDNA), in this tutorial, we will align the reads against the genome (DNA) reference sequences. We obtain both the genome refernce sequences and our gene annotation files from <a href=https://www.ensembl.org/info/data/ftp/index.html>ENSEMBL</a>.</p>
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#75715e># Download the latest human genome</span>
-wget -P reference <span style=color:#ae81ff>\
-</span><span style=color:#ae81ff></span>ftp://ftp.ensembl.org/pub/release-93/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
+wget -P reference ftp://ftp.ensembl.org/pub/release-93/fasta<span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
 </code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#75715e># Decompress genome sequence file and rename it</span>
-gzip -dk &lt; reference/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz &gt; reference/human_genome.fa
+gzip -dk &lt; reference/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz &gt; <span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>reference/human_genome.fa
 </code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#75715e># Download GTF annotation file</span>
-wget -P annotation ftp://ftp.ensembl.org/pub/release-95/gtf/homo_sapiens/Homo_sapiens.GRCh38.95.gtf.gz
+wget -P annotation ftp://ftp.ensembl.org/pub/release-95/gtf<span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>/homo_sapiens/Homo_sapiens.GRCh38.95.gtf.gz
 </code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#75715e># Decompress gene annotation file and rename it</span>
 gzip -dk &lt; annotation/Homo_sapiens.GRCh38.95.gtf.gz &gt; annotation/gene_annotation.gtf
 </code></pre></div><h3 id=42-aligning-reads-using-star>4.2. Aligning reads using STAR</h3>
@@ -295,8 +297,8 @@ cut -f5 samples.txt | xargs -i sh -c <span style=color:#ae81ff>\
 </span><span style=color:#e6db74>              --twopassMode Basic \
 </span><span style=color:#e6db74>              --runThreadN 10&#39;</span>
 </code></pre></div><h4 id=423-bam-file-indexing>4.2.3. BAM file indexing</h4>
-<p>Most downstream applications like the <a href=https://software.broadinstitute.org/software/igv/>Integrative Genomics Viewer (IGV)</a> will require a .BAM.BAI file together with every BAM file to quickly access the BAM files without having to load them into memory.</p>
-<p>To obtain these index, let&rsquo;s now index all the BAM files within the &lsquo;alignment_STAR&rsquo; folder using <code>samtools</code>.</p>
+<p>Most downstream applications like the <a href=https://software.broadinstitute.org/software/igv/>Integrative Genomics Viewer (IGV)</a> will require a <code>.BAM.BAI</code> file together with every BAM file to quickly access the BAM files without having to load them into memory.</p>
+<p>To obtain these <code>.BAM.BAI</code> files, let&rsquo;s index all the BAM files within the <code>alignment_STAR</code> folder using <code>samtools</code>.</p>
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#66d9ef>for</span> i in alignment_STAR/*; <span style=color:#66d9ef>do</span>
     <span style=color:#66d9ef>if</span> <span style=color:#f92672>[</span> <span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>i<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span> !<span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>i%.bam<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span> <span style=color:#f92672>]</span>;<span style=color:#66d9ef>then</span>
         samtools index <span style=color:#e6db74>${</span>i<span style=color:#e6db74>}</span>

@@ -218,16 +218,16 @@ wget -P reference http://hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#75715e># execute Bismark aligner</span>
 cut -f4 samples.txt | xargs -i bash -c <span style=color:#ae81ff>\
 </span><span style=color:#ae81ff></span>  <span style=color:#e6db74>&#39;run_accession={}; 
-</span><span style=color:#e6db74>  mkdir -p alignment_Bismark/${run_accession}; \
-</span><span style=color:#e6db74>  bismark --parallel 8 
-</span><span style=color:#e6db74>          --gzip \
-</span><span style=color:#e6db74>          --fastq \
-</span><span style=color:#e6db74>          --output_dir alignment_Bismark/${run_accession} \
-</span><span style=color:#e6db74>          --genome ./reference -1 fastq/${run_accession}/${run_accession}_1.fastq.gz \
-</span><span style=color:#e6db74>                               -2 fastq/${run_accession}/${run_accession}_2.fastq.gz&#39;</span>
+</span><span style=color:#e6db74>   mkdir -p alignment_Bismark/${run_accession}; \
+</span><span style=color:#e6db74>   bismark --parallel 8 
+</span><span style=color:#e6db74>           --gzip \
+</span><span style=color:#e6db74>           --fastq \
+</span><span style=color:#e6db74>           --output_dir alignment_Bismark/${run_accession} \
+</span><span style=color:#e6db74>           --genome ./reference -1 fastq/${run_accession}/${run_accession}_1.fastq.gz \
+</span><span style=color:#e6db74>                                -2 fastq/${run_accession}/${run_accession}_2.fastq.gz&#39;</span>
 </code></pre></div><h4 id=423-sorting-bam-files-and-converting-to-sam-files>4.2.3. Sorting BAM files and converting to SAM files</h4>
 <p>We sort sort the <code>BAM</code> files using the <code>samtools sort</code> command:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#75715e># Sorting the bam files and converting to </span>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#75715e># Sorting the bam files and converting them to sam files</span>
 <span style=color:#66d9ef>for</span> i in alignment_Bismark/*/*; <span style=color:#66d9ef>do</span>
     <span style=color:#66d9ef>if</span> <span style=color:#f92672>[</span> <span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>i<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span> !<span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>i%pe.bam<span style=color:#e6db74>}</span><span style=color:#e6db74>&#34;</span> <span style=color:#f92672>]</span>;<span style=color:#66d9ef>then</span>
         samtools sort -l <span style=color:#ae81ff>0</span> <span style=color:#ae81ff>\
@@ -254,7 +254,8 @@ cut -f4 samples.txt | xargs -i bash -c <span style=color:#ae81ff>\
 </span><span style=color:#e6db74>              --buffer_size 40G \
 </span><span style=color:#e6db74>              --merge_non_CpG \
 </span><span style=color:#e6db74>              --comprehensive \
-</span><span style=color:#e6db74>              --output bismark_methCalls/${run_accession} alignment_Bismark/${run_accession}/*_pe.bam&#39;</span>
+</span><span style=color:#e6db74>              --output bismark_methCalls/${run_accession} \
+</span><span style=color:#e6db74>                       alignment_Bismark/${run_accession}/*_pe.bam&#39;</span>
 </code></pre></div><p>In another tutorial, we will analyze DNA methylation data from the generated sorted SAM files from this tutorial using the <code>MethylKit</code> Bioconductor package in R.</p>
 <p>Find the Original source code for this tutorial <a href=https://github.com/rosericazondekon/bioinformatics-tuto/blob/main/DNA%20methylation%20analysis/bisulfite_seq_tuto.ipynb>here</a>.</p>
 </p>

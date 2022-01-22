@@ -188,7 +188,7 @@ methyl_files
     sampleTable <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>data.frame</span>(condition <span style=color:#f92672>=</span> conditions[i])
     <span style=color:#a6e22e>rownames</span>(sampleTable) <span style=color:#f92672>&lt;-</span> samples[i]
     <span style=color:#a6e22e>assign</span>(
-        <span style=color:#a6e22e>paste0</span>(<span style=color:#e6db74>&#34;methyl_data&#34;</span>,i),
+        <span style=color:#a6e22e>paste0</span>(<span style=color:#e6db74>&#34;methyl_data&#34;</span>, i),
         <span style=color:#a6e22e>read.bismark</span>(methyl_files[i],
                      loci <span style=color:#f92672>=</span> <span style=color:#66d9ef>NULL</span>,
                      colData <span style=color:#f92672>=</span> sampleTable,

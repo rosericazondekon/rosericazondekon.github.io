@@ -317,7 +317,8 @@ annotation <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>getA
          annoTrack<span style=color:#f92672>=</span>annotation)
 </code></pre></div><h2 id=5-detecting-large-scale-methylation-blocks>5. Detecting large-scale methylation blocks</h2>
 <p>In some applications, such as cancer, it is of interest to effectively &lsquo;zoom out&rsquo; in order to detect larger (lower-resolution) methylation blocks on the order of hundreds of thousands to millions of bases.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># run the results for a subset of 300,000 CpGs in the interest of computation time.</span>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Run the results for a subset of 300,000 CpGs in the interest</span>
+<span style=color:#75715e># of computation time.</span>
 <span style=color:#75715e># Run with a single core if it fails on multiple cores</span>
 blocks <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>dmrseq</span>(bs <span style=color:#f92672>=</span> combined_data.filtered[120001<span style=color:#f92672>:</span><span style=color:#ae81ff>420000</span>, ],
                  cutoff <span style=color:#f92672>=</span> <span style=color:#ae81ff>0.05</span>,

@@ -171,8 +171,8 @@ new.packages <span style=color:#f92672>&lt;-</span> packages[<span style=color:#
 </code></pre></div><h2 id=1-obtaining-methylation-data-from-bismark-extraction-methylation-calls>1. Obtaining methylation data from Bismark extraction methylation calls</h2>
 <p>We read in the methylation calls directly from the <code>Bismark</code> methylation extractor files obtained from the <a href=/posts/bisulfite-treated-read-align>previous tutoral</a>. The files are located within the <code>bismark_methCalls</code> folder (see <a href=/posts/bisulfite-treated-read-align>previous tutorial</a>). For that purpose, we use the <code>read.bismark()</code> function from the <code>bsseq</code> Bioconductor R package as described below:</p>
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Get sample data from files</span>
-files_loc <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>file.path</span>(<span style=color:#a6e22e>getwd</span>(),<span style=color:#e6db74>&#39;bismark_methCalls&#39;</span>)
-samples <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>list.dirs</span>(files_loc,full.names <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>,recursive <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>)
+files_loc <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>file.path</span>(<span style=color:#a6e22e>getwd</span>(), <span style=color:#e6db74>&#39;bismark_methCalls&#39;</span>)
+samples <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>list.dirs</span>(files_loc, full.names <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>, recursive <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>)
 samples
 </code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Define conditions</span>
 conditions <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>c</span>(<span style=color:#a6e22e>rep</span>(<span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;normal&#34;</span>, <span style=color:#e6db74>&#34;cancer&#34;</span>), each <span style=color:#f92672>=</span> <span style=color:#ae81ff>2</span>))
@@ -222,7 +222,8 @@ combined_data
 combined_data.fit <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>BSmooth</span>(
     BSseq <span style=color:#f92672>=</span> combined_data, 
     BPPARAM <span style=color:#f92672>=</span> <span style=color:#a6e22e>MulticoreParam</span>(workers <span style=color:#f92672>=</span> <span style=color:#ae81ff>7</span>), 
-    verbose <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
+    verbose <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>
+)
 </code></pre></div><p>Since the previous step is time consuming and computationally expensive, let&rsquo;s save the smoothed data:</p>
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Saving the smoothed data</span>
 <span style=color:#a6e22e>save</span>(combined_data.fit, file <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;combined_data_fit.rda&#34;</span>)
@@ -252,10 +253,13 @@ combined_data.filtered <span style=color:#f92672>&lt;-</span> combined_data[keep
 </code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>combined_data.filtered
 </code></pre></div><p>For t-statistics, we will only keep CpGs where at least 2 cancer samples and at least 2 normal samples have at least 2x in coverage.</p>
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>combined_data.cov <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>getCoverage</span>(combined_data.fit)
+
 keep.index2 <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>which</span>(<span style=color:#a6e22e>rowSums</span>(combined_data.cov[,
                              combined_data<span style=color:#f92672>$</span>condition <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;cancer&#34;</span>] <span style=color:#f92672>&gt;=</span> <span style=color:#ae81ff>2</span>) <span style=color:#f92672>&gt;=</span> <span style=color:#ae81ff>2</span> <span style=color:#f92672>&amp;</span>
                      <span style=color:#a6e22e>rowSums</span>(combined_data.cov[, 
-                             combined_data<span style=color:#f92672>$</span>condition <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;normal&#34;</span>] <span style=color:#f92672>&gt;=</span> <span style=color:#ae81ff>2</span>) <span style=color:#f92672>&gt;=</span> <span style=color:#ae81ff>2</span>)
+                             combined_data<span style=color:#f92672>$</span>condition <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;normal&#34;</span>] <span style=color:#f92672>&gt;=</span> <span style=color:#ae81ff>2</span>) <span style=color:#f92672>&gt;=</span> <span style=color:#ae81ff>2</span>
+              )
+
 <span style=color:#a6e22e>length</span>(keep.index2)
 </code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>combined_data.fit2 <span style=color:#f92672>&lt;-</span> combined_data.fit[keep.index2]
 </code></pre></div><p>Let&rsquo;s first arrange the two groups for the t-test:</p>
@@ -267,14 +271,14 @@ grp1
 grp2
 </code></pre></div><p>We now compute t-statistics with the <code>BSmooth.tstat</code> function provided by the <code>BSseq</code> Bioconductor R package.</p>
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>combined_data.tstat <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>BSmooth.tstat</span>(
-                          combined_data.fit2,
-                          group1 <span style=color:#f92672>=</span> grp2,
-                          group2 <span style=color:#f92672>=</span> grp1, 
-                          estimate.var <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;group2&#34;</span>,
-                          local.correct <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>,
-                          mc.cores <span style=color:#f92672>=</span> <span style=color:#ae81ff>8</span>,
-                          verbose <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>
-                      )
+    combined_data.fit2,
+    group1 <span style=color:#f92672>=</span> grp2,
+    group2 <span style=color:#f92672>=</span> grp1,
+    estimate.var <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;group2&#34;</span>,
+    local.correct <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>,
+    mc.cores <span style=color:#f92672>=</span> <span style=color:#ae81ff>8</span>,
+    verbose <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>
+)
 </code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>combined_data.tstat
 </code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>stats <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>as.data.frame</span>(combined_data.tstat<span style=color:#f92672>@</span>stats)
 <span style=color:#a6e22e>head</span>(stats)
@@ -290,7 +294,8 @@ grp2
 </code></pre></div><p>The “blocks” of hypomethylation are clearly visible in the marginal distribution of the uncorrected t-statistics.</p>
 <h2 id=4-finding-differentially-methylated-regions-dmrs>4. Finding Differentially Methylated Regions (DMRs)</h2>
 <p>We use the <code>dmrseq</code> function of the <code>dmrseq</code> Bioconductor R package to compute the DMRs.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># run the results for a subset of 60,000 CpGs in the interest of computation time.</span>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># run the results for a subset of 60,000 CpGs in the interest</span>
+<span style=color:#75715e># of computation time</span>
 <span style=color:#75715e># Run with a single core if it fails on multiple cores (workers = 1)</span>
 dmrs <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>dmrseq</span>(bs <span style=color:#f92672>=</span> combined_data.filtered[240001<span style=color:#f92672>:</span><span style=color:#ae81ff>300000</span>, ],
                cutoff <span style=color:#f92672>=</span> <span style=color:#ae81ff>0.05</span>,
@@ -318,7 +323,7 @@ annotation <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>getA
 </code></pre></div><h2 id=5-detecting-large-scale-methylation-blocks>5. Detecting large-scale methylation blocks</h2>
 <p>In some applications, such as cancer, it is of interest to effectively &lsquo;zoom out&rsquo; in order to detect larger (lower-resolution) methylation blocks on the order of hundreds of thousands to millions of bases.</p>
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Run the results for a subset of 300,000 CpGs in the interest</span>
-<span style=color:#75715e># of computation time.</span>
+<span style=color:#75715e># of computation time</span>
 <span style=color:#75715e># Run with a single core if it fails on multiple cores</span>
 blocks <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>dmrseq</span>(bs <span style=color:#f92672>=</span> combined_data.filtered[120001<span style=color:#f92672>:</span><span style=color:#ae81ff>420000</span>, ],
                  cutoff <span style=color:#f92672>=</span> <span style=color:#ae81ff>0.05</span>,

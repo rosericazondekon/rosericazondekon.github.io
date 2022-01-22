@@ -170,7 +170,7 @@ new.packages <span style=color:#f92672>&lt;-</span> packages[<span style=color:#
     <span style=color:#a6e22e>install.packages</span>(new.packages, repos <span style=color:#f92672>=</span> repositories)
 }
 
-<span style=color:#a6e22e>lapply</span>(packages, require, character.only <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
+<span style=color:#a6e22e>lapply</span>(packages, library, character.only <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
 </code></pre></div><p>Let&rsquo;s load our samples' information from the <code>samples.txt</code> (see <a href=/posts/rnaseq-read-align-quant>RNA-seq tutorial</a>)).</p>
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>samples <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>read.table</span>(<span style=color:#e6db74>&#34;samples.txt&#34;</span>)
 <span style=color:#a6e22e>head</span>(samples)

@@ -161,7 +161,7 @@ repositories <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>c<
 packages <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;bsseq&#34;</span>, <span style=color:#e6db74>&#34;bsseqdata&#34;</span>, <span style=color:#e6db74>&#34;dmrseq&#34;</span>, <span style=color:#e6db74>&#34;DelayedMatrixStats&#34;</span>)
 
 <span style=color:#75715e># Install and load missing packages</span>
-new.packages <span style=color:#f92672>&lt;-</span> packages[<span style=color:#f92672>!</span>(packages <span style=color:#f92672>%in%</span> <span style=color:#a6e22e>installed.packages</span>()[,<span style=color:#e6db74>&#34;Package&#34;</span>])]
+new.packages <span style=color:#f92672>&lt;-</span> packages[<span style=color:#f92672>!</span>(packages <span style=color:#f92672>%in%</span> <span style=color:#a6e22e>installed.packages</span>()[, <span style=color:#e6db74>&#34;Package&#34;</span>])]
 
 <span style=color:#a6e22e>if</span>(<span style=color:#a6e22e>length</span>(new.packages)){
     <span style=color:#a6e22e>install.packages</span>(new.packages, repos <span style=color:#f92672>=</span> repositories)
@@ -180,7 +180,7 @@ sampleData <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>data
 <span style=color:#a6e22e>rownames</span>(sampleData) <span style=color:#f92672>&lt;-</span> samples
 sampleData
 </code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>methyl_files <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>list.files</span>(files_loc, <span style=color:#e6db74>&#34;\\cov.gz$&#34;</span>, 
-                           full.names<span style=color:#f92672>=</span><span style=color:#66d9ef>TRUE</span>, recursive<span style=color:#f92672>=</span><span style=color:#66d9ef>TRUE</span>)
+                           full.names <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, recursive <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
 methyl_files
 </code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Will generate specifically for this set of data, 4 variables: </span>
 <span style=color:#75715e># methyl_data1, methyl_data2, methyl_data3, methyl_data4</span>

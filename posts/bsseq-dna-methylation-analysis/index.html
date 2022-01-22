@@ -293,7 +293,7 @@ grp2
        col <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;red&#34;</span>, <span style=color:#e6db74>&#34;blue&#34;</span>), lty <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>)
 </code></pre></div><p>The “blocks” of hypomethylation are clearly visible in the marginal distribution of the uncorrected t-statistics.</p>
 <h2 id=4-finding-differentially-methylated-regions-dmrs>4. Finding Differentially Methylated Regions (DMRs)</h2>
-<p>We use the <code>dmrseq</code> function of the <code>dmrseq</code> Bioconductor R package to compute the DMRs.</p>
+<p>We use the <code>dmrseq()</code> function of the <code>dmrseq</code> Bioconductor R package to compute the DMRs.</p>
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># run the results for a subset of 60,000 CpGs in the interest</span>
 <span style=color:#75715e># of computation time</span>
 <span style=color:#75715e># Run with a single core if it fails on multiple cores (workers = 1)</span>

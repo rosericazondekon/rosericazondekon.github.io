@@ -214,22 +214,46 @@ file.list2
 </code></pre></div><h2 id=2-quality-check-and-basic-features-of-the-data>2. Quality check and basic features of the data</h2>
 <p>Let&rsquo;s check the basic stats about the methylation data such as coverage and percent methylation.</p>
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Descriptive statistics on the samples</span>
-<span style=color:#a6e22e>getMethylationStats</span>(metyl.obj[[1]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) <span style=color:#75715e># normal1</span>
-<span style=color:#a6e22e>getMethylationStats</span>(metyl.obj[[2]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) <span style=color:#75715e># normal2</span>
-<span style=color:#a6e22e>getMethylationStats</span>(metyl.obj[[3]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) <span style=color:#75715e># cancer1</span>
-<span style=color:#a6e22e>getMethylationStats</span>(metyl.obj[[4]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) <span style=color:#75715e># cancer2</span>
+
+<span style=color:#75715e># normal1</span>
+<span style=color:#a6e22e>getMethylationStats</span>(metyl.obj[[1]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+
+<span style=color:#75715e># normal2</span>
+<span style=color:#a6e22e>getMethylationStats</span>(metyl.obj[[2]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+
+<span style=color:#75715e># cancer1</span>
+<span style=color:#a6e22e>getMethylationStats</span>(metyl.obj[[3]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+
+<span style=color:#75715e># cancer2</span>
+<span style=color:#a6e22e>getMethylationStats</span>(metyl.obj[[4]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
 </code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Histogram of % CpG methylation</span>
-<span style=color:#a6e22e>getMethylationStats</span>(metyl.obj[[1]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) <span style=color:#75715e># normal1</span>
-<span style=color:#a6e22e>getMethylationStats</span>(metyl.obj[[2]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) <span style=color:#75715e># normal2</span>
-<span style=color:#a6e22e>getMethylationStats</span>(metyl.obj[[3]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) <span style=color:#75715e># cancer1</span>
-<span style=color:#a6e22e>getMethylationStats</span>(metyl.obj[[4]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) <span style=color:#75715e># cancer2</span>
+
+<span style=color:#75715e># normal1</span>
+<span style=color:#a6e22e>getMethylationStats</span>(metyl.obj[[1]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+
+<span style=color:#75715e># normal2</span>
+<span style=color:#a6e22e>getMethylationStats</span>(metyl.obj[[2]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+
+<span style=color:#75715e># cancer1</span>
+<span style=color:#a6e22e>getMethylationStats</span>(metyl.obj[[3]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+
+<span style=color:#75715e># cancer2</span>
+<span style=color:#a6e22e>getMethylationStats</span>(metyl.obj[[4]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
 </code></pre></div><p>From the histograms generated by the previous scripts, the numbers on the bars represent the percentage of locations that are contained in each bin. Percent methylation histogram are expected to have two peaks on both ends.</p>
 <p>Alternatively, the histogram of the read coverage per base information can be plotted as well. Experiments that are highly suffering from PCR duplication bias are expected to have a secondary peak towards the right hand side of the histogram.</p>
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Histogram of CpG coverage</span>
-<span style=color:#a6e22e>getCoverageStats</span>(metyl.obj[[1]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) <span style=color:#75715e># normal1</span>
-<span style=color:#a6e22e>getCoverageStats</span>(metyl.obj[[2]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) <span style=color:#75715e># normal2</span>
-<span style=color:#a6e22e>getCoverageStats</span>(metyl.obj[[3]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) <span style=color:#75715e># cancer1</span>
-<span style=color:#a6e22e>getCoverageStats</span>(metyl.obj[[4]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) <span style=color:#75715e># cancer2</span>
+
+<span style=color:#75715e># normal1</span>
+<span style=color:#a6e22e>getCoverageStats</span>(metyl.obj[[1]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+
+<span style=color:#75715e># normal2</span>
+<span style=color:#a6e22e>getCoverageStats</span>(metyl.obj[[2]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+
+<span style=color:#75715e># cancer1</span>
+<span style=color:#a6e22e>getCoverageStats</span>(metyl.obj[[3]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+
+<span style=color:#75715e># cancer2</span>
+<span style=color:#a6e22e>getCoverageStats</span>(metyl.obj[[4]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
 </code></pre></div><h2 id=3-filtering-samples-based-on-read-coverage>3. Filtering samples based on read coverage</h2>
 <p>It is a good practice to filter samples based on coverage, and discard bases that have coverage below 10X bases that have more than 99.9th percentile of coverage in each sample. This can be achieved with the following code:</p>
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>filtered.metyl.obj <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>filterByCoverage</span>(
@@ -242,15 +266,31 @@ file.list2
 </code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>combined_data.filtered
 </code></pre></div><p>Let&rsquo;s assess once again the basic stats about the methylation data such as coverage and percent methylation.</p>
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Histogram of % CpG methylation</span>
-<span style=color:#a6e22e>getMethylationStats</span>(filtered.metyl.obj[[1]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) <span style=color:#75715e># normal1</span>
-<span style=color:#a6e22e>getMethylationStats</span>(filtered.metyl.obj[[2]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) <span style=color:#75715e># normal2</span>
-<span style=color:#a6e22e>getMethylationStats</span>(filtered.metyl.obj[[3]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) <span style=color:#75715e># cancer1</span>
-<span style=color:#a6e22e>getMethylationStats</span>(filtered.metyl.obj[[4]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) <span style=color:#75715e># cancer2</span>
+
+<span style=color:#75715e># normal1</span>
+<span style=color:#a6e22e>getMethylationStats</span>(filtered.metyl.obj[[1]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>)
+
+<span style=color:#75715e># normal2</span>
+<span style=color:#a6e22e>getMethylationStats</span>(filtered.metyl.obj[[2]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+
+<span style=color:#75715e># cancer1</span>
+<span style=color:#a6e22e>getMethylationStats</span>(filtered.metyl.obj[[3]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+
+<span style=color:#75715e># cancer2</span>
+<span style=color:#a6e22e>getMethylationStats</span>(filtered.metyl.obj[[4]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
 </code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Histogram of CpG coverage</span>
-<span style=color:#a6e22e>getCoverageStats</span>(filtered.metyl.obj[[1]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) <span style=color:#75715e># normal1</span>
-<span style=color:#a6e22e>getCoverageStats</span>(filtered.metyl.obj[[2]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) <span style=color:#75715e># normal2</span>
-<span style=color:#a6e22e>getCoverageStats</span>(filtered.metyl.obj[[3]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) <span style=color:#75715e># cancer1</span>
-<span style=color:#a6e22e>getCoverageStats</span>(filtered.metyl.obj[[4]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) <span style=color:#75715e># cancer2</span>
+
+<span style=color:#75715e># normal1</span>
+<span style=color:#a6e22e>getCoverageStats</span>(filtered.metyl.obj[[1]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+
+<span style=color:#75715e># normal2</span>
+<span style=color:#a6e22e>getCoverageStats</span>(filtered.metyl.obj[[2]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+
+<span style=color:#75715e># cancer1</span>
+<span style=color:#a6e22e>getCoverageStats</span>(filtered.metyl.obj[[3]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+
+<span style=color:#75715e># cancer2</span>
+<span style=color:#a6e22e>getCoverageStats</span>(filtered.metyl.obj[[4]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
 </code></pre></div><h2 id=4-sample-correlation>4. Sample correlation</h2>
 <p>To conduct sample correlation, we will need to merge all samples to one object for base-pair locations that are covered in all samples.</p>
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Merging all samples</span>
@@ -334,8 +374,12 @@ url <span style=color:#f92672>&lt;-</span> <span style=color:#e6db74>&#34;https:
 </code></pre></div><p>Similarly, we can read the CpG island annotation and annotate our differentially methylated bases/regions with them.</p>
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># read the shores and flanking regions and name the flanks as shores </span>
 <span style=color:#75715e># and CpG islands as CpGi</span>
-cpg.obj <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>readFeatureFlank</span>(<span style=color:#a6e22e>file.path</span>(<span style=color:#a6e22e>getwd</span>(), <span style=color:#e6db74>&#34;annotation&#34;</span>, <span style=color:#e6db74>&#34;hg38_RefSeq.bed.gz&#34;</span>),
-                            feature.flank.name <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;CpGi&#34;</span>, <span style=color:#e6db74>&#34;shores&#34;</span>))
+cpg.obj <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>readFeatureFlank</span>(
+              <span style=color:#a6e22e>file.path</span>(<span style=color:#a6e22e>getwd</span>(), 
+                        <span style=color:#e6db74>&#34;annotation&#34;</span>, 
+                        <span style=color:#e6db74>&#34;hg38_RefSeq.bed.gz&#34;</span>),
+                        feature.flank.name <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;CpGi&#34;</span>, <span style=color:#e6db74>&#34;shores&#34;</span>)
+)
 </code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># convert methylDiff object to GRanges and annotate</span>
 diffCpGann <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>annotateWithFeatureFlank</span>(
                   <span style=color:#a6e22e>as</span>(myDiff25p,<span style=color:#e6db74>&#34;GRanges&#34;</span>), 
@@ -374,7 +418,7 @@ diffAnn <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>annotat
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>genomation<span style=color:#f92672>::</span><span style=color:#a6e22e>plotTargetAnnotation</span>(
               diffCpGann, 
               col <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;green&#34;</span>, <span style=color:#e6db74>&#34;gray&#34;</span>, <span style=color:#e6db74>&#34;white&#34;</span>), 
-              main <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;differential methylation annotation&#34;</span>
+              main <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Differential methylation annotation&#34;</span>
 )
 </code></pre></div><p>Find the Original source code for this tutorial <a href=https://github.com/rosericazondekon/bioinformatics-tuto/blob/main/DNA%20methylation%20analysis/dna_methylation_tuto.ipynb>here</a>.</p>
 </p>

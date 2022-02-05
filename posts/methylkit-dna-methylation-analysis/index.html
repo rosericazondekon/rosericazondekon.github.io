@@ -361,7 +361,7 @@ myDiff25p <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>getMe
               )
 </code></pre></div><h2 id=8-annotating-differential-methylation-events>8. Annotating differential methylation events</h2>
 <p>We may annotate the differentially methylated regions/bases based on gene annotation. We therefore need to read the gene annotation from a bed file and annotate the differentially methylated regions with that information. Similar gene annotation can be created using the Bioconductor <a href=https://bioconductor.org/packages/release/bioc/html/GenomicFeatures.html><code>GenomicFeatures</code></a> R package.</p>
-<p>Let&rsquo;s first download an annotation <code>.bed</code> file in the annotation folder created in our first tutorial on DNA methylation. We get ours from <a href=https://sourceforge.net/>sourceforge.net</a>.</p>
+<p>Let&rsquo;s first download an annotation <code>.bed</code> file in the annotation folder created in our first tutorial on DNA methylation. We get ours from <a href=https://sourceforge.net/projects/rseqc/files/BED/Human_Homo_sapiens/>sourceforge.net</a>.</p>
 <div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># RDownload Annotation bed file</span>
 url <span style=color:#f92672>&lt;-</span> <span style=color:#e6db74>&#34;https://sourceforge.net/projects/rseqc/files/BED/Human_Homo_sapiens&#34;</span>
 <span style=color:#a6e22e>system</span>(<span style=color:#a6e22e>paste</span>(<span style=color:#e6db74>&#34;wget -P annotation&#34;</span>, <span style=color:#a6e22e>file.path</span>(url, <span style=color:#e6db74>&#34;hg38_RefSeq.bed.gz&#34;</span>)))

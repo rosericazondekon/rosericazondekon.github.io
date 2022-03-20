@@ -1,431 +1,245 @@
-<!doctype html><html lang=en><head>
-<meta charset=utf-8>
-<meta name=viewport content="width=device-width,initial-scale=1">
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-3TBYJJHRP3"></script>
-<script>var doNotTrack=!1;if(!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-3TBYJJHRP3',{anonymize_ip:!1})}</script>
-<style>:root{--accent-color:#FF4D4D}</style>
-<title>DNA Methylation Analysis using methylKit</title>
-<meta name=description content="A DNA Methylation Analysis tutorial Using the methylKit R package.">
-<meta name=keywords content="blog,rosericazondekon,gazondekon,razondekon,gbedegnon,roseric,azondekon,methylkit,cpg-islands,dmr,promoter,intron,exon,coverage,dna,methylation,fastq">
-<meta property="og:url" content="https://rosericazondekon.github.io/posts/methylkit-dna-methylation-analysis/">
-<meta property="og:type" content="website">
-<meta property="og:title" content="DNA Methylation Analysis using methylKit">
-<meta property="og:description" content="A DNA Methylation Analysis tutorial Using the methylKit R package.">
-<meta property="og:image" content="/images/roz.webp">
-<meta name=twitter:card content="summary_large_image">
-<meta name=twitter:title content="DNA Methylation Analysis using methylKit">
-<meta name=twitter:description content="A DNA Methylation Analysis tutorial Using the methylKit R package.">
-<meta property="twitter:domain" content="https://rosericazondekon.github.io/posts/methylkit-dna-methylation-analysis/">
-<meta property="twitter:url" content="https://rosericazondekon.github.io/posts/methylkit-dna-methylation-analysis/">
-<meta name=twitter:image content="/images/roz.webp">
-<link rel=canonical href=https://rosericazondekon.github.io/posts/methylkit-dna-methylation-analysis/>
-<link rel=stylesheet type=text/css href=/css/normalize.min.css media=print onload="this.media='all'">
-<link rel=stylesheet type=text/css href=/css/main.css>
-<link disabled id=dark-theme rel=stylesheet href=/css/dark.css>
-<script src=/js/svg-injector.min.js></script>
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><script async src="https://www.googletagmanager.com/gtag/js?id=G-3TBYJJHRP3"></script>
+<script>var doNotTrack=!1;if(!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-3TBYJJHRP3",{anonymize_ip:!1})}</script><style>:root{--accent-color:#FF4D4D}</style><title>DNA Methylation Analysis using methylKit</title><meta name=description content="A DNA Methylation Analysis tutorial Using the methylKit R package."><meta name=keywords content="blog,rosericazondekon,gazondekon,razondekon,gbedegnon,roseric,azondekon,methylkit,cpg-islands,dmr,promoter,intron,exon,coverage,dna,methylation,fastq"><meta property="og:url" content="https://rosericazondekon.github.io/posts/methylkit-dna-methylation-analysis/"><meta property="og:type" content="website"><meta property="og:title" content="DNA Methylation Analysis using methylKit"><meta property="og:description" content="A DNA Methylation Analysis tutorial Using the methylKit R package."><meta property="og:image" content="/images/roz.webp"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="DNA Methylation Analysis using methylKit"><meta name=twitter:description content="A DNA Methylation Analysis tutorial Using the methylKit R package."><meta property="twitter:domain" content="https://rosericazondekon.github.io/posts/methylkit-dna-methylation-analysis/"><meta property="twitter:url" content="https://rosericazondekon.github.io/posts/methylkit-dna-methylation-analysis/"><meta name=twitter:image content="/images/roz.webp"><link rel=canonical href=https://rosericazondekon.github.io/posts/methylkit-dna-methylation-analysis/><link rel=stylesheet type=text/css href=/css/normalize.min.css media=print onload='this.media="all"'><link rel=stylesheet type=text/css href=/css/main.css><link disabled id=dark-theme rel=stylesheet href=/css/dark.css><script src=/js/svg-injector.min.js></script>
 <script src=/js/feather-icons.min.js></script>
 <script src=/js/main.js></script>
-<link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.13.16/dist/katex.min.css integrity=sha384-6LkG2wmY8FK9E0vU9OOr8UvLwsaqUg9SETfpq4uTCN1agNe8HRdE9ABlk+fVx6gZ crossorigin=anonymous>
-<script defer src=https://cdn.jsdelivr.net/npm/katex@0.13.16/dist/katex.min.js integrity=sha384-31El76TwmbHj4rF9DyLsygbq6xoIobG0W+jqXim+a3dU9W53tdH3A/ngRPxOzzaB crossorigin=anonymous></script>
-<script defer src=https://cdn.jsdelivr.net/npm/katex@0.13.16/dist/contrib/auto-render.min.js integrity=sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl crossorigin=anonymous onload=renderMathInElement(document.body)></script>
-</head>
-<body>
-<script type=text/javascript>setThemeByUserPref()</script><header class=header>
-<nav class=header-nav>
-<div class=avatar>
-<a href=https://rosericazondekon.github.io/>
-<img src=/images/roz.webp alt=avatar>
-</a>
-</div>
-<div class=nav-title>
-<a class=nav-brand href=https://rosericazondekon.github.io/>Gbedegnon Roseric Azondekon</a>
-</div>
-<div class=nav-links>
-<div class=nav-link>
-<a href=/> Home </a>
-</div>
-<div class=nav-link>
-<a href=/posts/> Posts </a>
-</div>
-<div class=nav-link>
-<a href=/projects/> Projects </a>
-</div>
-<div class=nav-link>
-<a href=/cv/> CV </a>
-</div>
-<div class=nav-link>
-<a href=/tags/> Tags </a>
-</div>
-<div class=nav-link>
-<a href=/about/> About </a>
-</div>
-<div class=nav-link>
-<a href=https://github.com/rosericazondekon><span data-feather=github></span> </a>
-</div>
-<div class=nav-link>
-<a href=https://www.buymeacoffee.com/gazondekon><span data-feather=coffee></span> </a>
-</div>
-<div class=nav-link>
-<a href=/index.xml><span data-feather=rss></span> </a>
-</div>
-<span class=nav-icons-divider></span>
-<div class="nav-link dark-theme-toggle">
-<a>
-<span id=theme-toggle-icon data-feather=moon></span>
-</a>
-</div>
-<div class=nav-link id=hamburger-menu-toggle>
-<a>
-<span data-feather=menu></span>
-</a>
-</div>
-<ul class="nav-hamburger-list visibility-hidden">
-<li class=nav-item>
-<a href=/> Home </a>
-</li>
-<li class=nav-item>
-<a href=/posts/> Posts </a>
-</li>
-<li class=nav-item>
-<a href=/projects/> Projects </a>
-</li>
-<li class=nav-item>
-<a href=/cv/> CV </a>
-</li>
-<li class=nav-item>
-<a href=/tags/> Tags </a>
-</li>
-<li class=nav-item>
-<a href=/about/> About </a>
-</li>
-<li class=nav-item>
-<a href=https://github.com/rosericazondekon><span data-feather=github></span> </a>
-</li>
-<li class=nav-item>
-<a href=https://www.buymeacoffee.com/gazondekon><span data-feather=coffee></span> </a>
-</li>
-<li class=nav-item>
-<a href=/index.xml><span data-feather=rss></span> </a>
-</li>
-<li class="nav-item dark-theme-toggle">
-<a>
-<span id=theme-toggle-icon data-feather=moon></span>
-</a>
-</li>
-</ul>
-</div>
-</nav>
-</header>
-<main id=content>
-<div class="post container">
-<div class=post-header-section>
-<h1>DNA Methylation Analysis using methylKit</h1>
-<small role=doc-subtitle>A DNA Methylation Analysis tutorial Using the methylKit R package.</small>
-<p class=post-date>
-February 5, 2022
-</p>
-<ul class=post-tags>
-<li class=post-tag><a href=/tags/methylkit>methylkit</a></li>
-<li class=post-tag><a href=/tags/cpg-islands>cpg-islands</a></li>
-<li class=post-tag><a href=/tags/dmr>dmr</a></li>
-<li class=post-tag><a href=/tags/promoter>promoter</a></li>
-<li class=post-tag><a href=/tags/intron>intron</a></li>
-<li class=post-tag><a href=/tags/exon>exon</a></li>
-<li class=post-tag><a href=/tags/coverage>coverage</a></li>
-<li class=post-tag><a href=/tags/dna>dna</a></li>
-<li class=post-tag><a href=/tags/methylation>methylation</a></li>
-<li class=post-tag><a href=/tags/fastq>fastq</a></li>
-</ul>
-</div>
-<div class=post-content>
-<p>
-<p><strong>Disclaimer:</strong> This tutorial was originally written on June 04, 2019.</p>
-<h2 id=introduction>Introduction</h2>
-<p>In our <a href=/posts/bisulfite-treated-read-align>DNA Methylation Sequence Read Alignment</a> tutorial, we showed you how to download and process Bisulfite-treated sequence DNA methylation FASTQ files for read alignment on a reference sequence. In this tutorial, we show you how to run DNA methylation analysis using the Bioconductor <a href=https://bioconductor.org/packages/release/bioc/html/methylKit.html><code>methylKit</code></a> R package.</p>
-<p>We set our working directory to the <code>tuto</code> folder created in a <a href=/posts/bisulfite-treated-read-align>previous tutorial</a>.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#a6e22e>setwd</span>(<span style=color:#e6db74>&#39;./tuto&#39;</span>)
-</code></pre></div><p>Now, let&rsquo;s install all the required packages for this tutorial.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Indicate package repositories to R...</span>
-repositories <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;https://cloud.r-project.org&#34;</span>, 
-                   <span style=color:#e6db74>&#34;https://bioconductor.org/packages/3.7/bioc&#34;</span>,
-                   <span style=color:#e6db74>&#34;https://bioconductor.org/packages/3.7/data/annotation&#34;</span>, 
-                   <span style=color:#e6db74>&#34;https://bioconductor.org/packages/3.7/data/experiment&#34;</span>,
-                   <span style=color:#e6db74>&#34;https://www.stats.ox.ac.uk/pub/RWin&#34;</span>, 
-                   <span style=color:#e6db74>&#34;http://www.omegahat.net/R&#34;</span>, 
-                   <span style=color:#e6db74>&#34;https://R-Forge.R-project.org&#34;</span>,
-                   <span style=color:#e6db74>&#34;https://www.rforge.net&#34;</span>, 
-                   <span style=color:#e6db74>&#34;https://cloud.r-project.org&#34;</span>, 
-                   <span style=color:#e6db74>&#34;http://www.bioconductor.org&#34;</span>,
-                   <span style=color:#e6db74>&#34;http://www.stats.ox.ac.uk/pub/RWin&#34;</span>)
-
-<span style=color:#75715e># Package list to download</span>
-packages <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;BiocGenerics&#34;</span>,<span style=color:#e6db74>&#34;Biobase&#34;</span>,<span style=color:#e6db74>&#34;S4Vectors&#34;</span>,<span style=color:#e6db74>&#34;IRanges&#34;</span>,
-              <span style=color:#e6db74>&#34;GenomicRanges&#34;</span>,<span style=color:#e6db74>&#34;GenomeInfoDb&#34;</span>,<span style=color:#e6db74>&#34;AnnotationDbi&#34;</span>, 
-              <span style=color:#e6db74>&#34;genomation&#34;</span>, <span style=color:#e6db74>&#34;fastseg&#34;</span>, <span style=color:#e6db74>&#34;methylKit&#34;</span>)
-
-<span style=color:#75715e># Install and load missing packages</span>
-new.packages <span style=color:#f92672>&lt;-</span> packages[<span style=color:#f92672>!</span>(packages <span style=color:#f92672>%in%</span> <span style=color:#a6e22e>installed.packages</span>()[, <span style=color:#e6db74>&#34;Package&#34;</span>])]
-
-<span style=color:#a6e22e>if</span>(<span style=color:#a6e22e>length</span>(new.packages)){
-    <span style=color:#a6e22e>install.packages</span>(new.packages, repos <span style=color:#f92672>=</span> repositories)
-}
-
-<span style=color:#a6e22e>lapply</span>(packages, library, character.only <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
-</code></pre></div><h2 id=1-obtaining-methylation-percentage-from-sorted-bismark-alignments>1. Obtaining methylation percentage from sorted Bismark alignments</h2>
-<p>We read in the methylation calls directly from the <code>SAM</code> files obtained from the last tutoral. The SAM files must be sorted and be generated from Bismark aligner. For that purpose, we use the <code>processBismarkAln()</code> function from the Bioconductor <a href=https://bioconductor.org/packages/release/bioc/html/methylKit.html><code>methylKit</code></a> R package as described below:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Find all sorted SAM files</span>
-file_loc <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>file.path</span>(<span style=color:#a6e22e>getwd</span>(),<span style=color:#e6db74>&#39;alignment_Bismark&#39;</span>)
-
-file.list <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>as.list</span>(<span style=color:#a6e22e>list.files</span>(file_loc, <span style=color:#e6db74>&#34;\\.sort.sam$&#34;</span>,
-                                full.names <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, recursive <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>))
-
-file.list
-</code></pre></div><p>Now, let&rsquo;s read in the methylation data from the <code>SAM</code> files (<strong>this has to be run once</strong>).</p>
-<p>The following script may take a long time to run!</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Read the methylation data into an object (Has to be run once)</span>
-metyl.obj <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>processBismarkAln</span>(
-                file.list, 
-                sample.id <span style=color:#f92672>=</span> <span style=color:#a6e22e>list</span>(<span style=color:#e6db74>&#34;normal1&#34;</span>, <span style=color:#e6db74>&#34;normal2&#34;</span>,
-                                 <span style=color:#e6db74>&#34;cancer1&#34;</span>, <span style=color:#e6db74>&#34;cancer2&#34;</span>),
-                treatment <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>0</span>,<span style=color:#ae81ff>0</span>,<span style=color:#ae81ff>1</span>,<span style=color:#ae81ff>1</span>), 
-                assembly <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;hg38&#34;</span>,
-                read.context <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;CpG&#34;</span>,
-                save.folder <span style=color:#f92672>=</span> <span style=color:#a6e22e>file.path</span>(<span style=color:#a6e22e>getwd</span>(), <span style=color:#e6db74>&#34;methylation_calls&#34;</span>)
-)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#a6e22e>head</span>(metyl.obj,<span style=color:#ae81ff>3</span>)
-</code></pre></div><p>When computed, the set of methylation call files can be imported using the <code>methRead()</code> function provided by the <code>methylKit</code> R package.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># This code may be run if the methylation call files already exist</span>
-file_loc2 <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>file.path</span>(<span style=color:#a6e22e>getwd</span>(),<span style=color:#e6db74>&#39;methylation_calls&#39;</span>)
-file.list2 <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>as.list</span>(
-                <span style=color:#a6e22e>list.files</span>(file_loc2, <span style=color:#e6db74>&#34;\\CpG.txt$&#34;</span>,
-                           full.names <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>,
-                           recursive <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
-)
-
-file.list2
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>methyl.obj2 <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>methRead</span>(
-                  file.list2, 
-                  sample.id <span style=color:#f92672>=</span> <span style=color:#a6e22e>list</span>(<span style=color:#e6db74>&#34;cancer1&#34;</span>,<span style=color:#e6db74>&#34;cancer2&#34;</span>,
-                                   <span style=color:#e6db74>&#34;normal1&#34;</span>,<span style=color:#e6db74>&#34;normal2&#34;</span>), 
-                  treatment <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>0</span>, <span style=color:#ae81ff>0</span>), 
-                  assembly <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;hg38&#34;</span>
-)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#a6e22e>head</span>(methyl.obj2,<span style=color:#ae81ff>3</span>)
-</code></pre></div><h2 id=2-quality-check-and-basic-features-of-the-data>2. Quality check and basic features of the data</h2>
-<p>Let&rsquo;s check the basic stats about the methylation data such as coverage and percent methylation.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Descriptive statistics on the samples</span>
-
-<span style=color:#75715e># normal1</span>
-<span style=color:#a6e22e>getMethylationStats</span>(metyl.obj[[1]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
-
-<span style=color:#75715e># normal2</span>
-<span style=color:#a6e22e>getMethylationStats</span>(metyl.obj[[2]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
-
-<span style=color:#75715e># cancer1</span>
-<span style=color:#a6e22e>getMethylationStats</span>(metyl.obj[[3]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
-
-<span style=color:#75715e># cancer2</span>
-<span style=color:#a6e22e>getMethylationStats</span>(metyl.obj[[4]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Histogram of % CpG methylation</span>
-
-<span style=color:#75715e># normal1</span>
-<span style=color:#a6e22e>getMethylationStats</span>(metyl.obj[[1]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
-
-<span style=color:#75715e># normal2</span>
-<span style=color:#a6e22e>getMethylationStats</span>(metyl.obj[[2]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
-
-<span style=color:#75715e># cancer1</span>
-<span style=color:#a6e22e>getMethylationStats</span>(metyl.obj[[3]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
-
-<span style=color:#75715e># cancer2</span>
-<span style=color:#a6e22e>getMethylationStats</span>(metyl.obj[[4]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
-</code></pre></div><p>From the histograms generated by the previous scripts, the numbers on the bars represent the percentage of locations that are contained in each bin. Percent methylation histogram are expected to have two peaks on both ends.</p>
-<p>Alternatively, the histogram of the read coverage per base information can be plotted as well. Experiments that are highly suffering from PCR duplication bias are expected to have a secondary peak towards the right hand side of the histogram.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Histogram of CpG coverage</span>
-
-<span style=color:#75715e># normal1</span>
-<span style=color:#a6e22e>getCoverageStats</span>(metyl.obj[[1]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
-
-<span style=color:#75715e># normal2</span>
-<span style=color:#a6e22e>getCoverageStats</span>(metyl.obj[[2]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
-
-<span style=color:#75715e># cancer1</span>
-<span style=color:#a6e22e>getCoverageStats</span>(metyl.obj[[3]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
-
-<span style=color:#75715e># cancer2</span>
-<span style=color:#a6e22e>getCoverageStats</span>(metyl.obj[[4]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
-</code></pre></div><h2 id=3-filtering-samples-based-on-read-coverage>3. Filtering samples based on read coverage</h2>
-<p>It is a good practice to filter samples based on coverage, and discard bases that have coverage below 10X bases that have more than 99.9th percentile of coverage in each sample. This can be achieved with the following code:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>filtered.metyl.obj <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>filterByCoverage</span>(
-                        metyl.obj, 
-                        lo.count <span style=color:#f92672>=</span> <span style=color:#ae81ff>10</span>,
-                        lo.perc <span style=color:#f92672>=</span> <span style=color:#66d9ef>NULL</span>,
-                        hi.count <span style=color:#f92672>=</span> <span style=color:#66d9ef>NULL</span>,
-                        hi.perc <span style=color:#f92672>=</span> <span style=color:#ae81ff>99.9</span>
-)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>combined_data.filtered
-</code></pre></div><p>Let&rsquo;s assess once again the basic stats about the methylation data such as coverage and percent methylation.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Histogram of % CpG methylation</span>
-
-<span style=color:#75715e># normal1</span>
-<span style=color:#a6e22e>getMethylationStats</span>(filtered.metyl.obj[[1]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>)
-
-<span style=color:#75715e># normal2</span>
-<span style=color:#a6e22e>getMethylationStats</span>(filtered.metyl.obj[[2]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
-
-<span style=color:#75715e># cancer1</span>
-<span style=color:#a6e22e>getMethylationStats</span>(filtered.metyl.obj[[3]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
-
-<span style=color:#75715e># cancer2</span>
-<span style=color:#a6e22e>getMethylationStats</span>(filtered.metyl.obj[[4]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Histogram of CpG coverage</span>
-
-<span style=color:#75715e># normal1</span>
-<span style=color:#a6e22e>getCoverageStats</span>(filtered.metyl.obj[[1]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
-
-<span style=color:#75715e># normal2</span>
-<span style=color:#a6e22e>getCoverageStats</span>(filtered.metyl.obj[[2]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
-
-<span style=color:#75715e># cancer1</span>
-<span style=color:#a6e22e>getCoverageStats</span>(filtered.metyl.obj[[3]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
-
-<span style=color:#75715e># cancer2</span>
-<span style=color:#a6e22e>getCoverageStats</span>(filtered.metyl.obj[[4]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
-</code></pre></div><h2 id=4-sample-correlation>4. Sample correlation</h2>
-<p>To conduct sample correlation, we will need to merge all samples to one object for base-pair locations that are covered in all samples.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Merging all samples</span>
-merged.obj <span style=color:#f92672>=</span> <span style=color:#a6e22e>unite</span>(filtered.metyl.obj, destrand <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>)
-
-<span style=color:#75715e># Taking a glance at the data...</span>
-<span style=color:#a6e22e>head</span>(merged.obj,<span style=color:#ae81ff>3</span>)
-</code></pre></div><p>The sample correlation is computed using the <code>getCorrelation()</code> function available in the <code>methylKit</code> package.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Sample correlation</span>
-<span style=color:#a6e22e>getCorrelation</span>(merged.obj, plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
-</code></pre></div><h2 id=5-clustering-samples>5. Clustering samples</h2>
-<p>The <code>clusterSamples()</code> function in <code>methylKit</code> can be used to perform the hierarchical clustering of the samples based on their methylation profiles.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Clustering samples...</span>
-<span style=color:#a6e22e>clusterSamples</span>(merged.obj, dist <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;correlation&#34;</span>, method <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;ward&#34;</span>, plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
-</code></pre></div><p>Principal Component Analysis (PCA) is another available method to cluster the samples. We perform PCA using the the <code>PCASamples()</code> function, then plot the Screeplot.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Screeplot (PCA analysis) </span>
-<span style=color:#a6e22e>PCASamples</span>(merged.obj, screeplot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
-</code></pre></div><p>We may plot PC1 (principal component 1) and PC2 (principal component 2) axis and a scatter plot of our samples on those axes which reveals how they cluster.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Scatterplot (PCA analysis)</span>
-<span style=color:#a6e22e>PCASamples</span>(merged.obj)
-</code></pre></div><h2 id=6-getting-differentially-methylated-bases>6. Getting differentially methylated bases</h2>
-<p>The function <code>calculateDiffMeth()</code> is the main function to calculate differential methylation.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Finding differentially methylated bases or </span>
-<span style=color:#75715e># regions (using 8 cores for faster calculations)</span>
-methyl.diff <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>calculateDiffMeth</span>(merged.obj, num.cores <span style=color:#f92672>=</span> <span style=color:#ae81ff>8</span>)
-</code></pre></div><p>Following bit selects the bases that have q-value &lt; 0.01 and percent methylation difference larger than 25%.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># get hyper methylated bases</span>
-myDiff25p.hyper <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>getMethylDiff</span>(
-                      methyl.diff, 
-                      difference <span style=color:#f92672>=</span> <span style=color:#ae81ff>25</span>, 
-                      qvalue <span style=color:#f92672>=</span> <span style=color:#ae81ff>0.01</span>, 
-                      type <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;hyper&#34;</span>
-)
-
-<span style=color:#75715e># get hypo methylated bases</span>
-myDiff25p.hypo <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>getMethylDiff</span>(
-                      methyl.diff, 
-                      difference <span style=color:#f92672>=</span> <span style=color:#ae81ff>25</span>,
-                      qvalue <span style=color:#f92672>=</span> <span style=color:#ae81ff>0.01</span>, 
-                      type <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;hypo&#34;</span>
- )
-
-<span style=color:#75715e># get all differentially methylated bases</span>
-myDiff25p <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>getMethylDiff</span>(
-                      methyl.diff, 
-                      difference <span style=color:#f92672>=</span> <span style=color:#ae81ff>25</span>,
-                      qvalue <span style=color:#f92672>=</span> <span style=color:#ae81ff>0.01</span>
-)
-</code></pre></div><p>The <code>methylKit</code> package can summarize methylation information over tiling windows or over a set of predefined regions (promoters, CpG islands, introns, etc.) rather than doing base-pair resolution analysis.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>tiles <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>tileMethylCounts</span>(merged.obj, win.size <span style=color:#f92672>=</span> <span style=color:#ae81ff>1000</span>, step.size <span style=color:#f92672>=</span> <span style=color:#ae81ff>1000</span>)
-
-<span style=color:#a6e22e>head</span>(tiles, <span style=color:#ae81ff>3</span>)
-</code></pre></div><h2 id=7-differential-methylation-events-per-chromosome>7. Differential methylation events per chromosome</h2>
-<p>We may also visualize the distribution of hypo/hyper-methylated bases/regions per chromosome using the <code>diffMethPerChr()</code> function.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Return a list having per chromosome</span>
-<span style=color:#75715e># differentially methylation events will be returned</span>
-<span style=color:#a6e22e>diffMethPerChr</span>(methyl.diff,
-               plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>,
-               qvalue.cutoff <span style=color:#f92672>=</span> <span style=color:#ae81ff>0.01</span>,
-               meth.cutoff <span style=color:#f92672>=</span> <span style=color:#ae81ff>25</span>
-              )
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># visualize the distribution of hypo/hyper-methylated</span>
-<span style=color:#75715e># bases/regions per chromosome</span>
-<span style=color:#a6e22e>diffMethPerChr</span>(methyl.diff,
-               plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>,
-               qvalue.cutoff <span style=color:#f92672>=</span> <span style=color:#ae81ff>0.01</span>,
-               meth.cutoff <span style=color:#f92672>=</span> <span style=color:#ae81ff>25</span>
-              )
-</code></pre></div><h2 id=8-annotating-differential-methylation-events>8. Annotating differential methylation events</h2>
-<p>We may annotate the differentially methylated regions/bases based on gene annotation. We therefore need to read the gene annotation from a bed file and annotate the differentially methylated regions with that information. Similar gene annotation can be created using the Bioconductor <a href=https://bioconductor.org/packages/release/bioc/html/GenomicFeatures.html><code>GenomicFeatures</code></a> R package.</p>
-<p>Let&rsquo;s first download an annotation <code>.bed</code> file in the annotation folder created in our first tutorial on DNA methylation. We get ours from <a href=https://sourceforge.net/projects/rseqc/files/BED/Human_Homo_sapiens/>sourceforge.net</a>.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># RDownload Annotation bed file</span>
-url <span style=color:#f92672>&lt;-</span> <span style=color:#e6db74>&#34;https://sourceforge.net/projects/rseqc/files/BED/Human_Homo_sapiens&#34;</span>
-<span style=color:#a6e22e>system</span>(<span style=color:#a6e22e>paste</span>(<span style=color:#e6db74>&#34;wget -P annotation&#34;</span>, <span style=color:#a6e22e>file.path</span>(url, <span style=color:#e6db74>&#34;hg38_RefSeq.bed.gz&#34;</span>)))
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>gene.obj <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>readTranscriptFeatures</span>(
-              <span style=color:#a6e22e>file.path</span>(<span style=color:#a6e22e>getwd</span>(),
-                        <span style=color:#e6db74>&#34;annotation&#34;</span>,
-                        <span style=color:#e6db74>&#34;hg38_RefSeq.bed.gz&#34;</span>)
-)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#a6e22e>annotateWithGeneParts</span>(<span style=color:#a6e22e>as</span>(myDiff25p,<span style=color:#e6db74>&#34;GRanges&#34;</span>),gene.obj)
-</code></pre></div><p>Similarly, we can read the CpG island annotation and annotate our differentially methylated bases/regions with them.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># read the shores and flanking regions and name the flanks as shores </span>
-<span style=color:#75715e># and CpG islands as CpGi</span>
-cpg.obj <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>readFeatureFlank</span>(
-              <span style=color:#a6e22e>file.path</span>(<span style=color:#a6e22e>getwd</span>(), 
-                        <span style=color:#e6db74>&#34;annotation&#34;</span>, 
-                        <span style=color:#e6db74>&#34;hg38_RefSeq.bed.gz&#34;</span>),
-                        feature.flank.name <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;CpGi&#34;</span>, <span style=color:#e6db74>&#34;shores&#34;</span>)
-)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># convert methylDiff object to GRanges and annotate</span>
-diffCpGann <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>annotateWithFeatureFlank</span>(
-                  <span style=color:#a6e22e>as</span>(myDiff25p,<span style=color:#e6db74>&#34;GRanges&#34;</span>), 
-                  cpg.obj<span style=color:#f92672>$</span>CpGi, 
-                  cpg.obj<span style=color:#f92672>$</span>shores, 
-                  feature.name <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;CpGi&#34;</span>, 
-                  flank.name <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;shores&#34;</span>
-)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>diffCpGann
-</code></pre></div><h2 id=9-regional-analysis>9. Regional analysis</h2>
-<p>We now summarize methylation information over a set of defined regions such as promoters or CpG islands with the <code>regionCounts()</code> function.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>promoters <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>regionCounts</span>(metyl.obj,gene.obj<span style=color:#f92672>$</span>promoters)
-
-<span style=color:#a6e22e>head</span>(promoters[[1]])
-</code></pre></div><h2 id=10-getting-the-distance-to-tss-and-nearest-gene-name>10. Getting the distance to TSS and nearest gene name</h2>
-<p>After getting the annotation of differentially methylated regions, we can get the distance to TSS and nearest gene name using the <code>getAssociationWithTSS()</code> function from genomation package.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Annotate with gene parts</span>
-diffAnn <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>annotateWithGeneParts</span>(<span style=color:#a6e22e>as</span>(myDiff25p, <span style=color:#e6db74>&#34;GRanges&#34;</span>), gene.obj)
-
-<span style=color:#75715e># target.row is the row number in myDiff25p</span>
-<span style=color:#a6e22e>head</span>(<span style=color:#a6e22e>getAssociationWithTSS</span>(diffAnn), <span style=color:#ae81ff>3</span>)
-</code></pre></div><p>Getting the percentage/number of differentially methylated regions that overlap with intron/exon/promoters:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>genomation<span style=color:#f92672>::</span><span style=color:#a6e22e>getTargetAnnotationStats</span>(
-              diffAnn, 
-              percentage <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, 
-              precedence <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>
-)
-</code></pre></div><h2 id=11-working-with-annotated-methylation-events>11. Working with annotated methylation events</h2>
-<p>We may also plot the percentage of differentially methylated bases overlapping with exon/intron/promoters:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>genomation<span style=color:#f92672>::</span><span style=color:#a6e22e>plotTargetAnnotation</span>(
-              diffAnn, 
-              precedence <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, 
-              main <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Differential methylation annotation&#34;</span>
-)
-</code></pre></div><p>It is also possible to plot the CpG island annotation showing the percentage of differentially methylated bases that are on CpG islands, CpG island shores and other regions.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>genomation<span style=color:#f92672>::</span><span style=color:#a6e22e>plotTargetAnnotation</span>(
-              diffCpGann, 
-              col <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;green&#34;</span>, <span style=color:#e6db74>&#34;gray&#34;</span>, <span style=color:#e6db74>&#34;white&#34;</span>), 
-              main <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Differential methylation annotation&#34;</span>
-)
-</code></pre></div><p>Find the Original source code for this tutorial <a href=https://github.com/rosericazondekon/bioinformatics-tuto/blob/main/DNA%20methylation%20analysis/dna_methylation_tuto.ipynb>here</a>.</p>
-</p>
-</div>
-</div>
-</main><footer class=footer>
-<span>&copy; 2022 Roseric Azondekon</span>
-</footer>
-</body>
-</html>
+<link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.13.16/dist/katex.min.css integrity=sha384-6LkG2wmY8FK9E0vU9OOr8UvLwsaqUg9SETfpq4uTCN1agNe8HRdE9ABlk+fVx6gZ crossorigin=anonymous><script defer src=https://cdn.jsdelivr.net/npm/katex@0.13.16/dist/katex.min.js integrity=sha384-31El76TwmbHj4rF9DyLsygbq6xoIobG0W+jqXim+a3dU9W53tdH3A/ngRPxOzzaB crossorigin=anonymous></script>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.13.16/dist/contrib/auto-render.min.js integrity=sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl crossorigin=anonymous onload=renderMathInElement(document.body)></script></head><body><script type=text/javascript>setThemeByUserPref()</script><header class=header><nav class=header-nav><div class=avatar><a href=https://rosericazondekon.github.io/><img src=/images/roz.webp alt=avatar></a></div><div class=nav-title><a class=nav-brand href=https://rosericazondekon.github.io/>Gbedegnon Roseric Azondekon</a></div><div class=nav-links><div class=nav-link><a href=/>Home</a></div><div class=nav-link><a href=/posts/>Posts</a></div><div class=nav-link><a href=/projects/>Projects</a></div><div class=nav-link><a href=/cv/>CV</a></div><div class=nav-link><a href=/tags/>Tags</a></div><div class=nav-link><a href=/about/>About</a></div><div class=nav-link><a href=https://github.com/rosericazondekon><span data-feather=github></span></a></div><div class=nav-link><a href=https://www.buymeacoffee.com/gazondekon><span data-feather=coffee></span></a></div><div class=nav-link><a href=/index.xml><span data-feather=rss></span></a></div><span class=nav-icons-divider></span><div class="nav-link dark-theme-toggle"><a><span id=theme-toggle-icon data-feather=moon></span></a></div><div class=nav-link id=hamburger-menu-toggle><a><span data-feather=menu></span></a></div><ul class="nav-hamburger-list visibility-hidden"><li class=nav-item><a href=/>Home</a></li><li class=nav-item><a href=/posts/>Posts</a></li><li class=nav-item><a href=/projects/>Projects</a></li><li class=nav-item><a href=/cv/>CV</a></li><li class=nav-item><a href=/tags/>Tags</a></li><li class=nav-item><a href=/about/>About</a></li><li class=nav-item><a href=https://github.com/rosericazondekon><span data-feather=github></span></a></li><li class=nav-item><a href=https://www.buymeacoffee.com/gazondekon><span data-feather=coffee></span></a></li><li class=nav-item><a href=/index.xml><span data-feather=rss></span></a></li><li class="nav-item dark-theme-toggle"><a><span id=theme-toggle-icon data-feather=moon></span></a></li></ul></div></nav></header><main id=content><div class="post container"><div class=post-header-section><h1>DNA Methylation Analysis using methylKit</h1><small role=doc-subtitle>A DNA Methylation Analysis tutorial Using the methylKit R package.</small><p class=post-date>February 5, 2022</p><ul class=post-tags><li class=post-tag><a href=/tags/methylkit>methylkit</a></li><li class=post-tag><a href=/tags/cpg-islands>cpg-islands</a></li><li class=post-tag><a href=/tags/dmr>dmr</a></li><li class=post-tag><a href=/tags/promoter>promoter</a></li><li class=post-tag><a href=/tags/intron>intron</a></li><li class=post-tag><a href=/tags/exon>exon</a></li><li class=post-tag><a href=/tags/coverage>coverage</a></li><li class=post-tag><a href=/tags/dna>dna</a></li><li class=post-tag><a href=/tags/methylation>methylation</a></li><li class=post-tag><a href=/tags/fastq>fastq</a></li></ul></div><div class=post-content><p><p><strong>Disclaimer:</strong> This tutorial was originally written on June 04, 2019.</p><h2 id=introduction>Introduction</h2><p>In our <a href=/posts/bisulfite-treated-read-align>DNA Methylation Sequence Read Alignment</a> tutorial, we showed you how to download and process Bisulfite-treated sequence DNA methylation FASTQ files for read alignment on a reference sequence. In this tutorial, we show you how to run DNA methylation analysis using the Bioconductor <a href=https://bioconductor.org/packages/release/bioc/html/methylKit.html><code>methylKit</code></a> R package.</p><p>We set our working directory to the <code>tuto</code> folder created in a <a href=/posts/bisulfite-treated-read-align>previous tutorial</a>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#a6e22e>setwd</span>(<span style=color:#e6db74>&#39;./tuto&#39;</span>)
+</span></span></code></pre></div><p>Now, let&rsquo;s install all the required packages for this tutorial.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Indicate package repositories to R...</span>
+</span></span><span style=display:flex><span>repositories <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;https://cloud.r-project.org&#34;</span>, 
+</span></span><span style=display:flex><span>                   <span style=color:#e6db74>&#34;https://bioconductor.org/packages/3.7/bioc&#34;</span>,
+</span></span><span style=display:flex><span>                   <span style=color:#e6db74>&#34;https://bioconductor.org/packages/3.7/data/annotation&#34;</span>, 
+</span></span><span style=display:flex><span>                   <span style=color:#e6db74>&#34;https://bioconductor.org/packages/3.7/data/experiment&#34;</span>,
+</span></span><span style=display:flex><span>                   <span style=color:#e6db74>&#34;https://www.stats.ox.ac.uk/pub/RWin&#34;</span>, 
+</span></span><span style=display:flex><span>                   <span style=color:#e6db74>&#34;http://www.omegahat.net/R&#34;</span>, 
+</span></span><span style=display:flex><span>                   <span style=color:#e6db74>&#34;https://R-Forge.R-project.org&#34;</span>,
+</span></span><span style=display:flex><span>                   <span style=color:#e6db74>&#34;https://www.rforge.net&#34;</span>, 
+</span></span><span style=display:flex><span>                   <span style=color:#e6db74>&#34;https://cloud.r-project.org&#34;</span>, 
+</span></span><span style=display:flex><span>                   <span style=color:#e6db74>&#34;http://www.bioconductor.org&#34;</span>,
+</span></span><span style=display:flex><span>                   <span style=color:#e6db74>&#34;http://www.stats.ox.ac.uk/pub/RWin&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Package list to download</span>
+</span></span><span style=display:flex><span>packages <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;BiocGenerics&#34;</span>,<span style=color:#e6db74>&#34;Biobase&#34;</span>,<span style=color:#e6db74>&#34;S4Vectors&#34;</span>,<span style=color:#e6db74>&#34;IRanges&#34;</span>,
+</span></span><span style=display:flex><span>              <span style=color:#e6db74>&#34;GenomicRanges&#34;</span>,<span style=color:#e6db74>&#34;GenomeInfoDb&#34;</span>,<span style=color:#e6db74>&#34;AnnotationDbi&#34;</span>, 
+</span></span><span style=display:flex><span>              <span style=color:#e6db74>&#34;genomation&#34;</span>, <span style=color:#e6db74>&#34;fastseg&#34;</span>, <span style=color:#e6db74>&#34;methylKit&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Install and load missing packages</span>
+</span></span><span style=display:flex><span>new.packages <span style=color:#f92672>&lt;-</span> packages[<span style=color:#f92672>!</span>(packages <span style=color:#f92672>%in%</span> <span style=color:#a6e22e>installed.packages</span>()[, <span style=color:#e6db74>&#34;Package&#34;</span>])]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>if</span>(<span style=color:#a6e22e>length</span>(new.packages)){
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>install.packages</span>(new.packages, repos <span style=color:#f92672>=</span> repositories)
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>lapply</span>(packages, library, character.only <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
+</span></span></code></pre></div><h2 id=1-obtaining-methylation-percentage-from-sorted-bismark-alignments>1. Obtaining methylation percentage from sorted Bismark alignments</h2><p>We read in the methylation calls directly from the <code>SAM</code> files obtained from the last tutoral. The SAM files must be sorted and be generated from Bismark aligner. For that purpose, we use the <code>processBismarkAln()</code> function from the Bioconductor <a href=https://bioconductor.org/packages/release/bioc/html/methylKit.html><code>methylKit</code></a> R package as described below:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Find all sorted SAM files</span>
+</span></span><span style=display:flex><span>file_loc <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>file.path</span>(<span style=color:#a6e22e>getwd</span>(),<span style=color:#e6db74>&#39;alignment_Bismark&#39;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>file.list <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>as.list</span>(<span style=color:#a6e22e>list.files</span>(file_loc, <span style=color:#e6db74>&#34;\\.sort.sam$&#34;</span>,
+</span></span><span style=display:flex><span>                                full.names <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, recursive <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>file.list
+</span></span></code></pre></div><p>Now, let&rsquo;s read in the methylation data from the <code>SAM</code> files (<strong>this has to be run once</strong>).</p><p>The following script may take a long time to run!</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Read the methylation data into an object (Has to be run once)</span>
+</span></span><span style=display:flex><span>metyl.obj <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>processBismarkAln</span>(
+</span></span><span style=display:flex><span>                file.list, 
+</span></span><span style=display:flex><span>                sample.id <span style=color:#f92672>=</span> <span style=color:#a6e22e>list</span>(<span style=color:#e6db74>&#34;normal1&#34;</span>, <span style=color:#e6db74>&#34;normal2&#34;</span>,
+</span></span><span style=display:flex><span>                                 <span style=color:#e6db74>&#34;cancer1&#34;</span>, <span style=color:#e6db74>&#34;cancer2&#34;</span>),
+</span></span><span style=display:flex><span>                treatment <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>0</span>,<span style=color:#ae81ff>0</span>,<span style=color:#ae81ff>1</span>,<span style=color:#ae81ff>1</span>), 
+</span></span><span style=display:flex><span>                assembly <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;hg38&#34;</span>,
+</span></span><span style=display:flex><span>                read.context <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;CpG&#34;</span>,
+</span></span><span style=display:flex><span>                save.folder <span style=color:#f92672>=</span> <span style=color:#a6e22e>file.path</span>(<span style=color:#a6e22e>getwd</span>(), <span style=color:#e6db74>&#34;methylation_calls&#34;</span>)
+</span></span><span style=display:flex><span>)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#a6e22e>head</span>(metyl.obj,<span style=color:#ae81ff>3</span>)
+</span></span></code></pre></div><p>When computed, the set of methylation call files can be imported using the <code>methRead()</code> function provided by the <code>methylKit</code> R package.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># This code may be run if the methylation call files already exist</span>
+</span></span><span style=display:flex><span>file_loc2 <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>file.path</span>(<span style=color:#a6e22e>getwd</span>(),<span style=color:#e6db74>&#39;methylation_calls&#39;</span>)
+</span></span><span style=display:flex><span>file.list2 <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>as.list</span>(
+</span></span><span style=display:flex><span>                <span style=color:#a6e22e>list.files</span>(file_loc2, <span style=color:#e6db74>&#34;\\CpG.txt$&#34;</span>,
+</span></span><span style=display:flex><span>                           full.names <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>,
+</span></span><span style=display:flex><span>                           recursive <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>file.list2
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>methyl.obj2 <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>methRead</span>(
+</span></span><span style=display:flex><span>                  file.list2, 
+</span></span><span style=display:flex><span>                  sample.id <span style=color:#f92672>=</span> <span style=color:#a6e22e>list</span>(<span style=color:#e6db74>&#34;cancer1&#34;</span>,<span style=color:#e6db74>&#34;cancer2&#34;</span>,
+</span></span><span style=display:flex><span>                                   <span style=color:#e6db74>&#34;normal1&#34;</span>,<span style=color:#e6db74>&#34;normal2&#34;</span>), 
+</span></span><span style=display:flex><span>                  treatment <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>0</span>, <span style=color:#ae81ff>0</span>), 
+</span></span><span style=display:flex><span>                  assembly <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;hg38&#34;</span>
+</span></span><span style=display:flex><span>)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#a6e22e>head</span>(methyl.obj2,<span style=color:#ae81ff>3</span>)
+</span></span></code></pre></div><h2 id=2-quality-check-and-basic-features-of-the-data>2. Quality check and basic features of the data</h2><p>Let&rsquo;s check the basic stats about the methylation data such as coverage and percent methylation.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Descriptive statistics on the samples</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># normal1</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>getMethylationStats</span>(metyl.obj[[1]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># normal2</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>getMethylationStats</span>(metyl.obj[[2]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># cancer1</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>getMethylationStats</span>(metyl.obj[[3]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># cancer2</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>getMethylationStats</span>(metyl.obj[[4]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Histogram of % CpG methylation</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># normal1</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>getMethylationStats</span>(metyl.obj[[1]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># normal2</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>getMethylationStats</span>(metyl.obj[[2]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># cancer1</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>getMethylationStats</span>(metyl.obj[[3]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># cancer2</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>getMethylationStats</span>(metyl.obj[[4]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+</span></span></code></pre></div><p>From the histograms generated by the previous scripts, the numbers on the bars represent the percentage of locations that are contained in each bin. Percent methylation histogram are expected to have two peaks on both ends.</p><p>Alternatively, the histogram of the read coverage per base information can be plotted as well. Experiments that are highly suffering from PCR duplication bias are expected to have a secondary peak towards the right hand side of the histogram.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Histogram of CpG coverage</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># normal1</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>getCoverageStats</span>(metyl.obj[[1]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># normal2</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>getCoverageStats</span>(metyl.obj[[2]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># cancer1</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>getCoverageStats</span>(metyl.obj[[3]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># cancer2</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>getCoverageStats</span>(metyl.obj[[4]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+</span></span></code></pre></div><h2 id=3-filtering-samples-based-on-read-coverage>3. Filtering samples based on read coverage</h2><p>It is a good practice to filter samples based on coverage, and discard bases that have coverage below 10X bases that have more than 99.9th percentile of coverage in each sample. This can be achieved with the following code:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>filtered.metyl.obj <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>filterByCoverage</span>(
+</span></span><span style=display:flex><span>                        metyl.obj, 
+</span></span><span style=display:flex><span>                        lo.count <span style=color:#f92672>=</span> <span style=color:#ae81ff>10</span>,
+</span></span><span style=display:flex><span>                        lo.perc <span style=color:#f92672>=</span> <span style=color:#66d9ef>NULL</span>,
+</span></span><span style=display:flex><span>                        hi.count <span style=color:#f92672>=</span> <span style=color:#66d9ef>NULL</span>,
+</span></span><span style=display:flex><span>                        hi.perc <span style=color:#f92672>=</span> <span style=color:#ae81ff>99.9</span>
+</span></span><span style=display:flex><span>)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>combined_data.filtered
+</span></span></code></pre></div><p>Let&rsquo;s assess once again the basic stats about the methylation data such as coverage and percent methylation.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Histogram of % CpG methylation</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># normal1</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>getMethylationStats</span>(filtered.metyl.obj[[1]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># normal2</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>getMethylationStats</span>(filtered.metyl.obj[[2]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># cancer1</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>getMethylationStats</span>(filtered.metyl.obj[[3]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># cancer2</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>getMethylationStats</span>(filtered.metyl.obj[[4]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Histogram of CpG coverage</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># normal1</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>getCoverageStats</span>(filtered.metyl.obj[[1]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># normal2</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>getCoverageStats</span>(filtered.metyl.obj[[2]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># cancer1</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>getCoverageStats</span>(filtered.metyl.obj[[3]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># cancer2</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>getCoverageStats</span>(filtered.metyl.obj[[4]], plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, both.strands <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>) 
+</span></span></code></pre></div><h2 id=4-sample-correlation>4. Sample correlation</h2><p>To conduct sample correlation, we will need to merge all samples to one object for base-pair locations that are covered in all samples.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Merging all samples</span>
+</span></span><span style=display:flex><span>merged.obj <span style=color:#f92672>=</span> <span style=color:#a6e22e>unite</span>(filtered.metyl.obj, destrand <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Taking a glance at the data...</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>head</span>(merged.obj,<span style=color:#ae81ff>3</span>)
+</span></span></code></pre></div><p>The sample correlation is computed using the <code>getCorrelation()</code> function available in the <code>methylKit</code> package.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Sample correlation</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>getCorrelation</span>(merged.obj, plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
+</span></span></code></pre></div><h2 id=5-clustering-samples>5. Clustering samples</h2><p>The <code>clusterSamples()</code> function in <code>methylKit</code> can be used to perform the hierarchical clustering of the samples based on their methylation profiles.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Clustering samples...</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>clusterSamples</span>(merged.obj, dist <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;correlation&#34;</span>, method <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;ward&#34;</span>, plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
+</span></span></code></pre></div><p>Principal Component Analysis (PCA) is another available method to cluster the samples. We perform PCA using the the <code>PCASamples()</code> function, then plot the Screeplot.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Screeplot (PCA analysis) </span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>PCASamples</span>(merged.obj, screeplot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
+</span></span></code></pre></div><p>We may plot PC1 (principal component 1) and PC2 (principal component 2) axis and a scatter plot of our samples on those axes which reveals how they cluster.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Scatterplot (PCA analysis)</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>PCASamples</span>(merged.obj)
+</span></span></code></pre></div><h2 id=6-getting-differentially-methylated-bases>6. Getting differentially methylated bases</h2><p>The function <code>calculateDiffMeth()</code> is the main function to calculate differential methylation.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Finding differentially methylated bases or </span>
+</span></span><span style=display:flex><span><span style=color:#75715e># regions (using 8 cores for faster calculations)</span>
+</span></span><span style=display:flex><span>methyl.diff <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>calculateDiffMeth</span>(merged.obj, num.cores <span style=color:#f92672>=</span> <span style=color:#ae81ff>8</span>)
+</span></span></code></pre></div><p>Following bit selects the bases that have q-value &lt; 0.01 and percent methylation difference larger than 25%.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># get hyper methylated bases</span>
+</span></span><span style=display:flex><span>myDiff25p.hyper <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>getMethylDiff</span>(
+</span></span><span style=display:flex><span>                      methyl.diff, 
+</span></span><span style=display:flex><span>                      difference <span style=color:#f92672>=</span> <span style=color:#ae81ff>25</span>, 
+</span></span><span style=display:flex><span>                      qvalue <span style=color:#f92672>=</span> <span style=color:#ae81ff>0.01</span>, 
+</span></span><span style=display:flex><span>                      type <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;hyper&#34;</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># get hypo methylated bases</span>
+</span></span><span style=display:flex><span>myDiff25p.hypo <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>getMethylDiff</span>(
+</span></span><span style=display:flex><span>                      methyl.diff, 
+</span></span><span style=display:flex><span>                      difference <span style=color:#f92672>=</span> <span style=color:#ae81ff>25</span>,
+</span></span><span style=display:flex><span>                      qvalue <span style=color:#f92672>=</span> <span style=color:#ae81ff>0.01</span>, 
+</span></span><span style=display:flex><span>                      type <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;hypo&#34;</span>
+</span></span><span style=display:flex><span> )
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># get all differentially methylated bases</span>
+</span></span><span style=display:flex><span>myDiff25p <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>getMethylDiff</span>(
+</span></span><span style=display:flex><span>                      methyl.diff, 
+</span></span><span style=display:flex><span>                      difference <span style=color:#f92672>=</span> <span style=color:#ae81ff>25</span>,
+</span></span><span style=display:flex><span>                      qvalue <span style=color:#f92672>=</span> <span style=color:#ae81ff>0.01</span>
+</span></span><span style=display:flex><span>)
+</span></span></code></pre></div><p>The <code>methylKit</code> package can summarize methylation information over tiling windows or over a set of predefined regions (promoters, CpG islands, introns, etc.) rather than doing base-pair resolution analysis.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>tiles <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>tileMethylCounts</span>(merged.obj, win.size <span style=color:#f92672>=</span> <span style=color:#ae81ff>1000</span>, step.size <span style=color:#f92672>=</span> <span style=color:#ae81ff>1000</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>head</span>(tiles, <span style=color:#ae81ff>3</span>)
+</span></span></code></pre></div><h2 id=7-differential-methylation-events-per-chromosome>7. Differential methylation events per chromosome</h2><p>We may also visualize the distribution of hypo/hyper-methylated bases/regions per chromosome using the <code>diffMethPerChr()</code> function.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Return a list having per chromosome</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># differentially methylation events will be returned</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>diffMethPerChr</span>(methyl.diff,
+</span></span><span style=display:flex><span>               plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>,
+</span></span><span style=display:flex><span>               qvalue.cutoff <span style=color:#f92672>=</span> <span style=color:#ae81ff>0.01</span>,
+</span></span><span style=display:flex><span>               meth.cutoff <span style=color:#f92672>=</span> <span style=color:#ae81ff>25</span>
+</span></span><span style=display:flex><span>              )
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># visualize the distribution of hypo/hyper-methylated</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># bases/regions per chromosome</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>diffMethPerChr</span>(methyl.diff,
+</span></span><span style=display:flex><span>               plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>,
+</span></span><span style=display:flex><span>               qvalue.cutoff <span style=color:#f92672>=</span> <span style=color:#ae81ff>0.01</span>,
+</span></span><span style=display:flex><span>               meth.cutoff <span style=color:#f92672>=</span> <span style=color:#ae81ff>25</span>
+</span></span><span style=display:flex><span>              )
+</span></span></code></pre></div><h2 id=8-annotating-differential-methylation-events>8. Annotating differential methylation events</h2><p>We may annotate the differentially methylated regions/bases based on gene annotation. We therefore need to read the gene annotation from a bed file and annotate the differentially methylated regions with that information. Similar gene annotation can be created using the Bioconductor <a href=https://bioconductor.org/packages/release/bioc/html/GenomicFeatures.html><code>GenomicFeatures</code></a> R package.</p><p>Let&rsquo;s first download an annotation <code>.bed</code> file in the annotation folder created in our first tutorial on DNA methylation. We get ours from <a href=https://sourceforge.net/projects/rseqc/files/BED/Human_Homo_sapiens/>sourceforge.net</a>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># RDownload Annotation bed file</span>
+</span></span><span style=display:flex><span>url <span style=color:#f92672>&lt;-</span> <span style=color:#e6db74>&#34;https://sourceforge.net/projects/rseqc/files/BED/Human_Homo_sapiens&#34;</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>system</span>(<span style=color:#a6e22e>paste</span>(<span style=color:#e6db74>&#34;wget -P annotation&#34;</span>, <span style=color:#a6e22e>file.path</span>(url, <span style=color:#e6db74>&#34;hg38_RefSeq.bed.gz&#34;</span>)))
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>gene.obj <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>readTranscriptFeatures</span>(
+</span></span><span style=display:flex><span>              <span style=color:#a6e22e>file.path</span>(<span style=color:#a6e22e>getwd</span>(),
+</span></span><span style=display:flex><span>                        <span style=color:#e6db74>&#34;annotation&#34;</span>,
+</span></span><span style=display:flex><span>                        <span style=color:#e6db74>&#34;hg38_RefSeq.bed.gz&#34;</span>)
+</span></span><span style=display:flex><span>)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#a6e22e>annotateWithGeneParts</span>(<span style=color:#a6e22e>as</span>(myDiff25p,<span style=color:#e6db74>&#34;GRanges&#34;</span>),gene.obj)
+</span></span></code></pre></div><p>Similarly, we can read the CpG island annotation and annotate our differentially methylated bases/regions with them.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># read the shores and flanking regions and name the flanks as shores </span>
+</span></span><span style=display:flex><span><span style=color:#75715e># and CpG islands as CpGi</span>
+</span></span><span style=display:flex><span>cpg.obj <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>readFeatureFlank</span>(
+</span></span><span style=display:flex><span>              <span style=color:#a6e22e>file.path</span>(<span style=color:#a6e22e>getwd</span>(), 
+</span></span><span style=display:flex><span>                        <span style=color:#e6db74>&#34;annotation&#34;</span>, 
+</span></span><span style=display:flex><span>                        <span style=color:#e6db74>&#34;hg38_RefSeq.bed.gz&#34;</span>),
+</span></span><span style=display:flex><span>                        feature.flank.name <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;CpGi&#34;</span>, <span style=color:#e6db74>&#34;shores&#34;</span>)
+</span></span><span style=display:flex><span>)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># convert methylDiff object to GRanges and annotate</span>
+</span></span><span style=display:flex><span>diffCpGann <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>annotateWithFeatureFlank</span>(
+</span></span><span style=display:flex><span>                  <span style=color:#a6e22e>as</span>(myDiff25p,<span style=color:#e6db74>&#34;GRanges&#34;</span>), 
+</span></span><span style=display:flex><span>                  cpg.obj<span style=color:#f92672>$</span>CpGi, 
+</span></span><span style=display:flex><span>                  cpg.obj<span style=color:#f92672>$</span>shores, 
+</span></span><span style=display:flex><span>                  feature.name <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;CpGi&#34;</span>, 
+</span></span><span style=display:flex><span>                  flank.name <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;shores&#34;</span>
+</span></span><span style=display:flex><span>)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>diffCpGann
+</span></span></code></pre></div><h2 id=9-regional-analysis>9. Regional analysis</h2><p>We now summarize methylation information over a set of defined regions such as promoters or CpG islands with the <code>regionCounts()</code> function.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>promoters <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>regionCounts</span>(metyl.obj,gene.obj<span style=color:#f92672>$</span>promoters)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>head</span>(promoters[[1]])
+</span></span></code></pre></div><h2 id=10-getting-the-distance-to-tss-and-nearest-gene-name>10. Getting the distance to TSS and nearest gene name</h2><p>After getting the annotation of differentially methylated regions, we can get the distance to TSS and nearest gene name using the <code>getAssociationWithTSS()</code> function from genomation package.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Annotate with gene parts</span>
+</span></span><span style=display:flex><span>diffAnn <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>annotateWithGeneParts</span>(<span style=color:#a6e22e>as</span>(myDiff25p, <span style=color:#e6db74>&#34;GRanges&#34;</span>), gene.obj)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># target.row is the row number in myDiff25p</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>head</span>(<span style=color:#a6e22e>getAssociationWithTSS</span>(diffAnn), <span style=color:#ae81ff>3</span>)
+</span></span></code></pre></div><p>Getting the percentage/number of differentially methylated regions that overlap with intron/exon/promoters:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>genomation<span style=color:#f92672>::</span><span style=color:#a6e22e>getTargetAnnotationStats</span>(
+</span></span><span style=display:flex><span>              diffAnn, 
+</span></span><span style=display:flex><span>              percentage <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, 
+</span></span><span style=display:flex><span>              precedence <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>
+</span></span><span style=display:flex><span>)
+</span></span></code></pre></div><h2 id=11-working-with-annotated-methylation-events>11. Working with annotated methylation events</h2><p>We may also plot the percentage of differentially methylated bases overlapping with exon/intron/promoters:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>genomation<span style=color:#f92672>::</span><span style=color:#a6e22e>plotTargetAnnotation</span>(
+</span></span><span style=display:flex><span>              diffAnn, 
+</span></span><span style=display:flex><span>              precedence <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, 
+</span></span><span style=display:flex><span>              main <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Differential methylation annotation&#34;</span>
+</span></span><span style=display:flex><span>)
+</span></span></code></pre></div><p>It is also possible to plot the CpG island annotation showing the percentage of differentially methylated bases that are on CpG islands, CpG island shores and other regions.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>genomation<span style=color:#f92672>::</span><span style=color:#a6e22e>plotTargetAnnotation</span>(
+</span></span><span style=display:flex><span>              diffCpGann, 
+</span></span><span style=display:flex><span>              col <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;green&#34;</span>, <span style=color:#e6db74>&#34;gray&#34;</span>, <span style=color:#e6db74>&#34;white&#34;</span>), 
+</span></span><span style=display:flex><span>              main <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Differential methylation annotation&#34;</span>
+</span></span><span style=display:flex><span>)
+</span></span></code></pre></div><p>Find the Original source code for this tutorial <a href=https://github.com/rosericazondekon/bioinformatics-tuto/blob/main/DNA%20methylation%20analysis/dna_methylation_tuto.ipynb>here</a>.</p></p></div></div></main><footer class=footer><span>&copy; 2022 Roseric Azondekon</span></footer></body></html>

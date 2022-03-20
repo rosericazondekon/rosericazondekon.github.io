@@ -1,353 +1,179 @@
-<!doctype html><html lang=en><head>
-<meta charset=utf-8>
-<meta name=viewport content="width=device-width,initial-scale=1">
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-3TBYJJHRP3"></script>
-<script>var doNotTrack=!1;if(!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-3TBYJJHRP3',{anonymize_ip:!1})}</script>
-<style>:root{--accent-color:#FF4D4D}</style>
-<title>Bisulfite Treated DNA Methylation Analysis</title>
-<meta name=description content="A DNA Methylation Analysis tutorial Using R.">
-<meta name=keywords content="blog,rosericazondekon,gazondekon,razondekon,gbedegnon,roseric,azondekon,bsseq,dmrseq,cpg-islands,dmr,block,dna,methylation,bisulfite-seq,fastq">
-<meta property="og:url" content="https://rosericazondekon.github.io/posts/bsseq-dna-methylation-analysis/">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Bisulfite Treated DNA Methylation Analysis">
-<meta property="og:description" content="A DNA Methylation Analysis tutorial Using R.">
-<meta property="og:image" content="/images/roz.webp">
-<meta name=twitter:card content="summary_large_image">
-<meta name=twitter:title content="Bisulfite Treated DNA Methylation Analysis">
-<meta name=twitter:description content="A DNA Methylation Analysis tutorial Using R.">
-<meta property="twitter:domain" content="https://rosericazondekon.github.io/posts/bsseq-dna-methylation-analysis/">
-<meta property="twitter:url" content="https://rosericazondekon.github.io/posts/bsseq-dna-methylation-analysis/">
-<meta name=twitter:image content="/images/roz.webp">
-<link rel=canonical href=https://rosericazondekon.github.io/posts/bsseq-dna-methylation-analysis/>
-<link rel=stylesheet type=text/css href=/css/normalize.min.css media=print onload="this.media='all'">
-<link rel=stylesheet type=text/css href=/css/main.css>
-<link disabled id=dark-theme rel=stylesheet href=/css/dark.css>
-<script src=/js/svg-injector.min.js></script>
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><script async src="https://www.googletagmanager.com/gtag/js?id=G-3TBYJJHRP3"></script>
+<script>var doNotTrack=!1;if(!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-3TBYJJHRP3",{anonymize_ip:!1})}</script><style>:root{--accent-color:#FF4D4D}</style><title>Bisulfite Treated DNA Methylation Analysis</title><meta name=description content="A DNA Methylation Analysis tutorial Using R."><meta name=keywords content="blog,rosericazondekon,gazondekon,razondekon,gbedegnon,roseric,azondekon,bsseq,dmrseq,cpg-islands,dmr,block,dna,methylation,bisulfite-seq,fastq"><meta property="og:url" content="https://rosericazondekon.github.io/posts/bsseq-dna-methylation-analysis/"><meta property="og:type" content="website"><meta property="og:title" content="Bisulfite Treated DNA Methylation Analysis"><meta property="og:description" content="A DNA Methylation Analysis tutorial Using R."><meta property="og:image" content="/images/roz.webp"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="Bisulfite Treated DNA Methylation Analysis"><meta name=twitter:description content="A DNA Methylation Analysis tutorial Using R."><meta property="twitter:domain" content="https://rosericazondekon.github.io/posts/bsseq-dna-methylation-analysis/"><meta property="twitter:url" content="https://rosericazondekon.github.io/posts/bsseq-dna-methylation-analysis/"><meta name=twitter:image content="/images/roz.webp"><link rel=canonical href=https://rosericazondekon.github.io/posts/bsseq-dna-methylation-analysis/><link rel=stylesheet type=text/css href=/css/normalize.min.css media=print onload='this.media="all"'><link rel=stylesheet type=text/css href=/css/main.css><link disabled id=dark-theme rel=stylesheet href=/css/dark.css><script src=/js/svg-injector.min.js></script>
 <script src=/js/feather-icons.min.js></script>
 <script src=/js/main.js></script>
-<link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.13.16/dist/katex.min.css integrity=sha384-6LkG2wmY8FK9E0vU9OOr8UvLwsaqUg9SETfpq4uTCN1agNe8HRdE9ABlk+fVx6gZ crossorigin=anonymous>
-<script defer src=https://cdn.jsdelivr.net/npm/katex@0.13.16/dist/katex.min.js integrity=sha384-31El76TwmbHj4rF9DyLsygbq6xoIobG0W+jqXim+a3dU9W53tdH3A/ngRPxOzzaB crossorigin=anonymous></script>
-<script defer src=https://cdn.jsdelivr.net/npm/katex@0.13.16/dist/contrib/auto-render.min.js integrity=sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl crossorigin=anonymous onload=renderMathInElement(document.body)></script>
-</head>
-<body>
-<script type=text/javascript>setThemeByUserPref()</script><header class=header>
-<nav class=header-nav>
-<div class=avatar>
-<a href=https://rosericazondekon.github.io/>
-<img src=/images/roz.webp alt=avatar>
-</a>
-</div>
-<div class=nav-title>
-<a class=nav-brand href=https://rosericazondekon.github.io/>Gbedegnon Roseric Azondekon</a>
-</div>
-<div class=nav-links>
-<div class=nav-link>
-<a href=/> Home </a>
-</div>
-<div class=nav-link>
-<a href=/posts/> Posts </a>
-</div>
-<div class=nav-link>
-<a href=/projects/> Projects </a>
-</div>
-<div class=nav-link>
-<a href=/cv/> CV </a>
-</div>
-<div class=nav-link>
-<a href=/tags/> Tags </a>
-</div>
-<div class=nav-link>
-<a href=/about/> About </a>
-</div>
-<div class=nav-link>
-<a href=https://github.com/rosericazondekon><span data-feather=github></span> </a>
-</div>
-<div class=nav-link>
-<a href=https://www.buymeacoffee.com/gazondekon><span data-feather=coffee></span> </a>
-</div>
-<div class=nav-link>
-<a href=/index.xml><span data-feather=rss></span> </a>
-</div>
-<span class=nav-icons-divider></span>
-<div class="nav-link dark-theme-toggle">
-<a>
-<span id=theme-toggle-icon data-feather=moon></span>
-</a>
-</div>
-<div class=nav-link id=hamburger-menu-toggle>
-<a>
-<span data-feather=menu></span>
-</a>
-</div>
-<ul class="nav-hamburger-list visibility-hidden">
-<li class=nav-item>
-<a href=/> Home </a>
-</li>
-<li class=nav-item>
-<a href=/posts/> Posts </a>
-</li>
-<li class=nav-item>
-<a href=/projects/> Projects </a>
-</li>
-<li class=nav-item>
-<a href=/cv/> CV </a>
-</li>
-<li class=nav-item>
-<a href=/tags/> Tags </a>
-</li>
-<li class=nav-item>
-<a href=/about/> About </a>
-</li>
-<li class=nav-item>
-<a href=https://github.com/rosericazondekon><span data-feather=github></span> </a>
-</li>
-<li class=nav-item>
-<a href=https://www.buymeacoffee.com/gazondekon><span data-feather=coffee></span> </a>
-</li>
-<li class=nav-item>
-<a href=/index.xml><span data-feather=rss></span> </a>
-</li>
-<li class="nav-item dark-theme-toggle">
-<a>
-<span id=theme-toggle-icon data-feather=moon></span>
-</a>
-</li>
-</ul>
-</div>
-</nav>
-</header>
-<main id=content>
-<div class="post container">
-<div class=post-header-section>
-<h1>Bisulfite Treated DNA Methylation Analysis</h1>
-<small role=doc-subtitle>A DNA Methylation Analysis tutorial Using R.</small>
-<p class=post-date>
-January 22, 2022
-</p>
-<ul class=post-tags>
-<li class=post-tag><a href=/tags/bsseq>bsseq</a></li>
-<li class=post-tag><a href=/tags/dmrseq>dmrseq</a></li>
-<li class=post-tag><a href=/tags/cpg-islands>cpg-islands</a></li>
-<li class=post-tag><a href=/tags/dmr>dmr</a></li>
-<li class=post-tag><a href=/tags/block>block</a></li>
-<li class=post-tag><a href=/tags/dna>dna</a></li>
-<li class=post-tag><a href=/tags/methylation>methylation</a></li>
-<li class=post-tag><a href=/tags/bisulfite-seq>bisulfite-seq</a></li>
-<li class=post-tag><a href=/tags/fastq>fastq</a></li>
-</ul>
-</div>
-<div class=post-content>
-<p>
-<p><strong>Disclaimer:</strong> This tutorial was originally written on June 06, 2019.</p>
-<h2 id=introduction>Introduction</h2>
-<p>In a <a href=/posts/bisulfite-treated-read-align>previous tutorial</a>, we showed you how to download and process Bisulfite-treated sequence DNA methylation FASTQ files for read alignment on a reference sequence. In this tutorial, we show you how to run DNA methylation analysis using the Bioconductor <a href=https://bioconductor.org/packages/release/bioc/html/bsseq.html><code>bsseq</code></a> and <a href=https://bioconductor.org/packages/release/bioc/html/dmrseq.html><code>dmrseq</code></a> R packages.</p>
-<p>We set our working directory to the <code>tuto</code> folder created in our <a href=/posts/bisulfite-treated-read-align>previous tutorial</a>.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#a6e22e>setwd</span>(<span style=color:#e6db74>&#39;./tuto&#39;</span>)
-</code></pre></div><p>Now, let&rsquo;s install all the required packages for this tutorial.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Indicate package repositories to R...</span>
-repositories <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;https://cloud.r-project.org&#34;</span>, 
-                   <span style=color:#e6db74>&#34;https://bioconductor.org/packages/3.7/bioc&#34;</span>,
-                   <span style=color:#e6db74>&#34;https://bioconductor.org/packages/3.7/data/annotation&#34;</span>, 
-                   <span style=color:#e6db74>&#34;https://bioconductor.org/packages/3.7/data/experiment&#34;</span>,
-                   <span style=color:#e6db74>&#34;https://www.stats.ox.ac.uk/pub/RWin&#34;</span>, 
-                   <span style=color:#e6db74>&#34;http://www.omegahat.net/R&#34;</span>, 
-                   <span style=color:#e6db74>&#34;https://R-Forge.R-project.org&#34;</span>,
-                   <span style=color:#e6db74>&#34;https://www.rforge.net&#34;</span>, 
-                   <span style=color:#e6db74>&#34;https://cloud.r-project.org&#34;</span>, 
-                   <span style=color:#e6db74>&#34;http://www.bioconductor.org&#34;</span>,
-                   <span style=color:#e6db74>&#34;http://www.stats.ox.ac.uk/pub/RWin&#34;</span>)
-
-<span style=color:#75715e># Package list to download</span>
-packages <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;bsseq&#34;</span>, <span style=color:#e6db74>&#34;bsseqdata&#34;</span>, <span style=color:#e6db74>&#34;dmrseq&#34;</span>, <span style=color:#e6db74>&#34;DelayedMatrixStats&#34;</span>)
-
-<span style=color:#75715e># Install and load missing packages</span>
-new.packages <span style=color:#f92672>&lt;-</span> packages[<span style=color:#f92672>!</span>(packages <span style=color:#f92672>%in%</span> <span style=color:#a6e22e>installed.packages</span>()[, <span style=color:#e6db74>&#34;Package&#34;</span>])]
-
-<span style=color:#a6e22e>if</span>(<span style=color:#a6e22e>length</span>(new.packages)){
-    <span style=color:#a6e22e>install.packages</span>(new.packages, repos <span style=color:#f92672>=</span> repositories)
-}
-
-<span style=color:#a6e22e>lapply</span>(packages, library, character.only <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
-</code></pre></div><h2 id=1-obtaining-methylation-data-from-bismark-extraction-methylation-calls>1. Obtaining methylation data from Bismark extraction methylation calls</h2>
-<p>We read in the methylation calls directly from the <code>Bismark</code> methylation extractor files obtained from the <a href=/posts/bisulfite-treated-read-align>previous tutoral</a>. The files are located within the <code>bismark_methCalls</code> folder (see <a href=/posts/bisulfite-treated-read-align>previous tutorial</a>). For that purpose, we use the <code>read.bismark()</code> function from the <code>bsseq</code> Bioconductor R package as described below:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Get sample data from files</span>
-files_loc <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>file.path</span>(<span style=color:#a6e22e>getwd</span>(), <span style=color:#e6db74>&#39;bismark_methCalls&#39;</span>)
-samples <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>list.dirs</span>(files_loc, full.names <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>, recursive <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>)
-samples
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Define conditions</span>
-conditions <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>c</span>(<span style=color:#a6e22e>rep</span>(<span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;normal&#34;</span>, <span style=color:#e6db74>&#34;cancer&#34;</span>), each <span style=color:#f92672>=</span> <span style=color:#ae81ff>2</span>))
-sampleData <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>data.frame</span>(condition <span style=color:#f92672>=</span> conditions)
-<span style=color:#a6e22e>rownames</span>(sampleData) <span style=color:#f92672>&lt;-</span> samples
-sampleData
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>methyl_files <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>list.files</span>(files_loc, <span style=color:#e6db74>&#34;\\cov.gz$&#34;</span>, 
-                           full.names <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, recursive <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
-methyl_files
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Will generate specifically for this set of data, 4 variables: </span>
-<span style=color:#75715e># methyl_data1, methyl_data2, methyl_data3, methyl_data4</span>
-<span style=color:#a6e22e>for</span>(i in <span style=color:#ae81ff>1</span><span style=color:#f92672>:</span><span style=color:#a6e22e>length</span>(methyl_files)){
-    sampleTable <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>data.frame</span>(condition <span style=color:#f92672>=</span> conditions[i])
-    <span style=color:#a6e22e>rownames</span>(sampleTable) <span style=color:#f92672>&lt;-</span> samples[i]
-    <span style=color:#a6e22e>assign</span>(
-        <span style=color:#a6e22e>paste0</span>(<span style=color:#e6db74>&#34;methyl_data&#34;</span>, i),
-        <span style=color:#a6e22e>read.bismark</span>(methyl_files[i],
-                     loci <span style=color:#f92672>=</span> <span style=color:#66d9ef>NULL</span>,
-                     colData <span style=color:#f92672>=</span> sampleTable,
-                     rmZeroCov <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>,
-                     strandCollapse <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>,
-                     BPPARAM <span style=color:#f92672>=</span> <span style=color:#a6e22e>bpparam</span>(),
-                     BACKEND <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;HDF5Array&#34;</span>,
-                     dir <span style=color:#f92672>=</span> <span style=color:#a6e22e>tempfile</span>(<span style=color:#e6db74>&#34;BSseq&#34;</span>),
-                     replace <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>,
-                     chunkdim <span style=color:#f92672>=</span> <span style=color:#66d9ef>NULL</span>,
-                     level <span style=color:#f92672>=</span> <span style=color:#66d9ef>NULL</span>,
-                     nThread <span style=color:#f92672>=</span> <span style=color:#ae81ff>8</span>,
-                     verbose <span style=color:#f92672>=</span> <span style=color:#a6e22e>getOption</span>(<span style=color:#e6db74>&#34;verbose&#34;</span>))
-    )
-}
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>methyl_data1
-methyl_data2
-methyl_data3
-methyl_data4
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#a6e22e>pData</span>(methyl_data1)
-<span style=color:#a6e22e>pData</span>(methyl_data2)
-<span style=color:#a6e22e>pData</span>(methyl_data3)
-<span style=color:#a6e22e>pData</span>(methyl_data4)
-</code></pre></div><p>We now combine all methylation data for all 4 samples:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>combined_data <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>combine</span>(methyl_data1, methyl_data2, methyl_data3, methyl_data4)
-combined_data
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#a6e22e>pData</span>(combined_data)
-</code></pre></div><h2 id=2-smoothing>2. Smoothing</h2>
-<p>The first step of the analysis is to smooth the data</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Smoothing the data</span>
-combined_data.fit <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>BSmooth</span>(
-    BSseq <span style=color:#f92672>=</span> combined_data, 
-    BPPARAM <span style=color:#f92672>=</span> <span style=color:#a6e22e>MulticoreParam</span>(workers <span style=color:#f92672>=</span> <span style=color:#ae81ff>7</span>), 
-    verbose <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>
-)
-</code></pre></div><p>Since the previous step is time consuming and computationally expensive, let&rsquo;s save the smoothed data:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Saving the smoothed data</span>
-<span style=color:#a6e22e>save</span>(combined_data.fit, file <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;combined_data_fit.rda&#34;</span>)
-</code></pre></div><p>You may later load the <code>combined_data.fit</code> object by running the following code:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#a6e22e>load</span>(<span style=color:#e6db74>&#34;combined_data_fit.rda&#34;</span>)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Inspecting the combined smoothed data</span>
-combined_data.fit
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># The average coverage of CpGs on the two chromosomes</span>
-<span style=color:#a6e22e>round</span>(<span style=color:#a6e22e>colMeans</span>(<span style=color:#a6e22e>getCoverage</span>(combined_data)), <span style=color:#ae81ff>1</span>)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Number of CpGs in two chromosomes</span>
-<span style=color:#a6e22e>length</span>(combined_data)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Number of CpGs which are covered by at least 1 read in all 4 samples</span>
-<span style=color:#a6e22e>sum</span>(<span style=color:#a6e22e>rowSums</span>(<span style=color:#a6e22e>getCoverage</span>(combined_data) <span style=color:#f92672>&gt;=</span> <span style=color:#ae81ff>1</span>) <span style=color:#f92672>==</span> <span style=color:#ae81ff>4</span>)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Number of CpGs with 0 coverage in all samples</span>
-<span style=color:#a6e22e>sum</span>(<span style=color:#a6e22e>rowSums</span>(<span style=color:#a6e22e>getCoverage</span>(combined_data)) <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span>)
-</code></pre></div><h2 id=3-computing-t-statistics>3. Computing t-statistics</h2>
-<p>To avoid too many differentially methilated regions (DRMs), we remove CpGs with little or no coverage (which are likely false positives). We keep CpGs where at least 1 cancer samples and at least 1 normal samples have at least 2x in coverage.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># which loci and sample indices to keep</span>
-keep.index <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>which</span>(
-                DelayedMatrixStats<span style=color:#f92672>::</span><span style=color:#a6e22e>rowSums2</span>(
-                  <span style=color:#a6e22e>getCoverage</span>(combined_data, type <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Cov&#34;</span>) <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span>) <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span>
-              )
-
-sample.index <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>which</span>(<span style=color:#a6e22e>pData</span>(combined_data)<span style=color:#f92672>$</span>condition <span style=color:#f92672>%in%</span> <span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;normal&#34;</span>, <span style=color:#e6db74>&#34;cancer&#34;</span>))
-
-combined_data.filtered <span style=color:#f92672>&lt;-</span> combined_data[keep.index, sample.index]
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>combined_data.filtered
-</code></pre></div><p>For t-statistics, we will only keep CpGs where at least 2 cancer samples and at least 2 normal samples have at least 2x in coverage.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>combined_data.cov <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>getCoverage</span>(combined_data.fit)
-
-keep.index2 <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>which</span>(<span style=color:#a6e22e>rowSums</span>(combined_data.cov[,
-                             combined_data<span style=color:#f92672>$</span>condition <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;cancer&#34;</span>] <span style=color:#f92672>&gt;=</span> <span style=color:#ae81ff>2</span>) <span style=color:#f92672>&gt;=</span> <span style=color:#ae81ff>2</span> <span style=color:#f92672>&amp;</span>
-                     <span style=color:#a6e22e>rowSums</span>(combined_data.cov[, 
-                             combined_data<span style=color:#f92672>$</span>condition <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;normal&#34;</span>] <span style=color:#f92672>&gt;=</span> <span style=color:#ae81ff>2</span>) <span style=color:#f92672>&gt;=</span> <span style=color:#ae81ff>2</span>
-              )
-
-<span style=color:#a6e22e>length</span>(keep.index2)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>combined_data.fit2 <span style=color:#f92672>&lt;-</span> combined_data.fit[keep.index2]
-</code></pre></div><p>Let&rsquo;s first arrange the two groups for the t-test:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># In grp1, we keep all the normal sample names, and</span>
-<span style=color:#75715e># in grp2, all the cancer sample names</span>
-grp1 <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>rownames</span>(sampleData)[sampleData<span style=color:#f92672>$</span>condition <span style=color:#f92672>==</span> <span style=color:#e6db74>&#39;normal&#39;</span>]
-grp2 <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>rownames</span>(sampleData)[sampleData<span style=color:#f92672>$</span>condition <span style=color:#f92672>==</span> <span style=color:#e6db74>&#39;cancer&#39;</span>]
-grp1
-grp2
-</code></pre></div><p>We now compute t-statistics with the <code>BSmooth.tstat</code> function provided by the <code>BSseq</code> Bioconductor R package.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>combined_data.tstat <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>BSmooth.tstat</span>(
-    combined_data.fit2,
-    group1 <span style=color:#f92672>=</span> grp2,
-    group2 <span style=color:#f92672>=</span> grp1,
-    estimate.var <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;group2&#34;</span>,
-    local.correct <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>,
-    mc.cores <span style=color:#f92672>=</span> <span style=color:#ae81ff>8</span>,
-    verbose <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>
-)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>combined_data.tstat
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>stats <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>as.data.frame</span>(combined_data.tstat<span style=color:#f92672>@</span>stats)
-<span style=color:#a6e22e>head</span>(stats)
-</code></pre></div><p>Let&rsquo;s check the marginal distribution of the t-statistic:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#a6e22e>plot</span>(<span style=color:#a6e22e>density</span>(<span style=color:#a6e22e>as.numeric</span>(<span style=color:#a6e22e>as.vector</span>(stats<span style=color:#f92672>$</span>tstat.corrected)), 
-             na.rm <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>), xlim <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>-15</span>, <span style=color:#ae81ff>15</span>), col <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;red&#34;</span>, main <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;&#34;</span>)
-             
-<span style=color:#a6e22e>lines</span>(<span style=color:#a6e22e>density</span>(<span style=color:#a6e22e>as.numeric</span>(<span style=color:#a6e22e>as.vector</span>(stats<span style=color:#f92672>$</span>tstat)), 
-              na.rm <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>), col <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;blue&#34;</span>)
-              
-<span style=color:#a6e22e>legend</span>(<span style=color:#e6db74>&#34;topright&#34;</span>, legend <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;corrected&#34;</span>, <span style=color:#e6db74>&#34;uncorrected&#34;</span>), 
-       col <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;red&#34;</span>, <span style=color:#e6db74>&#34;blue&#34;</span>), lty <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>)
-</code></pre></div><p>The “blocks” of hypomethylation are clearly visible in the marginal distribution of the uncorrected t-statistics.</p>
-<h2 id=4-finding-differentially-methylated-regions-dmrs>4. Finding Differentially Methylated Regions (DMRs)</h2>
-<p>We use the <code>dmrseq()</code> function of the <code>dmrseq</code> Bioconductor R package to compute the DMRs.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># run the results for a subset of 60,000 CpGs in the interest</span>
-<span style=color:#75715e># of computation time</span>
-<span style=color:#75715e># Run with a single core if it fails on multiple cores (workers = 1)</span>
-dmrs <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>dmrseq</span>(bs <span style=color:#f92672>=</span> combined_data.filtered[240001<span style=color:#f92672>:</span><span style=color:#ae81ff>300000</span>, ],
-               cutoff <span style=color:#f92672>=</span> <span style=color:#ae81ff>0.05</span>,
-               BPPARAM <span style=color:#f92672>=</span> <span style=color:#a6e22e>MulticoreParam</span>(workers <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>),
-               testCovariate <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;condition&#34;</span>)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Displaying DMRs</span>
-<span style=color:#a6e22e>show</span>(dmrs)
-</code></pre></div><h3 id=41-exploring-significantly-methylated-regions>4.1. Exploring Significantly Methylated Regions</h3>
-<p>In this tutorial, the number of significantly (and Differentially) Methylated Regions is assessed at the FDR (q-value) cutoff of 0.05.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#a6e22e>sum</span>(dmrs<span style=color:#f92672>$</span>qval <span style=color:#f92672>&lt;</span> <span style=color:#ae81ff>0.05</span>)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># select just the regions below FDR 0.05 and place in a new data.frame</span>
-sigRegions <span style=color:#f92672>&lt;-</span> dmrs[dmrs<span style=color:#f92672>$</span>qval <span style=color:#f92672>&lt;</span> <span style=color:#ae81ff>0.05</span>, ]
-</code></pre></div><h3 id=42-proportion-of-regions-with-hyper-methylation>4.2. Proportion of regions with hyper-methylation</h3>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#a6e22e>sum</span>(sigRegions<span style=color:#f92672>$</span>stat <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>0</span>) <span style=color:#f92672>/</span> <span style=color:#a6e22e>length</span>(sigRegions)
-</code></pre></div><p>To interpret the direction of effect, since <code>dmrseq</code> uses alphabetical order of the covariate of interest, the condition <code>cancer</code> would be the reference category.</p>
-<h3 id=43-visualizing-differentially-methylated-regions-dmrs>4.3. Visualizing Differentially Methylated Regions (DMRs)</h3>
-<p>We first get the annotation for <code>hg18</code>, then use the <code>plotDMRs()</code> function provided by the Bioconductor <code>dmrseq</code> R package.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># get annotations for hg18</span>
-annotation <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>getAnnot</span>(<span style=color:#e6db74>&#34;hg18&#34;</span>)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Plot DMRs</span>
-<span style=color:#a6e22e>plotDMRs</span>(combined_data.filtered,
-         regions <span style=color:#f92672>=</span> dmrs[1, ], 
-         testCovariate <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;condition&#34;</span>,
-         annoTrack <span style=color:#f92672>=</span> annotation)
-</code></pre></div><h2 id=5-detecting-large-scale-methylation-blocks>5. Detecting large-scale methylation blocks</h2>
-<p>In some applications, such as cancer, it is of interest to effectively &lsquo;zoom out&rsquo; in order to detect larger (lower-resolution) methylation blocks on the order of hundreds of thousands to millions of bases.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Run the results for a subset of 300,000 CpGs in the interest</span>
-<span style=color:#75715e># of computation time</span>
-<span style=color:#75715e># Run with a single core if it fails on multiple cores</span>
-blocks <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>dmrseq</span>(bs <span style=color:#f92672>=</span> combined_data.filtered[120001<span style=color:#f92672>:</span><span style=color:#ae81ff>420000</span>, ],
-                 cutoff <span style=color:#f92672>=</span> <span style=color:#ae81ff>0.05</span>,
-                 testCovariate <span style=color:#f92672>=</span><span style=color:#e6db74>&#39;condition&#39;</span>,
-                 block <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>,
-                 BPPARAM <span style=color:#f92672>=</span> <span style=color:#a6e22e>MulticoreParam</span>(workers <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>),
-                 minInSpan <span style=color:#f92672>=</span> <span style=color:#ae81ff>500</span>,
-                 bpSpan <span style=color:#f92672>=</span> <span style=color:#ae81ff>5e4</span>,
-                 maxGapSmooth <span style=color:#f92672>=</span> <span style=color:#ae81ff>1e6</span>,
-                 maxGap <span style=color:#f92672>=</span> <span style=color:#ae81ff>5e3</span>)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#a6e22e>show</span>(blocks)
-</code></pre></div><p>We may visualize the top methylation blocks from the block analysis as shown below:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Plot top methylation blocks </span>
-<span style=color:#a6e22e>plotDMRs</span>(combined_data.filtered, 
-         regions <span style=color:#f92672>=</span> blocks[1, ], 
-         testCovariate <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;condition&#34;</span>,
-         annoTrack <span style=color:#f92672>=</span> annotation)
-</code></pre></div><p>This last DMR plot concludes this tutorial on DNA methylation analysis with the <code>BSseq</code> and <code>dmrseq</code> Bioconductor R packages. For more information, feel free to check the official <a href=http://bioconductor.org/packages/release/bioc/vignettes/bsseq/inst/doc/bsseq_analysis.html>BSseq</a> and <a href=https://bioconductor.org/packages/devel/bioc/vignettes/dmrseq/inst/doc/dmrseq.html>dmrseq</a> tutorials.</p>
-<p>Find the Original source code for this tutorial <a href=https://github.com/rosericazondekon/bioinformatics-tuto/blob/main/DNA%20methylation%20analysis/dna_methylation_bsseq_dmrseq.ipynb>here</a>.</p>
-</p>
-</div>
-</div>
-</main><footer class=footer>
-<span>&copy; 2022 Roseric Azondekon</span>
-</footer>
-</body>
-</html>
+<link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.13.16/dist/katex.min.css integrity=sha384-6LkG2wmY8FK9E0vU9OOr8UvLwsaqUg9SETfpq4uTCN1agNe8HRdE9ABlk+fVx6gZ crossorigin=anonymous><script defer src=https://cdn.jsdelivr.net/npm/katex@0.13.16/dist/katex.min.js integrity=sha384-31El76TwmbHj4rF9DyLsygbq6xoIobG0W+jqXim+a3dU9W53tdH3A/ngRPxOzzaB crossorigin=anonymous></script>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.13.16/dist/contrib/auto-render.min.js integrity=sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl crossorigin=anonymous onload=renderMathInElement(document.body)></script></head><body><script type=text/javascript>setThemeByUserPref()</script><header class=header><nav class=header-nav><div class=avatar><a href=https://rosericazondekon.github.io/><img src=/images/roz.webp alt=avatar></a></div><div class=nav-title><a class=nav-brand href=https://rosericazondekon.github.io/>Gbedegnon Roseric Azondekon</a></div><div class=nav-links><div class=nav-link><a href=/>Home</a></div><div class=nav-link><a href=/posts/>Posts</a></div><div class=nav-link><a href=/projects/>Projects</a></div><div class=nav-link><a href=/cv/>CV</a></div><div class=nav-link><a href=/tags/>Tags</a></div><div class=nav-link><a href=/about/>About</a></div><div class=nav-link><a href=https://github.com/rosericazondekon><span data-feather=github></span></a></div><div class=nav-link><a href=https://www.buymeacoffee.com/gazondekon><span data-feather=coffee></span></a></div><div class=nav-link><a href=/index.xml><span data-feather=rss></span></a></div><span class=nav-icons-divider></span><div class="nav-link dark-theme-toggle"><a><span id=theme-toggle-icon data-feather=moon></span></a></div><div class=nav-link id=hamburger-menu-toggle><a><span data-feather=menu></span></a></div><ul class="nav-hamburger-list visibility-hidden"><li class=nav-item><a href=/>Home</a></li><li class=nav-item><a href=/posts/>Posts</a></li><li class=nav-item><a href=/projects/>Projects</a></li><li class=nav-item><a href=/cv/>CV</a></li><li class=nav-item><a href=/tags/>Tags</a></li><li class=nav-item><a href=/about/>About</a></li><li class=nav-item><a href=https://github.com/rosericazondekon><span data-feather=github></span></a></li><li class=nav-item><a href=https://www.buymeacoffee.com/gazondekon><span data-feather=coffee></span></a></li><li class=nav-item><a href=/index.xml><span data-feather=rss></span></a></li><li class="nav-item dark-theme-toggle"><a><span id=theme-toggle-icon data-feather=moon></span></a></li></ul></div></nav></header><main id=content><div class="post container"><div class=post-header-section><h1>Bisulfite Treated DNA Methylation Analysis</h1><small role=doc-subtitle>A DNA Methylation Analysis tutorial Using R.</small><p class=post-date>January 22, 2022</p><ul class=post-tags><li class=post-tag><a href=/tags/bsseq>bsseq</a></li><li class=post-tag><a href=/tags/dmrseq>dmrseq</a></li><li class=post-tag><a href=/tags/cpg-islands>cpg-islands</a></li><li class=post-tag><a href=/tags/dmr>dmr</a></li><li class=post-tag><a href=/tags/block>block</a></li><li class=post-tag><a href=/tags/dna>dna</a></li><li class=post-tag><a href=/tags/methylation>methylation</a></li><li class=post-tag><a href=/tags/bisulfite-seq>bisulfite-seq</a></li><li class=post-tag><a href=/tags/fastq>fastq</a></li></ul></div><div class=post-content><p><p><strong>Disclaimer:</strong> This tutorial was originally written on June 06, 2019.</p><h2 id=introduction>Introduction</h2><p>In a <a href=/posts/bisulfite-treated-read-align>previous tutorial</a>, we showed you how to download and process Bisulfite-treated sequence DNA methylation FASTQ files for read alignment on a reference sequence. In this tutorial, we show you how to run DNA methylation analysis using the Bioconductor <a href=https://bioconductor.org/packages/release/bioc/html/bsseq.html><code>bsseq</code></a> and <a href=https://bioconductor.org/packages/release/bioc/html/dmrseq.html><code>dmrseq</code></a> R packages.</p><p>We set our working directory to the <code>tuto</code> folder created in our <a href=/posts/bisulfite-treated-read-align>previous tutorial</a>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#a6e22e>setwd</span>(<span style=color:#e6db74>&#39;./tuto&#39;</span>)
+</span></span></code></pre></div><p>Now, let&rsquo;s install all the required packages for this tutorial.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Indicate package repositories to R...</span>
+</span></span><span style=display:flex><span>repositories <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;https://cloud.r-project.org&#34;</span>, 
+</span></span><span style=display:flex><span>                   <span style=color:#e6db74>&#34;https://bioconductor.org/packages/3.7/bioc&#34;</span>,
+</span></span><span style=display:flex><span>                   <span style=color:#e6db74>&#34;https://bioconductor.org/packages/3.7/data/annotation&#34;</span>, 
+</span></span><span style=display:flex><span>                   <span style=color:#e6db74>&#34;https://bioconductor.org/packages/3.7/data/experiment&#34;</span>,
+</span></span><span style=display:flex><span>                   <span style=color:#e6db74>&#34;https://www.stats.ox.ac.uk/pub/RWin&#34;</span>, 
+</span></span><span style=display:flex><span>                   <span style=color:#e6db74>&#34;http://www.omegahat.net/R&#34;</span>, 
+</span></span><span style=display:flex><span>                   <span style=color:#e6db74>&#34;https://R-Forge.R-project.org&#34;</span>,
+</span></span><span style=display:flex><span>                   <span style=color:#e6db74>&#34;https://www.rforge.net&#34;</span>, 
+</span></span><span style=display:flex><span>                   <span style=color:#e6db74>&#34;https://cloud.r-project.org&#34;</span>, 
+</span></span><span style=display:flex><span>                   <span style=color:#e6db74>&#34;http://www.bioconductor.org&#34;</span>,
+</span></span><span style=display:flex><span>                   <span style=color:#e6db74>&#34;http://www.stats.ox.ac.uk/pub/RWin&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Package list to download</span>
+</span></span><span style=display:flex><span>packages <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;bsseq&#34;</span>, <span style=color:#e6db74>&#34;bsseqdata&#34;</span>, <span style=color:#e6db74>&#34;dmrseq&#34;</span>, <span style=color:#e6db74>&#34;DelayedMatrixStats&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Install and load missing packages</span>
+</span></span><span style=display:flex><span>new.packages <span style=color:#f92672>&lt;-</span> packages[<span style=color:#f92672>!</span>(packages <span style=color:#f92672>%in%</span> <span style=color:#a6e22e>installed.packages</span>()[, <span style=color:#e6db74>&#34;Package&#34;</span>])]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>if</span>(<span style=color:#a6e22e>length</span>(new.packages)){
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>install.packages</span>(new.packages, repos <span style=color:#f92672>=</span> repositories)
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>lapply</span>(packages, library, character.only <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
+</span></span></code></pre></div><h2 id=1-obtaining-methylation-data-from-bismark-extraction-methylation-calls>1. Obtaining methylation data from Bismark extraction methylation calls</h2><p>We read in the methylation calls directly from the <code>Bismark</code> methylation extractor files obtained from the <a href=/posts/bisulfite-treated-read-align>previous tutoral</a>. The files are located within the <code>bismark_methCalls</code> folder (see <a href=/posts/bisulfite-treated-read-align>previous tutorial</a>). For that purpose, we use the <code>read.bismark()</code> function from the <code>bsseq</code> Bioconductor R package as described below:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Get sample data from files</span>
+</span></span><span style=display:flex><span>files_loc <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>file.path</span>(<span style=color:#a6e22e>getwd</span>(), <span style=color:#e6db74>&#39;bismark_methCalls&#39;</span>)
+</span></span><span style=display:flex><span>samples <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>list.dirs</span>(files_loc, full.names <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>, recursive <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>)
+</span></span><span style=display:flex><span>samples
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Define conditions</span>
+</span></span><span style=display:flex><span>conditions <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>c</span>(<span style=color:#a6e22e>rep</span>(<span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;normal&#34;</span>, <span style=color:#e6db74>&#34;cancer&#34;</span>), each <span style=color:#f92672>=</span> <span style=color:#ae81ff>2</span>))
+</span></span><span style=display:flex><span>sampleData <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>data.frame</span>(condition <span style=color:#f92672>=</span> conditions)
+</span></span><span style=display:flex><span><span style=color:#a6e22e>rownames</span>(sampleData) <span style=color:#f92672>&lt;-</span> samples
+</span></span><span style=display:flex><span>sampleData
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>methyl_files <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>list.files</span>(files_loc, <span style=color:#e6db74>&#34;\\cov.gz$&#34;</span>, 
+</span></span><span style=display:flex><span>                           full.names <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, recursive <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
+</span></span><span style=display:flex><span>methyl_files
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Will generate specifically for this set of data, 4 variables: </span>
+</span></span><span style=display:flex><span><span style=color:#75715e># methyl_data1, methyl_data2, methyl_data3, methyl_data4</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>for</span>(i in <span style=color:#ae81ff>1</span><span style=color:#f92672>:</span><span style=color:#a6e22e>length</span>(methyl_files)){
+</span></span><span style=display:flex><span>    sampleTable <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>data.frame</span>(condition <span style=color:#f92672>=</span> conditions[i])
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>rownames</span>(sampleTable) <span style=color:#f92672>&lt;-</span> samples[i]
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>assign</span>(
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>paste0</span>(<span style=color:#e6db74>&#34;methyl_data&#34;</span>, i),
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>read.bismark</span>(methyl_files[i],
+</span></span><span style=display:flex><span>                     loci <span style=color:#f92672>=</span> <span style=color:#66d9ef>NULL</span>,
+</span></span><span style=display:flex><span>                     colData <span style=color:#f92672>=</span> sampleTable,
+</span></span><span style=display:flex><span>                     rmZeroCov <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>,
+</span></span><span style=display:flex><span>                     strandCollapse <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>,
+</span></span><span style=display:flex><span>                     BPPARAM <span style=color:#f92672>=</span> <span style=color:#a6e22e>bpparam</span>(),
+</span></span><span style=display:flex><span>                     BACKEND <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;HDF5Array&#34;</span>,
+</span></span><span style=display:flex><span>                     dir <span style=color:#f92672>=</span> <span style=color:#a6e22e>tempfile</span>(<span style=color:#e6db74>&#34;BSseq&#34;</span>),
+</span></span><span style=display:flex><span>                     replace <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>,
+</span></span><span style=display:flex><span>                     chunkdim <span style=color:#f92672>=</span> <span style=color:#66d9ef>NULL</span>,
+</span></span><span style=display:flex><span>                     level <span style=color:#f92672>=</span> <span style=color:#66d9ef>NULL</span>,
+</span></span><span style=display:flex><span>                     nThread <span style=color:#f92672>=</span> <span style=color:#ae81ff>8</span>,
+</span></span><span style=display:flex><span>                     verbose <span style=color:#f92672>=</span> <span style=color:#a6e22e>getOption</span>(<span style=color:#e6db74>&#34;verbose&#34;</span>))
+</span></span><span style=display:flex><span>    )
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>methyl_data1
+</span></span><span style=display:flex><span>methyl_data2
+</span></span><span style=display:flex><span>methyl_data3
+</span></span><span style=display:flex><span>methyl_data4
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#a6e22e>pData</span>(methyl_data1)
+</span></span><span style=display:flex><span><span style=color:#a6e22e>pData</span>(methyl_data2)
+</span></span><span style=display:flex><span><span style=color:#a6e22e>pData</span>(methyl_data3)
+</span></span><span style=display:flex><span><span style=color:#a6e22e>pData</span>(methyl_data4)
+</span></span></code></pre></div><p>We now combine all methylation data for all 4 samples:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>combined_data <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>combine</span>(methyl_data1, methyl_data2, methyl_data3, methyl_data4)
+</span></span><span style=display:flex><span>combined_data
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#a6e22e>pData</span>(combined_data)
+</span></span></code></pre></div><h2 id=2-smoothing>2. Smoothing</h2><p>The first step of the analysis is to smooth the data</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Smoothing the data</span>
+</span></span><span style=display:flex><span>combined_data.fit <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>BSmooth</span>(
+</span></span><span style=display:flex><span>    BSseq <span style=color:#f92672>=</span> combined_data, 
+</span></span><span style=display:flex><span>    BPPARAM <span style=color:#f92672>=</span> <span style=color:#a6e22e>MulticoreParam</span>(workers <span style=color:#f92672>=</span> <span style=color:#ae81ff>7</span>), 
+</span></span><span style=display:flex><span>    verbose <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>
+</span></span><span style=display:flex><span>)
+</span></span></code></pre></div><p>Since the previous step is time consuming and computationally expensive, let&rsquo;s save the smoothed data:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Saving the smoothed data</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>save</span>(combined_data.fit, file <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;combined_data_fit.rda&#34;</span>)
+</span></span></code></pre></div><p>You may later load the <code>combined_data.fit</code> object by running the following code:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#a6e22e>load</span>(<span style=color:#e6db74>&#34;combined_data_fit.rda&#34;</span>)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Inspecting the combined smoothed data</span>
+</span></span><span style=display:flex><span>combined_data.fit
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># The average coverage of CpGs on the two chromosomes</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>round</span>(<span style=color:#a6e22e>colMeans</span>(<span style=color:#a6e22e>getCoverage</span>(combined_data)), <span style=color:#ae81ff>1</span>)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Number of CpGs in two chromosomes</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>length</span>(combined_data)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Number of CpGs which are covered by at least 1 read in all 4 samples</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>sum</span>(<span style=color:#a6e22e>rowSums</span>(<span style=color:#a6e22e>getCoverage</span>(combined_data) <span style=color:#f92672>&gt;=</span> <span style=color:#ae81ff>1</span>) <span style=color:#f92672>==</span> <span style=color:#ae81ff>4</span>)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Number of CpGs with 0 coverage in all samples</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>sum</span>(<span style=color:#a6e22e>rowSums</span>(<span style=color:#a6e22e>getCoverage</span>(combined_data)) <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span>)
+</span></span></code></pre></div><h2 id=3-computing-t-statistics>3. Computing t-statistics</h2><p>To avoid too many differentially methilated regions (DRMs), we remove CpGs with little or no coverage (which are likely false positives). We keep CpGs where at least 1 cancer samples and at least 1 normal samples have at least 2x in coverage.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># which loci and sample indices to keep</span>
+</span></span><span style=display:flex><span>keep.index <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>which</span>(
+</span></span><span style=display:flex><span>                DelayedMatrixStats<span style=color:#f92672>::</span><span style=color:#a6e22e>rowSums2</span>(
+</span></span><span style=display:flex><span>                  <span style=color:#a6e22e>getCoverage</span>(combined_data, type <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Cov&#34;</span>) <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span>) <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span>
+</span></span><span style=display:flex><span>              )
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>sample.index <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>which</span>(<span style=color:#a6e22e>pData</span>(combined_data)<span style=color:#f92672>$</span>condition <span style=color:#f92672>%in%</span> <span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;normal&#34;</span>, <span style=color:#e6db74>&#34;cancer&#34;</span>))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>combined_data.filtered <span style=color:#f92672>&lt;-</span> combined_data[keep.index, sample.index]
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>combined_data.filtered
+</span></span></code></pre></div><p>For t-statistics, we will only keep CpGs where at least 2 cancer samples and at least 2 normal samples have at least 2x in coverage.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>combined_data.cov <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>getCoverage</span>(combined_data.fit)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>keep.index2 <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>which</span>(<span style=color:#a6e22e>rowSums</span>(combined_data.cov[,
+</span></span><span style=display:flex><span>                             combined_data<span style=color:#f92672>$</span>condition <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;cancer&#34;</span>] <span style=color:#f92672>&gt;=</span> <span style=color:#ae81ff>2</span>) <span style=color:#f92672>&gt;=</span> <span style=color:#ae81ff>2</span> <span style=color:#f92672>&amp;</span>
+</span></span><span style=display:flex><span>                     <span style=color:#a6e22e>rowSums</span>(combined_data.cov[, 
+</span></span><span style=display:flex><span>                             combined_data<span style=color:#f92672>$</span>condition <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;normal&#34;</span>] <span style=color:#f92672>&gt;=</span> <span style=color:#ae81ff>2</span>) <span style=color:#f92672>&gt;=</span> <span style=color:#ae81ff>2</span>
+</span></span><span style=display:flex><span>              )
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>length</span>(keep.index2)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>combined_data.fit2 <span style=color:#f92672>&lt;-</span> combined_data.fit[keep.index2]
+</span></span></code></pre></div><p>Let&rsquo;s first arrange the two groups for the t-test:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># In grp1, we keep all the normal sample names, and</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># in grp2, all the cancer sample names</span>
+</span></span><span style=display:flex><span>grp1 <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>rownames</span>(sampleData)[sampleData<span style=color:#f92672>$</span>condition <span style=color:#f92672>==</span> <span style=color:#e6db74>&#39;normal&#39;</span>]
+</span></span><span style=display:flex><span>grp2 <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>rownames</span>(sampleData)[sampleData<span style=color:#f92672>$</span>condition <span style=color:#f92672>==</span> <span style=color:#e6db74>&#39;cancer&#39;</span>]
+</span></span><span style=display:flex><span>grp1
+</span></span><span style=display:flex><span>grp2
+</span></span></code></pre></div><p>We now compute t-statistics with the <code>BSmooth.tstat</code> function provided by the <code>BSseq</code> Bioconductor R package.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>combined_data.tstat <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>BSmooth.tstat</span>(
+</span></span><span style=display:flex><span>    combined_data.fit2,
+</span></span><span style=display:flex><span>    group1 <span style=color:#f92672>=</span> grp2,
+</span></span><span style=display:flex><span>    group2 <span style=color:#f92672>=</span> grp1,
+</span></span><span style=display:flex><span>    estimate.var <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;group2&#34;</span>,
+</span></span><span style=display:flex><span>    local.correct <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>,
+</span></span><span style=display:flex><span>    mc.cores <span style=color:#f92672>=</span> <span style=color:#ae81ff>8</span>,
+</span></span><span style=display:flex><span>    verbose <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>
+</span></span><span style=display:flex><span>)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>combined_data.tstat
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>stats <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>as.data.frame</span>(combined_data.tstat<span style=color:#f92672>@</span>stats)
+</span></span><span style=display:flex><span><span style=color:#a6e22e>head</span>(stats)
+</span></span></code></pre></div><p>Let&rsquo;s check the marginal distribution of the t-statistic:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#a6e22e>plot</span>(<span style=color:#a6e22e>density</span>(<span style=color:#a6e22e>as.numeric</span>(<span style=color:#a6e22e>as.vector</span>(stats<span style=color:#f92672>$</span>tstat.corrected)), 
+</span></span><span style=display:flex><span>             na.rm <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>), xlim <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>-15</span>, <span style=color:#ae81ff>15</span>), col <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;red&#34;</span>, main <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;&#34;</span>)
+</span></span><span style=display:flex><span>             
+</span></span><span style=display:flex><span><span style=color:#a6e22e>lines</span>(<span style=color:#a6e22e>density</span>(<span style=color:#a6e22e>as.numeric</span>(<span style=color:#a6e22e>as.vector</span>(stats<span style=color:#f92672>$</span>tstat)), 
+</span></span><span style=display:flex><span>              na.rm <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>), col <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;blue&#34;</span>)
+</span></span><span style=display:flex><span>              
+</span></span><span style=display:flex><span><span style=color:#a6e22e>legend</span>(<span style=color:#e6db74>&#34;topright&#34;</span>, legend <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;corrected&#34;</span>, <span style=color:#e6db74>&#34;uncorrected&#34;</span>), 
+</span></span><span style=display:flex><span>       col <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;red&#34;</span>, <span style=color:#e6db74>&#34;blue&#34;</span>), lty <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>)
+</span></span></code></pre></div><p>The “blocks” of hypomethylation are clearly visible in the marginal distribution of the uncorrected t-statistics.</p><h2 id=4-finding-differentially-methylated-regions-dmrs>4. Finding Differentially Methylated Regions (DMRs)</h2><p>We use the <code>dmrseq()</code> function of the <code>dmrseq</code> Bioconductor R package to compute the DMRs.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># run the results for a subset of 60,000 CpGs in the interest</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># of computation time</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Run with a single core if it fails on multiple cores (workers = 1)</span>
+</span></span><span style=display:flex><span>dmrs <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>dmrseq</span>(bs <span style=color:#f92672>=</span> combined_data.filtered[240001<span style=color:#f92672>:</span><span style=color:#ae81ff>300000</span>, ],
+</span></span><span style=display:flex><span>               cutoff <span style=color:#f92672>=</span> <span style=color:#ae81ff>0.05</span>,
+</span></span><span style=display:flex><span>               BPPARAM <span style=color:#f92672>=</span> <span style=color:#a6e22e>MulticoreParam</span>(workers <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>),
+</span></span><span style=display:flex><span>               testCovariate <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;condition&#34;</span>)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Displaying DMRs</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>show</span>(dmrs)
+</span></span></code></pre></div><h3 id=41-exploring-significantly-methylated-regions>4.1. Exploring Significantly Methylated Regions</h3><p>In this tutorial, the number of significantly (and Differentially) Methylated Regions is assessed at the FDR (q-value) cutoff of 0.05.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#a6e22e>sum</span>(dmrs<span style=color:#f92672>$</span>qval <span style=color:#f92672>&lt;</span> <span style=color:#ae81ff>0.05</span>)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># select just the regions below FDR 0.05 and place in a new data.frame</span>
+</span></span><span style=display:flex><span>sigRegions <span style=color:#f92672>&lt;-</span> dmrs[dmrs<span style=color:#f92672>$</span>qval <span style=color:#f92672>&lt;</span> <span style=color:#ae81ff>0.05</span>, ]
+</span></span></code></pre></div><h3 id=42-proportion-of-regions-with-hyper-methylation>4.2. Proportion of regions with hyper-methylation</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#a6e22e>sum</span>(sigRegions<span style=color:#f92672>$</span>stat <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>0</span>) <span style=color:#f92672>/</span> <span style=color:#a6e22e>length</span>(sigRegions)
+</span></span></code></pre></div><p>To interpret the direction of effect, since <code>dmrseq</code> uses alphabetical order of the covariate of interest, the condition <code>cancer</code> would be the reference category.</p><h3 id=43-visualizing-differentially-methylated-regions-dmrs>4.3. Visualizing Differentially Methylated Regions (DMRs)</h3><p>We first get the annotation for <code>hg18</code>, then use the <code>plotDMRs()</code> function provided by the Bioconductor <code>dmrseq</code> R package.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># get annotations for hg18</span>
+</span></span><span style=display:flex><span>annotation <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>getAnnot</span>(<span style=color:#e6db74>&#34;hg18&#34;</span>)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Plot DMRs</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>plotDMRs</span>(combined_data.filtered,
+</span></span><span style=display:flex><span>         regions <span style=color:#f92672>=</span> dmrs[1, ], 
+</span></span><span style=display:flex><span>         testCovariate <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;condition&#34;</span>,
+</span></span><span style=display:flex><span>         annoTrack <span style=color:#f92672>=</span> annotation)
+</span></span></code></pre></div><h2 id=5-detecting-large-scale-methylation-blocks>5. Detecting large-scale methylation blocks</h2><p>In some applications, such as cancer, it is of interest to effectively &lsquo;zoom out&rsquo; in order to detect larger (lower-resolution) methylation blocks on the order of hundreds of thousands to millions of bases.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Run the results for a subset of 300,000 CpGs in the interest</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># of computation time</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Run with a single core if it fails on multiple cores</span>
+</span></span><span style=display:flex><span>blocks <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>dmrseq</span>(bs <span style=color:#f92672>=</span> combined_data.filtered[120001<span style=color:#f92672>:</span><span style=color:#ae81ff>420000</span>, ],
+</span></span><span style=display:flex><span>                 cutoff <span style=color:#f92672>=</span> <span style=color:#ae81ff>0.05</span>,
+</span></span><span style=display:flex><span>                 testCovariate <span style=color:#f92672>=</span><span style=color:#e6db74>&#39;condition&#39;</span>,
+</span></span><span style=display:flex><span>                 block <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>,
+</span></span><span style=display:flex><span>                 BPPARAM <span style=color:#f92672>=</span> <span style=color:#a6e22e>MulticoreParam</span>(workers <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>),
+</span></span><span style=display:flex><span>                 minInSpan <span style=color:#f92672>=</span> <span style=color:#ae81ff>500</span>,
+</span></span><span style=display:flex><span>                 bpSpan <span style=color:#f92672>=</span> <span style=color:#ae81ff>5e4</span>,
+</span></span><span style=display:flex><span>                 maxGapSmooth <span style=color:#f92672>=</span> <span style=color:#ae81ff>1e6</span>,
+</span></span><span style=display:flex><span>                 maxGap <span style=color:#f92672>=</span> <span style=color:#ae81ff>5e3</span>)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#a6e22e>show</span>(blocks)
+</span></span></code></pre></div><p>We may visualize the top methylation blocks from the block analysis as shown below:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Plot top methylation blocks </span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>plotDMRs</span>(combined_data.filtered, 
+</span></span><span style=display:flex><span>         regions <span style=color:#f92672>=</span> blocks[1, ], 
+</span></span><span style=display:flex><span>         testCovariate <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;condition&#34;</span>,
+</span></span><span style=display:flex><span>         annoTrack <span style=color:#f92672>=</span> annotation)
+</span></span></code></pre></div><p>This last DMR plot concludes this tutorial on DNA methylation analysis with the <code>BSseq</code> and <code>dmrseq</code> Bioconductor R packages. For more information, feel free to check the official <a href=http://bioconductor.org/packages/release/bioc/vignettes/bsseq/inst/doc/bsseq_analysis.html>BSseq</a> and <a href=https://bioconductor.org/packages/devel/bioc/vignettes/dmrseq/inst/doc/dmrseq.html>dmrseq</a> tutorials.</p><p>Find the Original source code for this tutorial <a href=https://github.com/rosericazondekon/bioinformatics-tuto/blob/main/DNA%20methylation%20analysis/dna_methylation_bsseq_dmrseq.ipynb>here</a>.</p></p></div></div></main><footer class=footer><span>&copy; 2022 Roseric Azondekon</span></footer></body></html>

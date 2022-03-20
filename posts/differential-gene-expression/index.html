@@ -1,571 +1,352 @@
-<!doctype html><html lang=en><head>
-<meta charset=utf-8>
-<meta name=viewport content="width=device-width,initial-scale=1">
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-3TBYJJHRP3"></script>
-<script>var doNotTrack=!1;if(!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-3TBYJJHRP3',{anonymize_ip:!1})}</script>
-<style>:root{--accent-color:#FF4D4D}</style>
-<title>Differential Gene Expression Analysis</title>
-<meta name=description content="A Differential Gene Expression Analysis tutorial Using R.">
-<meta name=keywords content="blog,rosericazondekon,gazondekon,razondekon,gbedegnon,roseric,azondekon,deseq2,edger,limma,differential,gene,expression,fastq,read,count">
-<meta property="og:url" content="https://rosericazondekon.github.io/posts/differential-gene-expression/">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Differential Gene Expression Analysis">
-<meta property="og:description" content="A Differential Gene Expression Analysis tutorial Using R.">
-<meta property="og:image" content="/images/roz.webp">
-<meta name=twitter:card content="summary_large_image">
-<meta name=twitter:title content="Differential Gene Expression Analysis">
-<meta name=twitter:description content="A Differential Gene Expression Analysis tutorial Using R.">
-<meta property="twitter:domain" content="https://rosericazondekon.github.io/posts/differential-gene-expression/">
-<meta property="twitter:url" content="https://rosericazondekon.github.io/posts/differential-gene-expression/">
-<meta name=twitter:image content="/images/roz.webp">
-<link rel=canonical href=https://rosericazondekon.github.io/posts/differential-gene-expression/>
-<link rel=stylesheet type=text/css href=/css/normalize.min.css media=print onload="this.media='all'">
-<link rel=stylesheet type=text/css href=/css/main.css>
-<link disabled id=dark-theme rel=stylesheet href=/css/dark.css>
-<script src=/js/svg-injector.min.js></script>
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><script async src="https://www.googletagmanager.com/gtag/js?id=G-3TBYJJHRP3"></script>
+<script>var doNotTrack=!1;if(!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-3TBYJJHRP3",{anonymize_ip:!1})}</script><style>:root{--accent-color:#FF4D4D}</style><title>Differential Gene Expression Analysis</title><meta name=description content="A Differential Gene Expression Analysis tutorial Using R."><meta name=keywords content="blog,rosericazondekon,gazondekon,razondekon,gbedegnon,roseric,azondekon,deseq2,edger,limma,differential,gene,expression,fastq,read,count"><meta property="og:url" content="https://rosericazondekon.github.io/posts/differential-gene-expression/"><meta property="og:type" content="website"><meta property="og:title" content="Differential Gene Expression Analysis"><meta property="og:description" content="A Differential Gene Expression Analysis tutorial Using R."><meta property="og:image" content="/images/roz.webp"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="Differential Gene Expression Analysis"><meta name=twitter:description content="A Differential Gene Expression Analysis tutorial Using R."><meta property="twitter:domain" content="https://rosericazondekon.github.io/posts/differential-gene-expression/"><meta property="twitter:url" content="https://rosericazondekon.github.io/posts/differential-gene-expression/"><meta name=twitter:image content="/images/roz.webp"><link rel=canonical href=https://rosericazondekon.github.io/posts/differential-gene-expression/><link rel=stylesheet type=text/css href=/css/normalize.min.css media=print onload='this.media="all"'><link rel=stylesheet type=text/css href=/css/main.css><link disabled id=dark-theme rel=stylesheet href=/css/dark.css><script src=/js/svg-injector.min.js></script>
 <script src=/js/feather-icons.min.js></script>
 <script src=/js/main.js></script>
-<link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.13.16/dist/katex.min.css integrity=sha384-6LkG2wmY8FK9E0vU9OOr8UvLwsaqUg9SETfpq4uTCN1agNe8HRdE9ABlk+fVx6gZ crossorigin=anonymous>
-<script defer src=https://cdn.jsdelivr.net/npm/katex@0.13.16/dist/katex.min.js integrity=sha384-31El76TwmbHj4rF9DyLsygbq6xoIobG0W+jqXim+a3dU9W53tdH3A/ngRPxOzzaB crossorigin=anonymous></script>
-<script defer src=https://cdn.jsdelivr.net/npm/katex@0.13.16/dist/contrib/auto-render.min.js integrity=sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl crossorigin=anonymous onload=renderMathInElement(document.body)></script>
-</head>
-<body>
-<script type=text/javascript>setThemeByUserPref()</script><header class=header>
-<nav class=header-nav>
-<div class=avatar>
-<a href=https://rosericazondekon.github.io/>
-<img src=/images/roz.webp alt=avatar>
-</a>
-</div>
-<div class=nav-title>
-<a class=nav-brand href=https://rosericazondekon.github.io/>Gbedegnon Roseric Azondekon</a>
-</div>
-<div class=nav-links>
-<div class=nav-link>
-<a href=/> Home </a>
-</div>
-<div class=nav-link>
-<a href=/posts/> Posts </a>
-</div>
-<div class=nav-link>
-<a href=/projects/> Projects </a>
-</div>
-<div class=nav-link>
-<a href=/cv/> CV </a>
-</div>
-<div class=nav-link>
-<a href=/tags/> Tags </a>
-</div>
-<div class=nav-link>
-<a href=/about/> About </a>
-</div>
-<div class=nav-link>
-<a href=https://github.com/rosericazondekon><span data-feather=github></span> </a>
-</div>
-<div class=nav-link>
-<a href=https://www.buymeacoffee.com/gazondekon><span data-feather=coffee></span> </a>
-</div>
-<div class=nav-link>
-<a href=/index.xml><span data-feather=rss></span> </a>
-</div>
-<span class=nav-icons-divider></span>
-<div class="nav-link dark-theme-toggle">
-<a>
-<span id=theme-toggle-icon data-feather=moon></span>
-</a>
-</div>
-<div class=nav-link id=hamburger-menu-toggle>
-<a>
-<span data-feather=menu></span>
-</a>
-</div>
-<ul class="nav-hamburger-list visibility-hidden">
-<li class=nav-item>
-<a href=/> Home </a>
-</li>
-<li class=nav-item>
-<a href=/posts/> Posts </a>
-</li>
-<li class=nav-item>
-<a href=/projects/> Projects </a>
-</li>
-<li class=nav-item>
-<a href=/cv/> CV </a>
-</li>
-<li class=nav-item>
-<a href=/tags/> Tags </a>
-</li>
-<li class=nav-item>
-<a href=/about/> About </a>
-</li>
-<li class=nav-item>
-<a href=https://github.com/rosericazondekon><span data-feather=github></span> </a>
-</li>
-<li class=nav-item>
-<a href=https://www.buymeacoffee.com/gazondekon><span data-feather=coffee></span> </a>
-</li>
-<li class=nav-item>
-<a href=/index.xml><span data-feather=rss></span> </a>
-</li>
-<li class="nav-item dark-theme-toggle">
-<a>
-<span id=theme-toggle-icon data-feather=moon></span>
-</a>
-</li>
-</ul>
-</div>
-</nav>
-</header>
-<main id=content>
-<div class="post container">
-<div class=post-header-section>
-<h1>Differential Gene Expression Analysis</h1>
-<small role=doc-subtitle>A Differential Gene Expression Analysis tutorial Using R.</small>
-<p class=post-date>
-December 23, 2021
-</p>
-<ul class=post-tags>
-<li class=post-tag><a href=/tags/deseq2>deseq2</a></li>
-<li class=post-tag><a href=/tags/edger>edger</a></li>
-<li class=post-tag><a href=/tags/limma>limma</a></li>
-<li class=post-tag><a href=/tags/differential>differential</a></li>
-<li class=post-tag><a href=/tags/gene>gene</a></li>
-<li class=post-tag><a href=/tags/expression>expression</a></li>
-<li class=post-tag><a href=/tags/fastq>fastq</a></li>
-<li class=post-tag><a href=/tags/read>read</a></li>
-<li class=post-tag><a href=/tags/count>count</a></li>
-</ul>
-</div>
-<div class=post-content>
-<p>
-<p><strong>Disclaimer:</strong> This tutorial was originally written on April 01, 2019.</p>
-<h2 id=introduction>Introduction</h2>
-<p>In a <a href=/posts/rnaseq-read-align-quant>previous tutorial</a>, we showed you how to download and process RNA-seq FASTQ files for read alignment on a reference sequence, and for read quantification. In this tutorial, we show you how to conduct Differential Gene Expression (DGE) analysis using the <a href=https://bioconductor.org/packages/release/bioc/html/DESeq2.html><code>DESeq2</code></a>, <a href=https://bioconductor.org/packages/release/bioc/html/edgeR.html><code>edgeR</code></a>, and <a href=https://bioconductor.org/packages/release/bioc/html/limma.html><code>limma</code></a> packages.</p>
-<p>We set our working directory to the <code>tuto</code> folder created in our first tutorial.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#a6e22e>setwd</span>(<span style=color:#e6db74>&#39;./tuto&#39;</span>)
-</code></pre></div><p>Now, let&rsquo;s install all the required packages for this tutorial.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Indicate package repositories to R...</span>
-repositories <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;https://cloud.r-project.org&#34;</span>, 
-                   <span style=color:#e6db74>&#34;https://bioconductor.org/packages/3.7/bioc&#34;</span>,
-                   <span style=color:#e6db74>&#34;https://bioconductor.org/packages/3.7/data/annotation&#34;</span>, 
-                   <span style=color:#e6db74>&#34;https://bioconductor.org/packages/3.7/data/experiment&#34;</span>,
-                   <span style=color:#e6db74>&#34;https://www.stats.ox.ac.uk/pub/RWin&#34;</span>, 
-                   <span style=color:#e6db74>&#34;http://www.omegahat.net/R&#34;</span>, 
-                   <span style=color:#e6db74>&#34;https://R-Forge.R-project.org&#34;</span>,
-                   <span style=color:#e6db74>&#34;https://www.rforge.net&#34;</span>, 
-                   <span style=color:#e6db74>&#34;https://cloud.r-project.org&#34;</span>, 
-                   <span style=color:#e6db74>&#34;http://www.bioconductor.org&#34;</span>,
-                   <span style=color:#e6db74>&#34;http://www.stats.ox.ac.uk/pub/RWin&#34;</span>)
-
-<span style=color:#75715e># Package list to download</span>
-packages <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;vsn&#34;</span>, <span style=color:#e6db74>&#34;UpSetR&#34;</span>, <span style=color:#e6db74>&#34;gplots&#34;</span>, <span style=color:#e6db74>&#34;NMF&#34;</span>, <span style=color:#e6db74>&#34;org.Hs.eg.db&#34;</span>, 
-              <span style=color:#e6db74>&#34;pheatmap&#34;</span>, <span style=color:#e6db74>&#34;tximport&#34;</span>, <span style=color:#e6db74>&#34;readr&#34;</span>, <span style=color:#e6db74>&#34;edgeR&#34;</span>, <span style=color:#e6db74>&#34;biomaRt&#34;</span>,
-              <span style=color:#e6db74>&#34;VennDiagram&#34;</span>, <span style=color:#e6db74>&#34;plyr&#34;</span>, <span style=color:#e6db74>&#34;dplyr&#34;</span>,<span style=color:#e6db74>&#34;DESeq2&#34;</span>, <span style=color:#e6db74>&#34;AnnotationDbi&#34;</span>,
-              <span style=color:#e6db74>&#34;Biobase&#34;</span>, <span style=color:#e6db74>&#34;ensembldb&#34;</span>, <span style=color:#e6db74>&#34;ggpubr&#34;</span>, <span style=color:#e6db74>&#34;ggplot2&#34;</span>, <span style=color:#e6db74>&#34;limma&#34;</span>, <span style=color:#e6db74>&#34;magrittr&#34;</span>)
-
-<span style=color:#75715e># Install and load missing packages</span>
-new.packages <span style=color:#f92672>&lt;-</span> packages[<span style=color:#f92672>!</span>(packages <span style=color:#f92672>%in%</span> <span style=color:#a6e22e>installed.packages</span>()[, <span style=color:#e6db74>&#34;Package&#34;</span>])]
-
-<span style=color:#a6e22e>if</span>(<span style=color:#a6e22e>length</span>(new.packages)){
-    <span style=color:#a6e22e>install.packages</span>(new.packages, repos <span style=color:#f92672>=</span> repositories)
-}
-
-<span style=color:#a6e22e>lapply</span>(packages, library, character.only <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
-</code></pre></div><p>Let&rsquo;s load our samples' information from the <code>samples.txt</code> (see <a href=/posts/rnaseq-read-align-quant>RNA-seq tutorial</a>)).</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>samples <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>read.table</span>(<span style=color:#e6db74>&#34;samples.txt&#34;</span>)
-<span style=color:#a6e22e>head</span>(samples)
-</code></pre></div><p>We can see that our samples names are contained in the 4th column of the <code>samples</code> table. We will use that information as our sample names.</p>
-<p>The 9 RNA-seq samples are respectively from 3 new-born, 3 middle-aged, and 3 long-lived individuals. We represent that information in the <code>sampleTable</code> variable as follows:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>conditions <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>factor</span>(<span style=color:#a6e22e>rep</span>(<span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;new_born&#34;</span>, <span style=color:#e6db74>&#34;middle_aged&#34;</span>, <span style=color:#e6db74>&#34;long_lived&#34;</span>), each <span style=color:#f92672>=</span> <span style=color:#ae81ff>3</span>))
-sampleTable <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>data.frame</span>(condition <span style=color:#f92672>=</span> conditions)
-<span style=color:#a6e22e>rownames</span>(sampleTable) <span style=color:#f92672>&lt;-</span> samples<span style=color:#f92672>$</span>V4
-sampleTable
-</code></pre></div><p>Now that we have downloaded and loaded all the required packages and samples information, we can import the read counts into <code>R</code>.</p>
-<h2 id=1-prepare-data-for-dge-analysis-from-star-feature-counts-data>1. Prepare data for DGE analysis from <code>STAR</code> feature counts data</h2>
-<h3 id=11-importing-read-counts-data-to-r-from-star-output>1.1. Importing read counts data to <code>R</code> from <code>STAR</code> output</h3>
-<p>Remember that the read counts data from <a href=https://github.com/alexdobin/STAR><code>STAR</code></a> were saved in the <code>featureCounts_results.txt</code> file inside the <code>read_counts</code> folder.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Get the table of read counts</span>
-readcounts <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>read.table</span>(<span style=color:#e6db74>&#34;read_counts/featureCounts_results.txt&#34;</span>, header <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
-
-<span style=color:#75715e># table overview</span>
-<span style=color:#a6e22e>head</span>(readcounts)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># The gene IDs should be stored as row.names</span>
-<span style=color:#a6e22e>row.names</span>(readcounts) <span style=color:#f92672>&lt;-</span> readcounts<span style=color:#f92672>$</span>Geneid
-
-<span style=color:#75715e># Exclude all columns that do not contain read counts</span>
-readcounts <span style=color:#f92672>&lt;-</span> readcounts[, <span style=color:#f92672>-</span><span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>1</span><span style=color:#f92672>:</span><span style=color:#ae81ff>6</span>)]
-
-<span style=color:#a6e22e>head</span>(readcounts)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Give meaningful sample names</span>
-<span style=color:#a6e22e>names</span>(readcounts) <span style=color:#f92672>&lt;-</span> samples<span style=color:#f92672>$</span>V4
-<span style=color:#a6e22e>head</span>(readcounts)
-</code></pre></div><h3 id=12-preparing-a-deseqdataset-for-use-with-deseq2>1.2. Preparing a <code>DESeqDataSet</code> for use with <code>DESeq2</code></h3>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>dds_star <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>DESeqDataSetFromMatrix</span>(readcounts, sampleTable, <span style=color:#f92672>~</span>condition)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Remove genes without any counts</span>
-dds_star <span style=color:#f92672>&lt;-</span> dds_star<span style=color:#a6e22e>[rowSums</span>(<span style=color:#a6e22e>counts</span>(dds_star)) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>0</span>, ]
-</code></pre></div><p>The <code>dds_star</code> object is now ready for the <code>DESeq()</code> function. For more, check the see <a href=http://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html><code>DESeq2</code> vignette</a>.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Inspect DESeq dataset</span>
-<span style=color:#a6e22e>colData</span>(dds_star) <span style=color:#f92672>%&gt;%</span> head
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Investigate different library sizes</span>
-<span style=color:#a6e22e>colSums</span>(<span style=color:#a6e22e>counts</span>(dds_star))
-</code></pre></div><p>Our read counts data table is now ready for the downstream DGE analysis. Next let&rsquo;s show how to import transcript-level estimates into R from the quantification files generated by <a href=https://combine-lab.github.io/salmon/><code>salmon</code></a>.</p>
-<h2 id=2-importing-transcript-level-estimates-to-r-from-salmon-output>2. Importing transcript-level estimates to <code>R</code> from <code>salmon</code> output</h2>
-<p>To import the transcript-level estimates, we need a gene annotation table for Homo sapiens. Such a table can be obtained from the <a href=https://bioconductor.org/packages/release/data/annotation/html/org.Hs.eg.db.html><code>org.Hs.eg.db</code></a> R package.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># get gene annotation table for Homo sapiens</span>
-tx2g <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>select</span>(org.Hs.eg.db,
-               keys <span style=color:#f92672>=</span> <span style=color:#a6e22e>keys</span>(org.Hs.eg.db),
-               columns <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;REFSEQ&#34;</span>,<span style=color:#e6db74>&#34;SYMBOL&#34;</span>,<span style=color:#e6db74>&#34;GENENAME&#34;</span>))
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>tx2g <span style=color:#f92672>&lt;-</span> tx2g[, <span style=color:#ae81ff>-1</span>]
-<span style=color:#a6e22e>colnames</span>(tx2g) <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;TXNAME&#34;</span>, <span style=color:#e6db74>&#34;GENEID&#34;</span>, <span style=color:#e6db74>&#34;GENENAME&#34;</span>)
-<span style=color:#a6e22e>head</span>(tx2g)
-</code></pre></div><p>Let&rsquo;s find the paths to the quantification. Recall that in the previous tutorial, we saved all the quantification files in the <code>quants</code> folder.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># search for &#39;.sf&#39; file starting from the current working directory</span>
-files <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>file.path</span>(<span style=color:#e6db74>&#39;.&#39;</span>, <span style=color:#a6e22e>list.files</span>(pattern <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;\\.sf$&#34;</span>, recursive <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>))
-files
-</code></pre></div><p>We now can import all the quantification files using the <code>tximport()</code> function provided by the <a href=https://bioconductor.org/packages/release/bioc/html/tximport.html><code>tximport</code></a> R package.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>txi <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>tximport</span>(files, type <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;salmon&#34;</span>, tx2gene <span style=color:#f92672>=</span> tx2g, ignoreTxVersion <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Give meaningful sample names</span>
-<span style=color:#a6e22e>colnames</span>(txi[[<span style=color:#e6db74>&#39;counts&#39;</span>]]) <span style=color:#f92672>&lt;-</span> samples<span style=color:#f92672>$</span>V4
-<span style=color:#a6e22e>colnames</span>(txi[[<span style=color:#e6db74>&#39;length&#39;</span>]]) <span style=color:#f92672>&lt;-</span> samples<span style=color:#f92672>$</span>V4
-<span style=color:#a6e22e>colnames</span>(txi[[<span style=color:#e6db74>&#39;abundance&#39;</span>]]) <span style=color:#f92672>&lt;-</span> samples<span style=color:#f92672>$</span>V4
-<span style=color:#a6e22e>names</span>(txi)
-</code></pre></div><p>Let&rsquo;s take a look at the <code>txi</code> object data.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Looking at the counts table</span>
-<span style=color:#a6e22e>head</span>(txi<span style=color:#f92672>$</span>counts)
-</code></pre></div><h3 id=21-preparing-a-deseqdataset-for-use-with-deseq2>2.1. Preparing a <code>DESeqDataSet</code> for use with <code>DESeq2</code></h3>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>dds_salmon <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>DESeqDataSetFromTximport</span>(txi, sampleTable, <span style=color:#f92672>~</span>condition)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Remove genes without any counts</span>
-dds_salmon <span style=color:#f92672>&lt;-</span> dds_salmon<span style=color:#a6e22e>[rowSums</span>(<span style=color:#a6e22e>counts</span>(dds_salmon)) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>0</span>, ]
-</code></pre></div><p>The dds_salmon object is now ready for the <code>DESeq()</code> function. For more, check the see <a href=http://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html><code>DESeq2</code> vignette</a>.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Inspect DESeq dataset</span>
-<span style=color:#a6e22e>colData</span>(dds_salmon) <span style=color:#f92672>%&gt;%</span> head
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Investigate different library sizes</span>
-<span style=color:#a6e22e>colSums</span>(<span style=color:#a6e22e>counts</span>(dds_salmon)) <span style=color:#75715e># should be the same as colSums(txi$counts)</span>
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Investigate different library sizes</span>
-<span style=color:#a6e22e>colSums</span>(txi<span style=color:#f92672>$</span>counts) <span style=color:#75715e># should be the same as colSums(counts(dds))</span>
-</code></pre></div><p>From this point forward, I choose to demonstrate the DGE analysis with <code>dds_star</code>. The code can be easily modified to switch between <code>dds_star</code> and <code>dds_salmon</code>.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>dds <span style=color:#f92672>&lt;-</span> dds_star <span style=color:#75715e># dds &lt;- dds_salmon</span>
-</code></pre></div><h2 id=3-normalization-and-transformation>3. Normalization and Transformation</h2>
-<h3 id=31-normalization-for-sequencing-depth-differences>3.1. Normalization for sequencing depth differences</h3>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Calculate the size factor and add it to the data set</span>
-dds <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>estimateSizeFactors</span>(dds)
-<span style=color:#a6e22e>sizeFactors</span>(dds)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># `counts()` allows you to immediately retrieve the normalized read counts</span>
-counts.sf_normalized <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>counts</span>(dds, normalized <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Inspect counts.sf_normalized</span>
-<span style=color:#a6e22e>head</span>(counts.sf_normalized)
-</code></pre></div><h3 id=32-transformation-of-sequencing-depth-normalized-read-counts>3.2. Transformation of sequencing-depth-normalized read counts</h3>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Transform size-factor normalized read counts </span>
-<span style=color:#75715e># to log2 scale using a pseudocount of 1</span>
-log.norm.counts <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>log2</span>(counts.sf_normalized <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span>)
-</code></pre></div><p>Let&rsquo;s see how the log2 transformation compares to the normalized read counts</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># First, boxplots of non-transformed read counts (one per sample)</span>
-<span style=color:#a6e22e>boxplot</span>(counts.sf_normalized, 
-        notch <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, 
-        main <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;untransformed read counts&#34;</span>, 
-        ylab <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;read counts&#34;</span>)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Boxplots of log2-transformed read counts</span>
-<span style=color:#a6e22e>boxplot</span>(log.norm.counts, 
-        notch <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, 
-        main <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;log2-transformed read counts&#34;</span>, 
-        ylab <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;log2(read counts)&#34;</span>)
-</code></pre></div><h3 id=33-visually-exploring-normalized-read-counts>3.3. Visually exploring normalized read counts</h3>
-<p>Let&rsquo;s get an impression of how similar read counts are between replicates</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#a6e22e>plot</span>(log.norm.counts[, <span style=color:#ae81ff>1</span><span style=color:#f92672>:</span><span style=color:#ae81ff>2</span>], cex <span style=color:#f92672>=</span> <span style=color:#ae81ff>0.1</span>, main <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Normalized log2 (read counts)&#34;</span>)
-</code></pre></div><p>Checking for heteroskedasticity&mldr;</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>msd_plot <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>meanSdPlot</span>(log.norm.counts, ranks <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>, plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>)
-msd_plot<span style=color:#f92672>$</span>gg <span style=color:#f92672>+</span> <span style=color:#a6e22e>ggtitle</span>(<span style=color:#e6db74>&#34;sequencing depth normalized log2(read counts)&#34;</span>) <span style=color:#f92672>+</span> 
-              <span style=color:#a6e22e>ylab</span>(<span style=color:#e6db74>&#34;standard deviation&#34;</span>)
-</code></pre></div><p>A clear bump on the left-hand side in the figure will indicate that the variance is higher for smaller read counts compared to the variance for greater read counts.</p>
-<h3 id=34-transformation-of-read-counts-including-variance-shrinkage>3.4. Transformation of read counts including variance shrinkage</h3>
-<p>The amount of heteroskedasticity can be reduced using the dispersion-mean trend that can be observed for the entire data set as a reference.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Obtain regularized log-transformed values</span>
-DESeq.rlog <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>rlog</span>(dds, blind <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
-rlog.norm.counts <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>assay</span>(DESeq.rlog)
-<span style=color:#a6e22e>head</span>(rlog.norm.counts)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># mean-sd plot for rlog-transformed data</span>
-msd_plot  <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>meanSdPlot</span>(rlog.norm.counts,
-                        ranks <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>,
-                        plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>)
-
-msd_plot<span style=color:#f92672>$</span>gg <span style=color:#f92672>+</span> <span style=color:#a6e22e>ggtitle</span>(<span style=color:#e6db74>&#34;rlog-transformed read counts&#34;</span>) <span style=color:#f92672>+</span> 
-              <span style=color:#a6e22e>ylab</span>(<span style=color:#e6db74>&#34;standard deviation&#34;</span>)
-</code></pre></div><p>Let&rsquo;s re-examine how similar the rlog−transformed read counts are between replicates.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#a6e22e>plot</span>(rlog.norm.counts[, <span style=color:#ae81ff>1</span><span style=color:#f92672>:</span><span style=color:#ae81ff>2</span>], cex <span style=color:#f92672>=</span> <span style=color:#ae81ff>0.1</span>, 
-     main <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Normalized log2(read counts)&#34;</span>)
-</code></pre></div><h3 id=35-exploring-global-read-count-patterns>3.5. Exploring global read count patterns</h3>
-<p>An important step before diving into the identification of differentially expressed genes is to check whether expectations about basic global patterns are met. The similarity of expression patterns can be assessed with various methods:</p>
-<ul>
-<li>Pairwise correlation</li>
-<li>Hierarchical clustering, and</li>
-<li>Principal Components Analysis (PCA)</li>
-</ul>
-<p>Assessing the similarity of RNA-seq samples in a pair-wise fashion&mldr;</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#a6e22e>cor</span>(counts.sf_normalized, method <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;pearson&#34;</span>)
-</code></pre></div><p>Hierarchical clustering can be used to determine whether the different sample types can be separated in an unsupervised fashion (i.e., samples of different conditions are more dissimilar to each other than replicates within the same condition).</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># cor() calculates the correlation between columns of a matrix</span>
-distance.m_rlog  <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>as.dist</span>(<span style=color:#ae81ff>1</span> <span style=color:#f92672>-</span> <span style=color:#a6e22e>cor</span>(rlog.norm.counts, method <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;pearson&#34;</span>))
-
-<span style=color:#75715e># plot() can directly interpret the output of hclust()</span>
-<span style=color:#a6e22e>plot</span>(<span style=color:#a6e22e>hclust</span>(distance.m_rlog), 
-     labels <span style=color:#f92672>=</span> <span style=color:#a6e22e>colnames</span>(rlog.norm.counts),
-     main <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;rlog transformed read counts\n distance: Pearson correlation&#34;</span>)
-</code></pre></div><p>PCA is a complementary approach to determine whether samples display greater variability between experimental conditions than between replicates of the same treatment is principal components analysis.</p>
-<p>The goal is to find groups of genes that have certain patterns of expression across different samples, so that the information from thousands of genes is captured and represented by a reduced number of groups.</p>
-<p>In base R, the function <code>prcomp()</code> can be used to perform PCA:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>pc <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>prcomp</span>(<span style=color:#a6e22e>t</span>(rlog.norm.counts))
-<span style=color:#a6e22e>plot</span>(pc<span style=color:#f92672>$</span>x[, <span style=color:#ae81ff>1</span>], pc<span style=color:#f92672>$</span>x[, <span style=color:#ae81ff>2</span>],
-     col <span style=color:#f92672>=</span> <span style=color:#a6e22e>colData</span>(dds)[, <span style=color:#ae81ff>1</span>],
-     main <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;PCA of seq.depth normalized\n and rlog -transformed read counts&#34;</span>)
-</code></pre></div><p>PCA can also be performed using the <code>DESeq2</code> which offers a convenient function based on the <code>ggplot2</code> R package to perform PCA directly on a <code>DESeqDataSet</code>:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># PCA</span>
-P <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>plotPCA</span>(DESeq.rlog)
-<span style=color:#75715e># plot cosmetics</span>
-P <span style=color:#f92672>&lt;-</span> P <span style=color:#f92672>+</span> <span style=color:#a6e22e>theme_bw</span>() <span style=color:#f92672>+</span> <span style=color:#a6e22e>ggtitle</span>(<span style=color:#e6db74>&#34;Rlog  transformed  counts&#34;</span>)
-<span style=color:#a6e22e>print</span>(P)
-</code></pre></div><h2 id=4-differential-gene-expression-analysis-dge>4. Differential Gene Expression Analysis (DGE)</h2>
-<p>Let&rsquo;s recall that the two basic tasks of all DGE tools are:</p>
-<ol>
-<li>Estimate the magnitude of differential expression between two or more conditions based on read counts from replicated samples, i.e., calculate the fold change of read counts, taking into account the differences in sequencing depth and variability.</li>
-<li>Estimate the significance of the difference and correct for multiple testing.</li>
-</ol>
-<p>When it comes to DGE analysis, R offers various tools among which, the best performing are:</p>
-<ul>
-<li><code>edgeR</code> (recommended for experiments with fewer than 12 replicates)</li>
-<li><code>DESeq/DESeq2</code> (better control of false positives and more conservative than <code>edgeR</code>)</li>
-<li><code>limma</code> (also more conservative than <code>edgeR</code>)</li>
-</ul>
-<p>All three packages rely on a <em>negative binomial model</em> to fit the observed read counts to arrive at the estimates for the difference.</p>
-<h2 id=41-running-dge-analysis-with-deseq2>4.1. Running DGE analysis with <code>DESeq2</code></h2>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># DESeq uses the levels of the condition</span>
-<span style=color:#75715e># to determine the order of the comparison</span>
-<span style=color:#a6e22e>str</span>(<span style=color:#a6e22e>colData</span>(dds)<span style=color:#f92672>$</span>condition)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># set &#39;new_born&#39; as the first-level factor</span>
-<span style=color:#a6e22e>colData</span>(dds)<span style=color:#f92672>$</span>condition <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>relevel</span>(<span style=color:#a6e22e>colData</span>(dds)<span style=color:#f92672>$</span>condition, <span style=color:#e6db74>&#34;new_born&#34;</span>)
-</code></pre></div><p>Now, we can run the DGE analysis using the <code>DESeq()</code> functiuon provided by the <code>DESeq2</code> R package:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Running DGE analysis using the DESeq() function</span>
-dds2 <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>DESeq</span>(dds)
-</code></pre></div><p>The <code>results()</code> function lets you extract the base means across samples, moderated log2 fold changes, standard errors, test statistics etc. for every gene.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>DGE.results <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>results</span>(dds2, independentFiltering <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, alpha <span style=color:#f92672>=</span> <span style=color:#ae81ff>0.05</span>)
-<span style=color:#a6e22e>summary</span>(DGE.results)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># The DESeqResult object can basically be handled like a data.frame</span>
-<span style=color:#a6e22e>head</span>(DGE.results)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Number of differentially expressed genes</span>
-<span style=color:#a6e22e>table</span>(DGE.results<span style=color:#f92672>$</span>padj <span style=color:#f92672>&lt;</span> <span style=color:#ae81ff>0.05</span>)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># list all differentially expressed genes</span>
-<span style=color:#a6e22e>rownames</span>(<span style=color:#a6e22e>subset</span>(DGE.results, padj <span style=color:#f92672>&lt;</span> <span style=color:#ae81ff>0.05</span>))
-</code></pre></div><p>The <code>DESeq()</code> function is a wrapper around the functions <code>estimateSizeFactors()</code>, <code>stimateDispersions()</code>, and <code>nbinomWaldTest()</code>, the DGE analysis can alternatively be performed as follows:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Sequencing depth normalization between the samples</span>
-dds3 <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>estimateSizeFactors</span>(dds)
-
-<span style=color:#75715e># Gene-wise dispersion estimates across all samples</span>
-dds3 <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>estimateDispersions</span>(dds3)
-
-<span style=color:#75715e># This fits a negative binomial GLM and </span>
-<span style=color:#75715e># applies Wald statistics to each gene</span>
-dds3 <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>nbinomWaldTest</span>(dds3)
-</code></pre></div><h3 id=411-exploratory-plots-following-dge-analysis-with-deseq2>4.1.1. Exploratory plots following DGE analysis with <code>DESeq2</code></h3>
-<p>A simple and fast way of inspecting how frequently certain values are present in a data set is to plot a histogram of p-values:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#a6e22e>hist</span>(DGE.results<span style=color:#f92672>$</span>pvalue, 
-     col <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;grey&#34;</span>, 
-     border <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;white&#34;</span>,
-     xlab <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;&#34;</span>, 
-     ylab <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;&#34;</span>, 
-     main <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;frequencies  of p-values&#34;</span>)
-</code></pre></div><p>MA plots provide a general view of the relationship between the expression change between condition</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#a6e22e>plotMA</span>(DGE.results,
-       alpha <span style=color:#f92672>=</span> <span style=color:#ae81ff>0.05</span>,  
-       main <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;new-born vs. middle-aged vs long-lived conditions&#34;</span>, 
-       ylim <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>-4</span>,<span style=color:#ae81ff>4</span>))
-</code></pre></div><p>Another way to provide a general view of the relationship between the expression change between condition is to use a volcano plot:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Volcano plot for a threshold of adjusted pval=0.05 and logFC = 7</span>
-<span style=color:#a6e22e>with</span>(DGE.results, 
-     <span style=color:#a6e22e>plot</span>(log2FoldChange, <span style=color:#f92672>-</span><span style=color:#a6e22e>log10</span>(padj), pch <span style=color:#f92672>=</span> <span style=color:#ae81ff>20</span>, 
-          main <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Volcano plot&#34;</span>, xlim <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>-10</span>,<span style=color:#ae81ff>10</span>)))
-
-<span style=color:#a6e22e>with</span>(<span style=color:#a6e22e>subset</span>(DGE.results, padj <span style=color:#f92672>&lt;</span> <span style=color:#ae81ff>0.05</span>), 
-     <span style=color:#a6e22e>points</span>(log2FoldChange, <span style=color:#f92672>-</span><span style=color:#a6e22e>log10</span>(padj), pch <span style=color:#f92672>=</span> <span style=color:#ae81ff>20</span>, col <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;blue&#34;</span>))
-
-<span style=color:#a6e22e>with</span>(<span style=color:#a6e22e>subset</span>(DGE.results, padj <span style=color:#f92672>&lt;</span> <span style=color:#ae81ff>0.05</span> <span style=color:#f92672>&amp;</span> <span style=color:#a6e22e>abs</span>(log2FoldChange) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>7</span>), 
-     <span style=color:#a6e22e>points</span>(log2FoldChange, <span style=color:#f92672>-</span><span style=color:#a6e22e>log10</span>(padj), pch <span style=color:#f92672>=</span> <span style=color:#ae81ff>20</span>, col <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;red&#34;</span>))
-</code></pre></div><p>Heatmaps are a popular means to visualize the expression values across the individual samples.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># `aheatmap()` needs a matrix of values, e.g., a matrix of DE genes  </span>
-<span style=color:#75715e># with the transformed read counts for each replicate</span>
-<span style=color:#75715e># sort the results according to the adjusted p-value</span>
-<span style=color:#75715e># DGE.results.sorted &lt;- DGE.results[order(DGE.results$padj), ]</span>
-
-<span style=color:#75715e># Sort the results according to the log2FoldChange</span>
-DGE.results.sorted <span style=color:#f92672>&lt;-</span> DGE.results<span style=color:#a6e22e>[order</span>(DGE.results<span style=color:#f92672>$</span>log2FoldChange), ]
-
-<span style=color:#75715e># Identify genes with the desired adjusted p-value cut -off</span>
-<span style=color:#75715e># DGEgenes &lt;- rownames(subset(DGE.results.sorted, padj &lt; 0.05))</span>
-
-<span style=color:#75715e># Identify genes with the desired cut -off</span>
-DGEgenes <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>rownames</span>(<span style=color:#a6e22e>subset</span>(DGE.results.sorted, <span style=color:#a6e22e>abs</span>(log2FoldChange) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>7</span>))
-<span style=color:#a6e22e>length</span>(DGEgenes)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># extract the normalized read counts for DE genes into a matrix</span>
-hm.mat_DGEgenes <span style=color:#f92672>&lt;-</span> log.norm.counts[DGEgenes, ]
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Scale the read counts per gene to emphasize </span>
-<span style=color:#75715e># the sample type-specific differences</span>
-<span style=color:#a6e22e>aheatmap</span>(hm.mat_DGEgenes, 
-         Rowv <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>,
-         Colv <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, 
-         distfun <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;euclidean&#34;</span>, 
-         hclustfun <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;average&#34;</span>, 
-         scale <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;row&#34;</span>) 
-<span style=color:#75715e># values are transformed into distances from the center</span>
-<span style=color:#75715e># of the row-specific average: </span>
-<span style=color:#75715e># (actual value-mean of the group)/standard deviation</span>
-</code></pre></div><h3 id=42-running-dge-analysis-with-edger>4.2. Running DGE analysis with edgeR</h3>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># We need to specify the sample types, similarly to what we did for DESeq2.</span>
-sample_info.edger <span style=color:#f92672>&lt;-</span> sampleTable<span style=color:#f92672>$</span>condition
-sample_info.edger <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>relevel</span>(sample_info.edger, ref <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;new_born&#34;</span>)
-
-<span style=color:#75715e># `DGEList()` is the function that converts the count matrix into an edgeR object.</span>
-<span style=color:#75715e># readcounts &lt;- txi$counts # uncomment this line when data from salmon</span>
-edgeR.DGElist <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>DGEList</span>(counts <span style=color:#f92672>=</span> readcounts, group <span style=color:#f92672>=</span> sample_info.edger)
-keep <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>rowSums</span>( <span style=color:#a6e22e>cpm</span>(edgeR.DGElist) <span style=color:#f92672>&gt;=</span> <span style=color:#ae81ff>1</span>) <span style=color:#f92672>&gt;=</span> <span style=color:#ae81ff>5</span>
-edgeR.DGElist <span style=color:#f92672>&lt;-</span> edgeR.DGElist[keep, ]
-edgeR.DGElist <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>calcNormFactors</span>(edgeR.DGElist, method <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;TMM&#34;</span>)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># check  the  result</span>
-edgeR.DGElist[1<span style=color:#f92672>:</span><span style=color:#ae81ff>5</span>, ]
-</code></pre></div><p>The <code>edgeR</code> package recommends removing genes with almost no coverage. In order to determine a sensible cutoff, we plot a histogram of counts per million calculated by <code>edgeR</code>’s <code>cpm()</code> function.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Get an impression of the coverage across samples</span>
-<span style=color:#a6e22e>hist</span>(<span style=color:#a6e22e>log2</span>(<span style=color:#a6e22e>rowSums</span>(<span style=color:#a6e22e>cpm</span>(edgeR.DGElist))))
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Specify the design setup - the design matrix looks a bit intimitating, </span>
-<span style=color:#75715e># but if you just focus on the formula [~sample_info.edger] </span>
-<span style=color:#75715e># you can see that it&#39;s exactly what we used for DESeq2, too</span>
-design  <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>model.matrix</span>(<span style=color:#f92672>~</span>sample_info.edger)
-
-<span style=color:#75715e># Estimate the dispersion for all read counts across all samples</span>
-edgeR.DGElist  <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>estimateDisp</span>(edgeR.DGElist, design)
-
-<span style=color:#75715e># Fit the negative binomial model</span>
-edger_fit  <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>glmFit</span>(edgeR.DGElist, design)
-
-<span style=color:#75715e># Perform the testing for every gene using the neg. binomial model</span>
-edger_lrt  <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>glmLRT</span>(edger_fit)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Extract results from edger_lrt$table</span>
-DGE.results_edgeR <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>topTags</span>(edger_lrt, n <span style=color:#f92672>=</span> <span style=color:#66d9ef>Inf</span>, <span style=color:#75715e># to retrieve all genes</span>
-                              sort.by <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;PValue&#34;</span>, 
-                              adjust.method <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;BH&#34;</span>)
-
-DGE.results_edgeR[1<span style=color:#f92672>:</span><span style=color:#ae81ff>10</span>, ]
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>DGE.res_edgeR.sort <span style=color:#f92672>&lt;-</span> DGE.results_edgeR<span style=color:#f92672>$</span>table<span style=color:#a6e22e>[order</span>(DGE.results_edgeR<span style=color:#f92672>$</span>table<span style=color:#f92672>$</span>FDR), ]
-
-<span style=color:#75715e># Ientify genes with the desired cut-off</span>
-DGEgenes_edgeR <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>rownames</span>(<span style=color:#a6e22e>subset</span>(DGE.res_edgeR.sort, FDR <span style=color:#f92672>&lt;=</span> <span style=color:#ae81ff>0.05</span>))
-<span style=color:#a6e22e>length</span>(DGEgenes_edgeR)
-</code></pre></div><p>Fit a quasi-likelihood negative binomial generalized log-linear model to count data:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>fit2 <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>glmQLFit</span>(edgeR.DGElist, design)
-
-<span style=color:#75715e># Conduct genewise statistical tests for a given coefficient or contrast.</span>
-qlf2 <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>glmQLFTest</span>(fit2, coef <span style=color:#f92672>=</span> <span style=color:#ae81ff>2</span>)
-sm<span style=color:#f92672>&lt;-</span><span style=color:#a6e22e>topTags</span>(qlf2, n <span style=color:#f92672>=</span> <span style=color:#66d9ef>Inf</span>, <span style=color:#75715e># to retrieve all genes</span>
-            sort.by <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;PValue&#34;</span>, 
-            adjust.method <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;BH&#34;</span>)
-
-<span style=color:#75715e># explore results table</span>
-sm[1<span style=color:#f92672>:</span><span style=color:#ae81ff>10</span>, ]
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>DGEgenes_edgeR.QL <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>rownames</span>(<span style=color:#a6e22e>subset</span>(sm<span style=color:#f92672>$</span>table, <span style=color:#a6e22e>abs</span>(logFC) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>7</span>))
-<span style=color:#a6e22e>length</span>(DGEgenes_edgeR.QL)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#a6e22e>hist</span>(sm<span style=color:#f92672>$</span>table<span style=color:#f92672>$</span>PValue, col <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;grey&#34;</span>, border <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;white&#34;</span>,
-     xlab <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;&#34;</span>, ylab <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;&#34;</span>, main <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;frequencies of p-values&#34;</span>)
-</code></pre></div><p>Another way to provide a general view of the relationship between the expression change between condition is to use a volcano plot:</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Volcano plot for a threshold of PValue=0.05 and logFC=7</span>
-<span style=color:#a6e22e>with</span>(sm<span style=color:#f92672>$</span>table, <span style=color:#a6e22e>plot</span>(logFC, <span style=color:#f92672>-</span><span style=color:#a6e22e>log10</span>(PValue), pch <span style=color:#f92672>=</span> <span style=color:#ae81ff>20</span>, 
-                    main <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Volcano plot&#34;</span>, xlim <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>-10</span>,<span style=color:#ae81ff>10</span>)))
-
-<span style=color:#a6e22e>with</span>(<span style=color:#a6e22e>subset</span>(sm<span style=color:#f92672>$</span>table, PValue <span style=color:#f92672>&lt;</span> <span style=color:#ae81ff>0.05</span>), 
-     <span style=color:#a6e22e>points</span>(logFC,<span style=color:#f92672>-</span><span style=color:#a6e22e>log10</span>(PValue), pch <span style=color:#f92672>=</span> <span style=color:#ae81ff>20</span>, col <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;blue&#34;</span>))
-
-<span style=color:#a6e22e>with</span>(<span style=color:#a6e22e>subset</span>(sm<span style=color:#f92672>$</span>table, PValue <span style=color:#f92672>&lt;</span> <span style=color:#ae81ff>0.05</span> <span style=color:#f92672>&amp;</span> <span style=color:#a6e22e>abs</span>(logFC) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>7</span>), 
-     <span style=color:#a6e22e>points</span>(logFC, <span style=color:#f92672>-</span><span style=color:#a6e22e>log10</span>(PValue), pch <span style=color:#f92672>=</span> <span style=color:#ae81ff>20</span>, col <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;red&#34;</span>))
-</code></pre></div><p>Let&rsquo;s generate the heatmap of the differentially expressed determined by the quasi-likelihood negative binomial generalized log-linear model.</p>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Extract the normalized read counts for DE genes into a matrix</span>
-hm.mat_DGEgenes.edgeR <span style=color:#f92672>&lt;-</span> log.norm.counts[DGEgenes_edgeR.QL, ]
-
-<span style=color:#75715e># Plot the normalized read counts of DE genes sorted by the adjusted p-value</span>
-<span style=color:#75715e># aheatmap(hm.mat_DGEgenes.edgeR, Rowv = NA, Colv = NA)</span>
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Scale the read counts per gene to emphasize </span>
-<span style=color:#75715e># the sample type-specific differences</span>
-<span style=color:#a6e22e>aheatmap</span>(hm.mat_DGEgenes.edgeR, 
-         Rowv <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>,
-         Colv <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, 
-         distfun <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;euclidean&#34;</span>, 
-         hclustfun <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;average&#34;</span>, 
-         scale <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;row&#34;</span>) 
-<span style=color:#75715e># values are transformed into distances from the center</span>
-<span style=color:#75715e># of the row-specific average: </span>
-<span style=color:#75715e># (actual value - mean of the group)/standard deviation</span>
-</code></pre></div><h3 id=43-running-dge-analysis-with-limma>4.3. Running DGE analysis with <code>limma</code></h3>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># `limma` also needs a design matrix, just like edgeR</span>
-design <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>model.matrix</span>(<span style=color:#f92672>~</span>sample_info.edger)
-
-<span style=color:#75715e># Transform the count  data to log2-counts -per -million and estimate</span>
-<span style=color:#75715e># the mean-variance relationship, which is used to compute weights</span>
-<span style=color:#75715e># for each count -- this is supposed to make the read counts</span>
-<span style=color:#75715e># amenable to be used with linear models</span>
-design <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>model.matrix</span>(<span style=color:#f92672>~</span>sample_info.edger)
-<span style=color:#a6e22e>rownames</span>(design) <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>colnames</span>(edgeR.DGElist)
-voomTransformed <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>voom</span>(edgeR.DGElist, design, plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Fit a linear model for each gene</span>
-voomed.fitted <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>lmFit</span>(voomTransformed, design <span style=color:#f92672>=</span> design)
-
-<span style=color:#75715e># Compute moderated t-statistics, moderated F-statistics,</span>
-<span style=color:#75715e># and log-odds of differential expression</span>
-voomed.fitted <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>eBayes</span>(voomed.fitted)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Extract gene list with logFC and statistical measures</span>
-<span style=color:#a6e22e>colnames</span>(design) <span style=color:#75715e># check how the coefficient is named</span>
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>DGE.results_limma <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>topTable</span>(voomed.fitted,
-                               coef <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;sample_info.edgermiddle_aged&#34;</span>,
-                               number <span style=color:#f92672>=</span> <span style=color:#66d9ef>Inf</span>, 
-                               adjust.method <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;BH&#34;</span>,
-                               sort.by <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;logFC&#34;</span>)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#a6e22e>head</span>(DGE.results_limma[DGE.results_limma<span style=color:#f92672>$</span>logFC <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>3</span>, ])
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r>DGE.results_lima.sorted  <span style=color:#f92672>&lt;-</span> DGE.results_limma<span style=color:#a6e22e>[order</span>(DGE.results_limma<span style=color:#f92672>$</span>adj.P.Val), ]
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Identify genes with the desired cut-off</span>
-DGEgenes_lima  <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>rownames</span>(<span style=color:#a6e22e>subset</span>(DGE.results_lima.sorted, <span style=color:#a6e22e>abs</span>(logFC) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>7</span>))
-<span style=color:#a6e22e>length</span>(DGEgenes_lima)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Extract the normalized read counts for DE genes into a matrix</span>
-hm.mat_DGEgenes.lima  <span style=color:#f92672>&lt;-</span> log.norm.counts[DGEgenes_lima, ]
-
-<span style=color:#75715e># Plot the normalized read counts of DE genes sorted by the adjusted p-value</span>
-<span style=color:#75715e>#aheatmap(hm.mat_DGEgenes.edgeR, Rowv = NA, Colv = NA)</span>
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Scale the read counts per gene to emphasize </span>
-<span style=color:#75715e># the sample type-specific differences</span>
-<span style=color:#a6e22e>aheatmap</span>(hm.mat_DGEgenes.lima, 
-         Rowv <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>,
-         Colv <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, 
-         distfun <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;euclidean&#34;</span>, 
-         hclustfun <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;average&#34;</span>, 
-         scale <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;row&#34;</span>) 
-<span style=color:#75715e># values are transformed into distances from the center</span>
-<span style=color:#75715e># of the row -specific  average: </span>
-<span style=color:#75715e># (actual value - mean of the group)/standard deviation</span>
-</code></pre></div><h3 id=44-venn-diagram-and-upset-plot>4.4. Venn Diagram and Upset plot</h3>
-<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># Make a Venn diagram</span>
-DE_list <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>list</span>(edger <span style=color:#f92672>=</span> <span style=color:#a6e22e>rownames</span>(<span style=color:#a6e22e>subset</span>(DGE.results_edgeR<span style=color:#f92672>$</span>table, <span style=color:#a6e22e>abs</span>(logFC) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>7</span>))
-                 ,edger_QL <span style=color:#f92672>=</span> <span style=color:#a6e22e>rownames</span>(<span style=color:#a6e22e>subset</span>(sm<span style=color:#f92672>$</span>table, <span style=color:#a6e22e>abs</span>(logFC) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>7</span>))
-                 ,deseq2 <span style=color:#f92672>=</span> <span style=color:#a6e22e>rownames</span>(<span style=color:#a6e22e>subset</span>(DGE.results, <span style=color:#a6e22e>abs</span>(log2FoldChange) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>7</span>))
-                 ,limma <span style=color:#f92672>=</span> <span style=color:#a6e22e>rownames</span>(<span style=color:#a6e22e>subset</span>(DGE.results_limma, <span style=color:#a6e22e>abs</span>(logFC) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>7</span>))
-                )
-
-gplots<span style=color:#f92672>::</span><span style=color:#a6e22e>venn</span>(DE_list)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># more sophisticated venn alternative, especially if you </span>
-<span style=color:#75715e># are comparing  more than 3 lists</span>
-DE_gns <span style=color:#f92672>&lt;-</span> UpSetR<span style=color:#f92672>::</span><span style=color:#a6e22e>fromList</span>(DE_list)
-UpSetR<span style=color:#f92672>::</span><span style=color:#a6e22e>upset</span>(DE_gns, order.by <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;freq&#34;</span>)
-</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=color:#75715e># List the Differentially Expressed genes </span>
-<span style=color:#75715e># by categories displayed in the Venn Diagram</span>
-out <span style=color:#f92672>&lt;-</span> gplots<span style=color:#f92672>::</span><span style=color:#a6e22e>venn</span>(DE_list, show.plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>)
-out
-</code></pre></div><p>The Venn Diagram and the Upset plot conclude our tutorial on DGE analysis. Find the Original source code for this tutorial <a href=https://github.com/rosericazondekon/bioinformatics-tuto/blob/main/RNAseq%20analysis/DGE_tutorial.ipynb>here</a>.</p>
-</p>
-</div>
-</div>
-</main><footer class=footer>
-<span>&copy; 2022 Roseric Azondekon</span>
-</footer>
-</body>
-</html>
+<link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.13.16/dist/katex.min.css integrity=sha384-6LkG2wmY8FK9E0vU9OOr8UvLwsaqUg9SETfpq4uTCN1agNe8HRdE9ABlk+fVx6gZ crossorigin=anonymous><script defer src=https://cdn.jsdelivr.net/npm/katex@0.13.16/dist/katex.min.js integrity=sha384-31El76TwmbHj4rF9DyLsygbq6xoIobG0W+jqXim+a3dU9W53tdH3A/ngRPxOzzaB crossorigin=anonymous></script>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.13.16/dist/contrib/auto-render.min.js integrity=sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl crossorigin=anonymous onload=renderMathInElement(document.body)></script></head><body><script type=text/javascript>setThemeByUserPref()</script><header class=header><nav class=header-nav><div class=avatar><a href=https://rosericazondekon.github.io/><img src=/images/roz.webp alt=avatar></a></div><div class=nav-title><a class=nav-brand href=https://rosericazondekon.github.io/>Gbedegnon Roseric Azondekon</a></div><div class=nav-links><div class=nav-link><a href=/>Home</a></div><div class=nav-link><a href=/posts/>Posts</a></div><div class=nav-link><a href=/projects/>Projects</a></div><div class=nav-link><a href=/cv/>CV</a></div><div class=nav-link><a href=/tags/>Tags</a></div><div class=nav-link><a href=/about/>About</a></div><div class=nav-link><a href=https://github.com/rosericazondekon><span data-feather=github></span></a></div><div class=nav-link><a href=https://www.buymeacoffee.com/gazondekon><span data-feather=coffee></span></a></div><div class=nav-link><a href=/index.xml><span data-feather=rss></span></a></div><span class=nav-icons-divider></span><div class="nav-link dark-theme-toggle"><a><span id=theme-toggle-icon data-feather=moon></span></a></div><div class=nav-link id=hamburger-menu-toggle><a><span data-feather=menu></span></a></div><ul class="nav-hamburger-list visibility-hidden"><li class=nav-item><a href=/>Home</a></li><li class=nav-item><a href=/posts/>Posts</a></li><li class=nav-item><a href=/projects/>Projects</a></li><li class=nav-item><a href=/cv/>CV</a></li><li class=nav-item><a href=/tags/>Tags</a></li><li class=nav-item><a href=/about/>About</a></li><li class=nav-item><a href=https://github.com/rosericazondekon><span data-feather=github></span></a></li><li class=nav-item><a href=https://www.buymeacoffee.com/gazondekon><span data-feather=coffee></span></a></li><li class=nav-item><a href=/index.xml><span data-feather=rss></span></a></li><li class="nav-item dark-theme-toggle"><a><span id=theme-toggle-icon data-feather=moon></span></a></li></ul></div></nav></header><main id=content><div class="post container"><div class=post-header-section><h1>Differential Gene Expression Analysis</h1><small role=doc-subtitle>A Differential Gene Expression Analysis tutorial Using R.</small><p class=post-date>December 23, 2021</p><ul class=post-tags><li class=post-tag><a href=/tags/deseq2>deseq2</a></li><li class=post-tag><a href=/tags/edger>edger</a></li><li class=post-tag><a href=/tags/limma>limma</a></li><li class=post-tag><a href=/tags/differential>differential</a></li><li class=post-tag><a href=/tags/gene>gene</a></li><li class=post-tag><a href=/tags/expression>expression</a></li><li class=post-tag><a href=/tags/fastq>fastq</a></li><li class=post-tag><a href=/tags/read>read</a></li><li class=post-tag><a href=/tags/count>count</a></li></ul></div><div class=post-content><p><p><strong>Disclaimer:</strong> This tutorial was originally written on April 01, 2019.</p><h2 id=introduction>Introduction</h2><p>In a <a href=/posts/rnaseq-read-align-quant>previous tutorial</a>, we showed you how to download and process RNA-seq FASTQ files for read alignment on a reference sequence, and for read quantification. In this tutorial, we show you how to conduct Differential Gene Expression (DGE) analysis using the <a href=https://bioconductor.org/packages/release/bioc/html/DESeq2.html><code>DESeq2</code></a>, <a href=https://bioconductor.org/packages/release/bioc/html/edgeR.html><code>edgeR</code></a>, and <a href=https://bioconductor.org/packages/release/bioc/html/limma.html><code>limma</code></a> packages.</p><p>We set our working directory to the <code>tuto</code> folder created in our first tutorial.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#a6e22e>setwd</span>(<span style=color:#e6db74>&#39;./tuto&#39;</span>)
+</span></span></code></pre></div><p>Now, let&rsquo;s install all the required packages for this tutorial.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Indicate package repositories to R...</span>
+</span></span><span style=display:flex><span>repositories <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;https://cloud.r-project.org&#34;</span>, 
+</span></span><span style=display:flex><span>                   <span style=color:#e6db74>&#34;https://bioconductor.org/packages/3.7/bioc&#34;</span>,
+</span></span><span style=display:flex><span>                   <span style=color:#e6db74>&#34;https://bioconductor.org/packages/3.7/data/annotation&#34;</span>, 
+</span></span><span style=display:flex><span>                   <span style=color:#e6db74>&#34;https://bioconductor.org/packages/3.7/data/experiment&#34;</span>,
+</span></span><span style=display:flex><span>                   <span style=color:#e6db74>&#34;https://www.stats.ox.ac.uk/pub/RWin&#34;</span>, 
+</span></span><span style=display:flex><span>                   <span style=color:#e6db74>&#34;http://www.omegahat.net/R&#34;</span>, 
+</span></span><span style=display:flex><span>                   <span style=color:#e6db74>&#34;https://R-Forge.R-project.org&#34;</span>,
+</span></span><span style=display:flex><span>                   <span style=color:#e6db74>&#34;https://www.rforge.net&#34;</span>, 
+</span></span><span style=display:flex><span>                   <span style=color:#e6db74>&#34;https://cloud.r-project.org&#34;</span>, 
+</span></span><span style=display:flex><span>                   <span style=color:#e6db74>&#34;http://www.bioconductor.org&#34;</span>,
+</span></span><span style=display:flex><span>                   <span style=color:#e6db74>&#34;http://www.stats.ox.ac.uk/pub/RWin&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Package list to download</span>
+</span></span><span style=display:flex><span>packages <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;vsn&#34;</span>, <span style=color:#e6db74>&#34;UpSetR&#34;</span>, <span style=color:#e6db74>&#34;gplots&#34;</span>, <span style=color:#e6db74>&#34;NMF&#34;</span>, <span style=color:#e6db74>&#34;org.Hs.eg.db&#34;</span>, 
+</span></span><span style=display:flex><span>              <span style=color:#e6db74>&#34;pheatmap&#34;</span>, <span style=color:#e6db74>&#34;tximport&#34;</span>, <span style=color:#e6db74>&#34;readr&#34;</span>, <span style=color:#e6db74>&#34;edgeR&#34;</span>, <span style=color:#e6db74>&#34;biomaRt&#34;</span>,
+</span></span><span style=display:flex><span>              <span style=color:#e6db74>&#34;VennDiagram&#34;</span>, <span style=color:#e6db74>&#34;plyr&#34;</span>, <span style=color:#e6db74>&#34;dplyr&#34;</span>,<span style=color:#e6db74>&#34;DESeq2&#34;</span>, <span style=color:#e6db74>&#34;AnnotationDbi&#34;</span>,
+</span></span><span style=display:flex><span>              <span style=color:#e6db74>&#34;Biobase&#34;</span>, <span style=color:#e6db74>&#34;ensembldb&#34;</span>, <span style=color:#e6db74>&#34;ggpubr&#34;</span>, <span style=color:#e6db74>&#34;ggplot2&#34;</span>, <span style=color:#e6db74>&#34;limma&#34;</span>, <span style=color:#e6db74>&#34;magrittr&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Install and load missing packages</span>
+</span></span><span style=display:flex><span>new.packages <span style=color:#f92672>&lt;-</span> packages[<span style=color:#f92672>!</span>(packages <span style=color:#f92672>%in%</span> <span style=color:#a6e22e>installed.packages</span>()[, <span style=color:#e6db74>&#34;Package&#34;</span>])]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>if</span>(<span style=color:#a6e22e>length</span>(new.packages)){
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>install.packages</span>(new.packages, repos <span style=color:#f92672>=</span> repositories)
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>lapply</span>(packages, library, character.only <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
+</span></span></code></pre></div><p>Let&rsquo;s load our samples&rsquo; information from the <code>samples.txt</code> (see <a href=/posts/rnaseq-read-align-quant>RNA-seq tutorial</a>)).</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>samples <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>read.table</span>(<span style=color:#e6db74>&#34;samples.txt&#34;</span>)
+</span></span><span style=display:flex><span><span style=color:#a6e22e>head</span>(samples)
+</span></span></code></pre></div><p>We can see that our samples names are contained in the 4th column of the <code>samples</code> table. We will use that information as our sample names.</p><p>The 9 RNA-seq samples are respectively from 3 new-born, 3 middle-aged, and 3 long-lived individuals. We represent that information in the <code>sampleTable</code> variable as follows:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>conditions <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>factor</span>(<span style=color:#a6e22e>rep</span>(<span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;new_born&#34;</span>, <span style=color:#e6db74>&#34;middle_aged&#34;</span>, <span style=color:#e6db74>&#34;long_lived&#34;</span>), each <span style=color:#f92672>=</span> <span style=color:#ae81ff>3</span>))
+</span></span><span style=display:flex><span>sampleTable <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>data.frame</span>(condition <span style=color:#f92672>=</span> conditions)
+</span></span><span style=display:flex><span><span style=color:#a6e22e>rownames</span>(sampleTable) <span style=color:#f92672>&lt;-</span> samples<span style=color:#f92672>$</span>V4
+</span></span><span style=display:flex><span>sampleTable
+</span></span></code></pre></div><p>Now that we have downloaded and loaded all the required packages and samples information, we can import the read counts into <code>R</code>.</p><h2 id=1-prepare-data-for-dge-analysis-from-star-feature-counts-data>1. Prepare data for DGE analysis from <code>STAR</code> feature counts data</h2><h3 id=11-importing-read-counts-data-to-r-from-star-output>1.1. Importing read counts data to <code>R</code> from <code>STAR</code> output</h3><p>Remember that the read counts data from <a href=https://github.com/alexdobin/STAR><code>STAR</code></a> were saved in the <code>featureCounts_results.txt</code> file inside the <code>read_counts</code> folder.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Get the table of read counts</span>
+</span></span><span style=display:flex><span>readcounts <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>read.table</span>(<span style=color:#e6db74>&#34;read_counts/featureCounts_results.txt&#34;</span>, header <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># table overview</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>head</span>(readcounts)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># The gene IDs should be stored as row.names</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>row.names</span>(readcounts) <span style=color:#f92672>&lt;-</span> readcounts<span style=color:#f92672>$</span>Geneid
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Exclude all columns that do not contain read counts</span>
+</span></span><span style=display:flex><span>readcounts <span style=color:#f92672>&lt;-</span> readcounts[, <span style=color:#f92672>-</span><span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>1</span><span style=color:#f92672>:</span><span style=color:#ae81ff>6</span>)]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>head</span>(readcounts)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Give meaningful sample names</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>names</span>(readcounts) <span style=color:#f92672>&lt;-</span> samples<span style=color:#f92672>$</span>V4
+</span></span><span style=display:flex><span><span style=color:#a6e22e>head</span>(readcounts)
+</span></span></code></pre></div><h3 id=12-preparing-a-deseqdataset-for-use-with-deseq2>1.2. Preparing a <code>DESeqDataSet</code> for use with <code>DESeq2</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>dds_star <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>DESeqDataSetFromMatrix</span>(readcounts, sampleTable, <span style=color:#f92672>~</span>condition)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Remove genes without any counts</span>
+</span></span><span style=display:flex><span>dds_star <span style=color:#f92672>&lt;-</span> dds_star<span style=color:#a6e22e>[rowSums</span>(<span style=color:#a6e22e>counts</span>(dds_star)) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>0</span>, ]
+</span></span></code></pre></div><p>The <code>dds_star</code> object is now ready for the <code>DESeq()</code> function. For more, check the see <a href=http://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html><code>DESeq2</code> vignette</a>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Inspect DESeq dataset</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>colData</span>(dds_star) <span style=color:#f92672>%&gt;%</span> head
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Investigate different library sizes</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>colSums</span>(<span style=color:#a6e22e>counts</span>(dds_star))
+</span></span></code></pre></div><p>Our read counts data table is now ready for the downstream DGE analysis. Next let&rsquo;s show how to import transcript-level estimates into R from the quantification files generated by <a href=https://combine-lab.github.io/salmon/><code>salmon</code></a>.</p><h2 id=2-importing-transcript-level-estimates-to-r-from-salmon-output>2. Importing transcript-level estimates to <code>R</code> from <code>salmon</code> output</h2><p>To import the transcript-level estimates, we need a gene annotation table for Homo sapiens. Such a table can be obtained from the <a href=https://bioconductor.org/packages/release/data/annotation/html/org.Hs.eg.db.html><code>org.Hs.eg.db</code></a> R package.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># get gene annotation table for Homo sapiens</span>
+</span></span><span style=display:flex><span>tx2g <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>select</span>(org.Hs.eg.db,
+</span></span><span style=display:flex><span>               keys <span style=color:#f92672>=</span> <span style=color:#a6e22e>keys</span>(org.Hs.eg.db),
+</span></span><span style=display:flex><span>               columns <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;REFSEQ&#34;</span>,<span style=color:#e6db74>&#34;SYMBOL&#34;</span>,<span style=color:#e6db74>&#34;GENENAME&#34;</span>))
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>tx2g <span style=color:#f92672>&lt;-</span> tx2g[, <span style=color:#ae81ff>-1</span>]
+</span></span><span style=display:flex><span><span style=color:#a6e22e>colnames</span>(tx2g) <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>c</span>(<span style=color:#e6db74>&#34;TXNAME&#34;</span>, <span style=color:#e6db74>&#34;GENEID&#34;</span>, <span style=color:#e6db74>&#34;GENENAME&#34;</span>)
+</span></span><span style=display:flex><span><span style=color:#a6e22e>head</span>(tx2g)
+</span></span></code></pre></div><p>Let&rsquo;s find the paths to the quantification. Recall that in the previous tutorial, we saved all the quantification files in the <code>quants</code> folder.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># search for &#39;.sf&#39; file starting from the current working directory</span>
+</span></span><span style=display:flex><span>files <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>file.path</span>(<span style=color:#e6db74>&#39;.&#39;</span>, <span style=color:#a6e22e>list.files</span>(pattern <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;\\.sf$&#34;</span>, recursive <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>))
+</span></span><span style=display:flex><span>files
+</span></span></code></pre></div><p>We now can import all the quantification files using the <code>tximport()</code> function provided by the <a href=https://bioconductor.org/packages/release/bioc/html/tximport.html><code>tximport</code></a> R package.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>txi <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>tximport</span>(files, type <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;salmon&#34;</span>, tx2gene <span style=color:#f92672>=</span> tx2g, ignoreTxVersion <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Give meaningful sample names</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>colnames</span>(txi[[<span style=color:#e6db74>&#39;counts&#39;</span>]]) <span style=color:#f92672>&lt;-</span> samples<span style=color:#f92672>$</span>V4
+</span></span><span style=display:flex><span><span style=color:#a6e22e>colnames</span>(txi[[<span style=color:#e6db74>&#39;length&#39;</span>]]) <span style=color:#f92672>&lt;-</span> samples<span style=color:#f92672>$</span>V4
+</span></span><span style=display:flex><span><span style=color:#a6e22e>colnames</span>(txi[[<span style=color:#e6db74>&#39;abundance&#39;</span>]]) <span style=color:#f92672>&lt;-</span> samples<span style=color:#f92672>$</span>V4
+</span></span><span style=display:flex><span><span style=color:#a6e22e>names</span>(txi)
+</span></span></code></pre></div><p>Let&rsquo;s take a look at the <code>txi</code> object data.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Looking at the counts table</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>head</span>(txi<span style=color:#f92672>$</span>counts)
+</span></span></code></pre></div><h3 id=21-preparing-a-deseqdataset-for-use-with-deseq2>2.1. Preparing a <code>DESeqDataSet</code> for use with <code>DESeq2</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>dds_salmon <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>DESeqDataSetFromTximport</span>(txi, sampleTable, <span style=color:#f92672>~</span>condition)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Remove genes without any counts</span>
+</span></span><span style=display:flex><span>dds_salmon <span style=color:#f92672>&lt;-</span> dds_salmon<span style=color:#a6e22e>[rowSums</span>(<span style=color:#a6e22e>counts</span>(dds_salmon)) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>0</span>, ]
+</span></span></code></pre></div><p>The dds_salmon object is now ready for the <code>DESeq()</code> function. For more, check the see <a href=http://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html><code>DESeq2</code> vignette</a>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Inspect DESeq dataset</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>colData</span>(dds_salmon) <span style=color:#f92672>%&gt;%</span> head
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Investigate different library sizes</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>colSums</span>(<span style=color:#a6e22e>counts</span>(dds_salmon)) <span style=color:#75715e># should be the same as colSums(txi$counts)</span>
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Investigate different library sizes</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>colSums</span>(txi<span style=color:#f92672>$</span>counts) <span style=color:#75715e># should be the same as colSums(counts(dds))</span>
+</span></span></code></pre></div><p>From this point forward, I choose to demonstrate the DGE analysis with <code>dds_star</code>. The code can be easily modified to switch between <code>dds_star</code> and <code>dds_salmon</code>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>dds <span style=color:#f92672>&lt;-</span> dds_star <span style=color:#75715e># dds &lt;- dds_salmon</span>
+</span></span></code></pre></div><h2 id=3-normalization-and-transformation>3. Normalization and Transformation</h2><h3 id=31-normalization-for-sequencing-depth-differences>3.1. Normalization for sequencing depth differences</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Calculate the size factor and add it to the data set</span>
+</span></span><span style=display:flex><span>dds <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>estimateSizeFactors</span>(dds)
+</span></span><span style=display:flex><span><span style=color:#a6e22e>sizeFactors</span>(dds)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># `counts()` allows you to immediately retrieve the normalized read counts</span>
+</span></span><span style=display:flex><span>counts.sf_normalized <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>counts</span>(dds, normalized <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Inspect counts.sf_normalized</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>head</span>(counts.sf_normalized)
+</span></span></code></pre></div><h3 id=32-transformation-of-sequencing-depth-normalized-read-counts>3.2. Transformation of sequencing-depth-normalized read counts</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Transform size-factor normalized read counts </span>
+</span></span><span style=display:flex><span><span style=color:#75715e># to log2 scale using a pseudocount of 1</span>
+</span></span><span style=display:flex><span>log.norm.counts <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>log2</span>(counts.sf_normalized <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span>)
+</span></span></code></pre></div><p>Let&rsquo;s see how the log2 transformation compares to the normalized read counts</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># First, boxplots of non-transformed read counts (one per sample)</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>boxplot</span>(counts.sf_normalized, 
+</span></span><span style=display:flex><span>        notch <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, 
+</span></span><span style=display:flex><span>        main <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;untransformed read counts&#34;</span>, 
+</span></span><span style=display:flex><span>        ylab <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;read counts&#34;</span>)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Boxplots of log2-transformed read counts</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>boxplot</span>(log.norm.counts, 
+</span></span><span style=display:flex><span>        notch <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, 
+</span></span><span style=display:flex><span>        main <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;log2-transformed read counts&#34;</span>, 
+</span></span><span style=display:flex><span>        ylab <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;log2(read counts)&#34;</span>)
+</span></span></code></pre></div><h3 id=33-visually-exploring-normalized-read-counts>3.3. Visually exploring normalized read counts</h3><p>Let&rsquo;s get an impression of how similar read counts are between replicates</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#a6e22e>plot</span>(log.norm.counts[, <span style=color:#ae81ff>1</span><span style=color:#f92672>:</span><span style=color:#ae81ff>2</span>], cex <span style=color:#f92672>=</span> <span style=color:#ae81ff>0.1</span>, main <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Normalized log2 (read counts)&#34;</span>)
+</span></span></code></pre></div><p>Checking for heteroskedasticity&mldr;</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>msd_plot <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>meanSdPlot</span>(log.norm.counts, ranks <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>, plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>)
+</span></span><span style=display:flex><span>msd_plot<span style=color:#f92672>$</span>gg <span style=color:#f92672>+</span> <span style=color:#a6e22e>ggtitle</span>(<span style=color:#e6db74>&#34;sequencing depth normalized log2(read counts)&#34;</span>) <span style=color:#f92672>+</span> 
+</span></span><span style=display:flex><span>              <span style=color:#a6e22e>ylab</span>(<span style=color:#e6db74>&#34;standard deviation&#34;</span>)
+</span></span></code></pre></div><p>A clear bump on the left-hand side in the figure will indicate that the variance is higher for smaller read counts compared to the variance for greater read counts.</p><h3 id=34-transformation-of-read-counts-including-variance-shrinkage>3.4. Transformation of read counts including variance shrinkage</h3><p>The amount of heteroskedasticity can be reduced using the dispersion-mean trend that can be observed for the entire data set as a reference.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Obtain regularized log-transformed values</span>
+</span></span><span style=display:flex><span>DESeq.rlog <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>rlog</span>(dds, blind <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
+</span></span><span style=display:flex><span>rlog.norm.counts <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>assay</span>(DESeq.rlog)
+</span></span><span style=display:flex><span><span style=color:#a6e22e>head</span>(rlog.norm.counts)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># mean-sd plot for rlog-transformed data</span>
+</span></span><span style=display:flex><span>msd_plot  <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>meanSdPlot</span>(rlog.norm.counts,
+</span></span><span style=display:flex><span>                        ranks <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>,
+</span></span><span style=display:flex><span>                        plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>msd_plot<span style=color:#f92672>$</span>gg <span style=color:#f92672>+</span> <span style=color:#a6e22e>ggtitle</span>(<span style=color:#e6db74>&#34;rlog-transformed read counts&#34;</span>) <span style=color:#f92672>+</span> 
+</span></span><span style=display:flex><span>              <span style=color:#a6e22e>ylab</span>(<span style=color:#e6db74>&#34;standard deviation&#34;</span>)
+</span></span></code></pre></div><p>Let&rsquo;s re-examine how similar the rlog−transformed read counts are between replicates.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#a6e22e>plot</span>(rlog.norm.counts[, <span style=color:#ae81ff>1</span><span style=color:#f92672>:</span><span style=color:#ae81ff>2</span>], cex <span style=color:#f92672>=</span> <span style=color:#ae81ff>0.1</span>, 
+</span></span><span style=display:flex><span>     main <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Normalized log2(read counts)&#34;</span>)
+</span></span></code></pre></div><h3 id=35-exploring-global-read-count-patterns>3.5. Exploring global read count patterns</h3><p>An important step before diving into the identification of differentially expressed genes is to check whether expectations about basic global patterns are met. The similarity of expression patterns can be assessed with various methods:</p><ul><li>Pairwise correlation</li><li>Hierarchical clustering, and</li><li>Principal Components Analysis (PCA)</li></ul><p>Assessing the similarity of RNA-seq samples in a pair-wise fashion&mldr;</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#a6e22e>cor</span>(counts.sf_normalized, method <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;pearson&#34;</span>)
+</span></span></code></pre></div><p>Hierarchical clustering can be used to determine whether the different sample types can be separated in an unsupervised fashion (i.e., samples of different conditions are more dissimilar to each other than replicates within the same condition).</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># cor() calculates the correlation between columns of a matrix</span>
+</span></span><span style=display:flex><span>distance.m_rlog  <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>as.dist</span>(<span style=color:#ae81ff>1</span> <span style=color:#f92672>-</span> <span style=color:#a6e22e>cor</span>(rlog.norm.counts, method <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;pearson&#34;</span>))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># plot() can directly interpret the output of hclust()</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>plot</span>(<span style=color:#a6e22e>hclust</span>(distance.m_rlog), 
+</span></span><span style=display:flex><span>     labels <span style=color:#f92672>=</span> <span style=color:#a6e22e>colnames</span>(rlog.norm.counts),
+</span></span><span style=display:flex><span>     main <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;rlog transformed read counts\n distance: Pearson correlation&#34;</span>)
+</span></span></code></pre></div><p>PCA is a complementary approach to determine whether samples display greater variability between experimental conditions than between replicates of the same treatment is principal components analysis.</p><p>The goal is to find groups of genes that have certain patterns of expression across different samples, so that the information from thousands of genes is captured and represented by a reduced number of groups.</p><p>In base R, the function <code>prcomp()</code> can be used to perform PCA:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>pc <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>prcomp</span>(<span style=color:#a6e22e>t</span>(rlog.norm.counts))
+</span></span><span style=display:flex><span><span style=color:#a6e22e>plot</span>(pc<span style=color:#f92672>$</span>x[, <span style=color:#ae81ff>1</span>], pc<span style=color:#f92672>$</span>x[, <span style=color:#ae81ff>2</span>],
+</span></span><span style=display:flex><span>     col <span style=color:#f92672>=</span> <span style=color:#a6e22e>colData</span>(dds)[, <span style=color:#ae81ff>1</span>],
+</span></span><span style=display:flex><span>     main <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;PCA of seq.depth normalized\n and rlog -transformed read counts&#34;</span>)
+</span></span></code></pre></div><p>PCA can also be performed using the <code>DESeq2</code> which offers a convenient function based on the <code>ggplot2</code> R package to perform PCA directly on a <code>DESeqDataSet</code>:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># PCA</span>
+</span></span><span style=display:flex><span>P <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>plotPCA</span>(DESeq.rlog)
+</span></span><span style=display:flex><span><span style=color:#75715e># plot cosmetics</span>
+</span></span><span style=display:flex><span>P <span style=color:#f92672>&lt;-</span> P <span style=color:#f92672>+</span> <span style=color:#a6e22e>theme_bw</span>() <span style=color:#f92672>+</span> <span style=color:#a6e22e>ggtitle</span>(<span style=color:#e6db74>&#34;Rlog  transformed  counts&#34;</span>)
+</span></span><span style=display:flex><span><span style=color:#a6e22e>print</span>(P)
+</span></span></code></pre></div><h2 id=4-differential-gene-expression-analysis-dge>4. Differential Gene Expression Analysis (DGE)</h2><p>Let&rsquo;s recall that the two basic tasks of all DGE tools are:</p><ol><li>Estimate the magnitude of differential expression between two or more conditions based on read counts from replicated samples, i.e., calculate the fold change of read counts, taking into account the differences in sequencing depth and variability.</li><li>Estimate the significance of the difference and correct for multiple testing.</li></ol><p>When it comes to DGE analysis, R offers various tools among which, the best performing are:</p><ul><li><code>edgeR</code> (recommended for experiments with fewer than 12 replicates)</li><li><code>DESeq/DESeq2</code> (better control of false positives and more conservative than <code>edgeR</code>)</li><li><code>limma</code> (also more conservative than <code>edgeR</code>)</li></ul><p>All three packages rely on a <em>negative binomial model</em> to fit the observed read counts to arrive at the estimates for the difference.</p><h2 id=41-running-dge-analysis-with-deseq2>4.1. Running DGE analysis with <code>DESeq2</code></h2><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># DESeq uses the levels of the condition</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># to determine the order of the comparison</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>str</span>(<span style=color:#a6e22e>colData</span>(dds)<span style=color:#f92672>$</span>condition)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># set &#39;new_born&#39; as the first-level factor</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>colData</span>(dds)<span style=color:#f92672>$</span>condition <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>relevel</span>(<span style=color:#a6e22e>colData</span>(dds)<span style=color:#f92672>$</span>condition, <span style=color:#e6db74>&#34;new_born&#34;</span>)
+</span></span></code></pre></div><p>Now, we can run the DGE analysis using the <code>DESeq()</code> functiuon provided by the <code>DESeq2</code> R package:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Running DGE analysis using the DESeq() function</span>
+</span></span><span style=display:flex><span>dds2 <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>DESeq</span>(dds)
+</span></span></code></pre></div><p>The <code>results()</code> function lets you extract the base means across samples, moderated log2 fold changes, standard errors, test statistics etc. for every gene.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>DGE.results <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>results</span>(dds2, independentFiltering <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, alpha <span style=color:#f92672>=</span> <span style=color:#ae81ff>0.05</span>)
+</span></span><span style=display:flex><span><span style=color:#a6e22e>summary</span>(DGE.results)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># The DESeqResult object can basically be handled like a data.frame</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>head</span>(DGE.results)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Number of differentially expressed genes</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>table</span>(DGE.results<span style=color:#f92672>$</span>padj <span style=color:#f92672>&lt;</span> <span style=color:#ae81ff>0.05</span>)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># list all differentially expressed genes</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>rownames</span>(<span style=color:#a6e22e>subset</span>(DGE.results, padj <span style=color:#f92672>&lt;</span> <span style=color:#ae81ff>0.05</span>))
+</span></span></code></pre></div><p>The <code>DESeq()</code> function is a wrapper around the functions <code>estimateSizeFactors()</code>, <code>stimateDispersions()</code>, and <code>nbinomWaldTest()</code>, the DGE analysis can alternatively be performed as follows:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Sequencing depth normalization between the samples</span>
+</span></span><span style=display:flex><span>dds3 <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>estimateSizeFactors</span>(dds)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Gene-wise dispersion estimates across all samples</span>
+</span></span><span style=display:flex><span>dds3 <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>estimateDispersions</span>(dds3)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># This fits a negative binomial GLM and </span>
+</span></span><span style=display:flex><span><span style=color:#75715e># applies Wald statistics to each gene</span>
+</span></span><span style=display:flex><span>dds3 <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>nbinomWaldTest</span>(dds3)
+</span></span></code></pre></div><h3 id=411-exploratory-plots-following-dge-analysis-with-deseq2>4.1.1. Exploratory plots following DGE analysis with <code>DESeq2</code></h3><p>A simple and fast way of inspecting how frequently certain values are present in a data set is to plot a histogram of p-values:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#a6e22e>hist</span>(DGE.results<span style=color:#f92672>$</span>pvalue, 
+</span></span><span style=display:flex><span>     col <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;grey&#34;</span>, 
+</span></span><span style=display:flex><span>     border <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;white&#34;</span>,
+</span></span><span style=display:flex><span>     xlab <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;&#34;</span>, 
+</span></span><span style=display:flex><span>     ylab <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;&#34;</span>, 
+</span></span><span style=display:flex><span>     main <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;frequencies  of p-values&#34;</span>)
+</span></span></code></pre></div><p>MA plots provide a general view of the relationship between the expression change between condition</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#a6e22e>plotMA</span>(DGE.results,
+</span></span><span style=display:flex><span>       alpha <span style=color:#f92672>=</span> <span style=color:#ae81ff>0.05</span>,  
+</span></span><span style=display:flex><span>       main <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;new-born vs. middle-aged vs long-lived conditions&#34;</span>, 
+</span></span><span style=display:flex><span>       ylim <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>-4</span>,<span style=color:#ae81ff>4</span>))
+</span></span></code></pre></div><p>Another way to provide a general view of the relationship between the expression change between condition is to use a volcano plot:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Volcano plot for a threshold of adjusted pval=0.05 and logFC = 7</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>with</span>(DGE.results, 
+</span></span><span style=display:flex><span>     <span style=color:#a6e22e>plot</span>(log2FoldChange, <span style=color:#f92672>-</span><span style=color:#a6e22e>log10</span>(padj), pch <span style=color:#f92672>=</span> <span style=color:#ae81ff>20</span>, 
+</span></span><span style=display:flex><span>          main <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Volcano plot&#34;</span>, xlim <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>-10</span>,<span style=color:#ae81ff>10</span>)))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>with</span>(<span style=color:#a6e22e>subset</span>(DGE.results, padj <span style=color:#f92672>&lt;</span> <span style=color:#ae81ff>0.05</span>), 
+</span></span><span style=display:flex><span>     <span style=color:#a6e22e>points</span>(log2FoldChange, <span style=color:#f92672>-</span><span style=color:#a6e22e>log10</span>(padj), pch <span style=color:#f92672>=</span> <span style=color:#ae81ff>20</span>, col <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;blue&#34;</span>))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>with</span>(<span style=color:#a6e22e>subset</span>(DGE.results, padj <span style=color:#f92672>&lt;</span> <span style=color:#ae81ff>0.05</span> <span style=color:#f92672>&amp;</span> <span style=color:#a6e22e>abs</span>(log2FoldChange) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>7</span>), 
+</span></span><span style=display:flex><span>     <span style=color:#a6e22e>points</span>(log2FoldChange, <span style=color:#f92672>-</span><span style=color:#a6e22e>log10</span>(padj), pch <span style=color:#f92672>=</span> <span style=color:#ae81ff>20</span>, col <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;red&#34;</span>))
+</span></span></code></pre></div><p>Heatmaps are a popular means to visualize the expression values across the individual samples.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># `aheatmap()` needs a matrix of values, e.g., a matrix of DE genes  </span>
+</span></span><span style=display:flex><span><span style=color:#75715e># with the transformed read counts for each replicate</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># sort the results according to the adjusted p-value</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># DGE.results.sorted &lt;- DGE.results[order(DGE.results$padj), ]</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Sort the results according to the log2FoldChange</span>
+</span></span><span style=display:flex><span>DGE.results.sorted <span style=color:#f92672>&lt;-</span> DGE.results<span style=color:#a6e22e>[order</span>(DGE.results<span style=color:#f92672>$</span>log2FoldChange), ]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Identify genes with the desired adjusted p-value cut -off</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># DGEgenes &lt;- rownames(subset(DGE.results.sorted, padj &lt; 0.05))</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Identify genes with the desired cut -off</span>
+</span></span><span style=display:flex><span>DGEgenes <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>rownames</span>(<span style=color:#a6e22e>subset</span>(DGE.results.sorted, <span style=color:#a6e22e>abs</span>(log2FoldChange) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>7</span>))
+</span></span><span style=display:flex><span><span style=color:#a6e22e>length</span>(DGEgenes)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># extract the normalized read counts for DE genes into a matrix</span>
+</span></span><span style=display:flex><span>hm.mat_DGEgenes <span style=color:#f92672>&lt;-</span> log.norm.counts[DGEgenes, ]
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Scale the read counts per gene to emphasize </span>
+</span></span><span style=display:flex><span><span style=color:#75715e># the sample type-specific differences</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>aheatmap</span>(hm.mat_DGEgenes, 
+</span></span><span style=display:flex><span>         Rowv <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>,
+</span></span><span style=display:flex><span>         Colv <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, 
+</span></span><span style=display:flex><span>         distfun <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;euclidean&#34;</span>, 
+</span></span><span style=display:flex><span>         hclustfun <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;average&#34;</span>, 
+</span></span><span style=display:flex><span>         scale <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;row&#34;</span>) 
+</span></span><span style=display:flex><span><span style=color:#75715e># values are transformed into distances from the center</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># of the row-specific average: </span>
+</span></span><span style=display:flex><span><span style=color:#75715e># (actual value-mean of the group)/standard deviation</span>
+</span></span></code></pre></div><h3 id=42-running-dge-analysis-with-edger>4.2. Running DGE analysis with edgeR</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># We need to specify the sample types, similarly to what we did for DESeq2.</span>
+</span></span><span style=display:flex><span>sample_info.edger <span style=color:#f92672>&lt;-</span> sampleTable<span style=color:#f92672>$</span>condition
+</span></span><span style=display:flex><span>sample_info.edger <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>relevel</span>(sample_info.edger, ref <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;new_born&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># `DGEList()` is the function that converts the count matrix into an edgeR object.</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># readcounts &lt;- txi$counts # uncomment this line when data from salmon</span>
+</span></span><span style=display:flex><span>edgeR.DGElist <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>DGEList</span>(counts <span style=color:#f92672>=</span> readcounts, group <span style=color:#f92672>=</span> sample_info.edger)
+</span></span><span style=display:flex><span>keep <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>rowSums</span>( <span style=color:#a6e22e>cpm</span>(edgeR.DGElist) <span style=color:#f92672>&gt;=</span> <span style=color:#ae81ff>1</span>) <span style=color:#f92672>&gt;=</span> <span style=color:#ae81ff>5</span>
+</span></span><span style=display:flex><span>edgeR.DGElist <span style=color:#f92672>&lt;-</span> edgeR.DGElist[keep, ]
+</span></span><span style=display:flex><span>edgeR.DGElist <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>calcNormFactors</span>(edgeR.DGElist, method <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;TMM&#34;</span>)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># check  the  result</span>
+</span></span><span style=display:flex><span>edgeR.DGElist[1<span style=color:#f92672>:</span><span style=color:#ae81ff>5</span>, ]
+</span></span></code></pre></div><p>The <code>edgeR</code> package recommends removing genes with almost no coverage. In order to determine a sensible cutoff, we plot a histogram of counts per million calculated by <code>edgeR</code>’s <code>cpm()</code> function.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Get an impression of the coverage across samples</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>hist</span>(<span style=color:#a6e22e>log2</span>(<span style=color:#a6e22e>rowSums</span>(<span style=color:#a6e22e>cpm</span>(edgeR.DGElist))))
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Specify the design setup - the design matrix looks a bit intimitating, </span>
+</span></span><span style=display:flex><span><span style=color:#75715e># but if you just focus on the formula [~sample_info.edger] </span>
+</span></span><span style=display:flex><span><span style=color:#75715e># you can see that it&#39;s exactly what we used for DESeq2, too</span>
+</span></span><span style=display:flex><span>design  <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>model.matrix</span>(<span style=color:#f92672>~</span>sample_info.edger)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Estimate the dispersion for all read counts across all samples</span>
+</span></span><span style=display:flex><span>edgeR.DGElist  <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>estimateDisp</span>(edgeR.DGElist, design)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Fit the negative binomial model</span>
+</span></span><span style=display:flex><span>edger_fit  <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>glmFit</span>(edgeR.DGElist, design)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Perform the testing for every gene using the neg. binomial model</span>
+</span></span><span style=display:flex><span>edger_lrt  <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>glmLRT</span>(edger_fit)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Extract results from edger_lrt$table</span>
+</span></span><span style=display:flex><span>DGE.results_edgeR <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>topTags</span>(edger_lrt, n <span style=color:#f92672>=</span> <span style=color:#66d9ef>Inf</span>, <span style=color:#75715e># to retrieve all genes</span>
+</span></span><span style=display:flex><span>                              sort.by <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;PValue&#34;</span>, 
+</span></span><span style=display:flex><span>                              adjust.method <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;BH&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>DGE.results_edgeR[1<span style=color:#f92672>:</span><span style=color:#ae81ff>10</span>, ]
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>DGE.res_edgeR.sort <span style=color:#f92672>&lt;-</span> DGE.results_edgeR<span style=color:#f92672>$</span>table<span style=color:#a6e22e>[order</span>(DGE.results_edgeR<span style=color:#f92672>$</span>table<span style=color:#f92672>$</span>FDR), ]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Ientify genes with the desired cut-off</span>
+</span></span><span style=display:flex><span>DGEgenes_edgeR <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>rownames</span>(<span style=color:#a6e22e>subset</span>(DGE.res_edgeR.sort, FDR <span style=color:#f92672>&lt;=</span> <span style=color:#ae81ff>0.05</span>))
+</span></span><span style=display:flex><span><span style=color:#a6e22e>length</span>(DGEgenes_edgeR)
+</span></span></code></pre></div><p>Fit a quasi-likelihood negative binomial generalized log-linear model to count data:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>fit2 <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>glmQLFit</span>(edgeR.DGElist, design)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Conduct genewise statistical tests for a given coefficient or contrast.</span>
+</span></span><span style=display:flex><span>qlf2 <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>glmQLFTest</span>(fit2, coef <span style=color:#f92672>=</span> <span style=color:#ae81ff>2</span>)
+</span></span><span style=display:flex><span>sm<span style=color:#f92672>&lt;-</span><span style=color:#a6e22e>topTags</span>(qlf2, n <span style=color:#f92672>=</span> <span style=color:#66d9ef>Inf</span>, <span style=color:#75715e># to retrieve all genes</span>
+</span></span><span style=display:flex><span>            sort.by <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;PValue&#34;</span>, 
+</span></span><span style=display:flex><span>            adjust.method <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;BH&#34;</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># explore results table</span>
+</span></span><span style=display:flex><span>sm[1<span style=color:#f92672>:</span><span style=color:#ae81ff>10</span>, ]
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>DGEgenes_edgeR.QL <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>rownames</span>(<span style=color:#a6e22e>subset</span>(sm<span style=color:#f92672>$</span>table, <span style=color:#a6e22e>abs</span>(logFC) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>7</span>))
+</span></span><span style=display:flex><span><span style=color:#a6e22e>length</span>(DGEgenes_edgeR.QL)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#a6e22e>hist</span>(sm<span style=color:#f92672>$</span>table<span style=color:#f92672>$</span>PValue, col <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;grey&#34;</span>, border <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;white&#34;</span>,
+</span></span><span style=display:flex><span>     xlab <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;&#34;</span>, ylab <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;&#34;</span>, main <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;frequencies of p-values&#34;</span>)
+</span></span></code></pre></div><p>Another way to provide a general view of the relationship between the expression change between condition is to use a volcano plot:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Volcano plot for a threshold of PValue=0.05 and logFC=7</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>with</span>(sm<span style=color:#f92672>$</span>table, <span style=color:#a6e22e>plot</span>(logFC, <span style=color:#f92672>-</span><span style=color:#a6e22e>log10</span>(PValue), pch <span style=color:#f92672>=</span> <span style=color:#ae81ff>20</span>, 
+</span></span><span style=display:flex><span>                    main <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;Volcano plot&#34;</span>, xlim <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>-10</span>,<span style=color:#ae81ff>10</span>)))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>with</span>(<span style=color:#a6e22e>subset</span>(sm<span style=color:#f92672>$</span>table, PValue <span style=color:#f92672>&lt;</span> <span style=color:#ae81ff>0.05</span>), 
+</span></span><span style=display:flex><span>     <span style=color:#a6e22e>points</span>(logFC,<span style=color:#f92672>-</span><span style=color:#a6e22e>log10</span>(PValue), pch <span style=color:#f92672>=</span> <span style=color:#ae81ff>20</span>, col <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;blue&#34;</span>))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>with</span>(<span style=color:#a6e22e>subset</span>(sm<span style=color:#f92672>$</span>table, PValue <span style=color:#f92672>&lt;</span> <span style=color:#ae81ff>0.05</span> <span style=color:#f92672>&amp;</span> <span style=color:#a6e22e>abs</span>(logFC) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>7</span>), 
+</span></span><span style=display:flex><span>     <span style=color:#a6e22e>points</span>(logFC, <span style=color:#f92672>-</span><span style=color:#a6e22e>log10</span>(PValue), pch <span style=color:#f92672>=</span> <span style=color:#ae81ff>20</span>, col <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;red&#34;</span>))
+</span></span></code></pre></div><p>Let&rsquo;s generate the heatmap of the differentially expressed determined by the quasi-likelihood negative binomial generalized log-linear model.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Extract the normalized read counts for DE genes into a matrix</span>
+</span></span><span style=display:flex><span>hm.mat_DGEgenes.edgeR <span style=color:#f92672>&lt;-</span> log.norm.counts[DGEgenes_edgeR.QL, ]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Plot the normalized read counts of DE genes sorted by the adjusted p-value</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># aheatmap(hm.mat_DGEgenes.edgeR, Rowv = NA, Colv = NA)</span>
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Scale the read counts per gene to emphasize </span>
+</span></span><span style=display:flex><span><span style=color:#75715e># the sample type-specific differences</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>aheatmap</span>(hm.mat_DGEgenes.edgeR, 
+</span></span><span style=display:flex><span>         Rowv <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>,
+</span></span><span style=display:flex><span>         Colv <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, 
+</span></span><span style=display:flex><span>         distfun <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;euclidean&#34;</span>, 
+</span></span><span style=display:flex><span>         hclustfun <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;average&#34;</span>, 
+</span></span><span style=display:flex><span>         scale <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;row&#34;</span>) 
+</span></span><span style=display:flex><span><span style=color:#75715e># values are transformed into distances from the center</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># of the row-specific average: </span>
+</span></span><span style=display:flex><span><span style=color:#75715e># (actual value - mean of the group)/standard deviation</span>
+</span></span></code></pre></div><h3 id=43-running-dge-analysis-with-limma>4.3. Running DGE analysis with <code>limma</code></h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># `limma` also needs a design matrix, just like edgeR</span>
+</span></span><span style=display:flex><span>design <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>model.matrix</span>(<span style=color:#f92672>~</span>sample_info.edger)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Transform the count  data to log2-counts -per -million and estimate</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># the mean-variance relationship, which is used to compute weights</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># for each count -- this is supposed to make the read counts</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># amenable to be used with linear models</span>
+</span></span><span style=display:flex><span>design <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>model.matrix</span>(<span style=color:#f92672>~</span>sample_info.edger)
+</span></span><span style=display:flex><span><span style=color:#a6e22e>rownames</span>(design) <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>colnames</span>(edgeR.DGElist)
+</span></span><span style=display:flex><span>voomTransformed <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>voom</span>(edgeR.DGElist, design, plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Fit a linear model for each gene</span>
+</span></span><span style=display:flex><span>voomed.fitted <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>lmFit</span>(voomTransformed, design <span style=color:#f92672>=</span> design)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Compute moderated t-statistics, moderated F-statistics,</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># and log-odds of differential expression</span>
+</span></span><span style=display:flex><span>voomed.fitted <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>eBayes</span>(voomed.fitted)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Extract gene list with logFC and statistical measures</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>colnames</span>(design) <span style=color:#75715e># check how the coefficient is named</span>
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>DGE.results_limma <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>topTable</span>(voomed.fitted,
+</span></span><span style=display:flex><span>                               coef <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;sample_info.edgermiddle_aged&#34;</span>,
+</span></span><span style=display:flex><span>                               number <span style=color:#f92672>=</span> <span style=color:#66d9ef>Inf</span>, 
+</span></span><span style=display:flex><span>                               adjust.method <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;BH&#34;</span>,
+</span></span><span style=display:flex><span>                               sort.by <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;logFC&#34;</span>)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#a6e22e>head</span>(DGE.results_limma[DGE.results_limma<span style=color:#f92672>$</span>logFC <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>3</span>, ])
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>DGE.results_lima.sorted  <span style=color:#f92672>&lt;-</span> DGE.results_limma<span style=color:#a6e22e>[order</span>(DGE.results_limma<span style=color:#f92672>$</span>adj.P.Val), ]
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Identify genes with the desired cut-off</span>
+</span></span><span style=display:flex><span>DGEgenes_lima  <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>rownames</span>(<span style=color:#a6e22e>subset</span>(DGE.results_lima.sorted, <span style=color:#a6e22e>abs</span>(logFC) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>7</span>))
+</span></span><span style=display:flex><span><span style=color:#a6e22e>length</span>(DGEgenes_lima)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Extract the normalized read counts for DE genes into a matrix</span>
+</span></span><span style=display:flex><span>hm.mat_DGEgenes.lima  <span style=color:#f92672>&lt;-</span> log.norm.counts[DGEgenes_lima, ]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e># Plot the normalized read counts of DE genes sorted by the adjusted p-value</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#aheatmap(hm.mat_DGEgenes.edgeR, Rowv = NA, Colv = NA)</span>
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Scale the read counts per gene to emphasize </span>
+</span></span><span style=display:flex><span><span style=color:#75715e># the sample type-specific differences</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>aheatmap</span>(hm.mat_DGEgenes.lima, 
+</span></span><span style=display:flex><span>         Rowv <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>,
+</span></span><span style=display:flex><span>         Colv <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, 
+</span></span><span style=display:flex><span>         distfun <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;euclidean&#34;</span>, 
+</span></span><span style=display:flex><span>         hclustfun <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;average&#34;</span>, 
+</span></span><span style=display:flex><span>         scale <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;row&#34;</span>) 
+</span></span><span style=display:flex><span><span style=color:#75715e># values are transformed into distances from the center</span>
+</span></span><span style=display:flex><span><span style=color:#75715e># of the row -specific  average: </span>
+</span></span><span style=display:flex><span><span style=color:#75715e># (actual value - mean of the group)/standard deviation</span>
+</span></span></code></pre></div><h3 id=44-venn-diagram-and-upset-plot>4.4. Venn Diagram and Upset plot</h3><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Make a Venn diagram</span>
+</span></span><span style=display:flex><span>DE_list <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>list</span>(edger <span style=color:#f92672>=</span> <span style=color:#a6e22e>rownames</span>(<span style=color:#a6e22e>subset</span>(DGE.results_edgeR<span style=color:#f92672>$</span>table, <span style=color:#a6e22e>abs</span>(logFC) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>7</span>))
+</span></span><span style=display:flex><span>                 ,edger_QL <span style=color:#f92672>=</span> <span style=color:#a6e22e>rownames</span>(<span style=color:#a6e22e>subset</span>(sm<span style=color:#f92672>$</span>table, <span style=color:#a6e22e>abs</span>(logFC) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>7</span>))
+</span></span><span style=display:flex><span>                 ,deseq2 <span style=color:#f92672>=</span> <span style=color:#a6e22e>rownames</span>(<span style=color:#a6e22e>subset</span>(DGE.results, <span style=color:#a6e22e>abs</span>(log2FoldChange) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>7</span>))
+</span></span><span style=display:flex><span>                 ,limma <span style=color:#f92672>=</span> <span style=color:#a6e22e>rownames</span>(<span style=color:#a6e22e>subset</span>(DGE.results_limma, <span style=color:#a6e22e>abs</span>(logFC) <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>7</span>))
+</span></span><span style=display:flex><span>                )
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>gplots<span style=color:#f92672>::</span><span style=color:#a6e22e>venn</span>(DE_list)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># more sophisticated venn alternative, especially if you </span>
+</span></span><span style=display:flex><span><span style=color:#75715e># are comparing  more than 3 lists</span>
+</span></span><span style=display:flex><span>DE_gns <span style=color:#f92672>&lt;-</span> UpSetR<span style=color:#f92672>::</span><span style=color:#a6e22e>fromList</span>(DE_list)
+</span></span><span style=display:flex><span>UpSetR<span style=color:#f92672>::</span><span style=color:#a6e22e>upset</span>(DE_gns, order.by <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;freq&#34;</span>)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># List the Differentially Expressed genes </span>
+</span></span><span style=display:flex><span><span style=color:#75715e># by categories displayed in the Venn Diagram</span>
+</span></span><span style=display:flex><span>out <span style=color:#f92672>&lt;-</span> gplots<span style=color:#f92672>::</span><span style=color:#a6e22e>venn</span>(DE_list, show.plot <span style=color:#f92672>=</span> <span style=color:#66d9ef>FALSE</span>)
+</span></span><span style=display:flex><span>out
+</span></span></code></pre></div><p>The Venn Diagram and the Upset plot conclude our tutorial on DGE analysis. Find the Original source code for this tutorial <a href=https://github.com/rosericazondekon/bioinformatics-tuto/blob/main/RNAseq%20analysis/DGE_tutorial.ipynb>here</a>.</p></p></div></div></main><footer class=footer><span>&copy; 2022 Roseric Azondekon</span></footer></body></html>

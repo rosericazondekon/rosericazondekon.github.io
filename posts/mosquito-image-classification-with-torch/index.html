@@ -20,7 +20,9 @@
 </span></span><span style=display:flex><span>    deleted_files <span style=color:#f92672>&lt;-</span> deleted_files <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span>
 </span></span><span style=display:flex><span>  }
 </span></span><span style=display:flex><span>}
-</span></span><span style=display:flex><span>cli<span style=color:#f92672>::</span><span style=color:#a6e22e>cli_alert</span>(<span style=color:#a6e22e>paste</span>(deleted_files, <span style=color:#e6db74>&#34;corrupt files have been identified and deleted.&#34;</span>))
+</span></span><span style=display:flex><span>cli<span style=color:#f92672>::</span><span style=color:#a6e22e>cli_alert</span>(
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>paste</span>(deleted_files, <span style=color:#e6db74>&#34;corrupt files have been identified and deleted.&#34;</span>)
+</span></span><span style=display:flex><span>)
 </span></span></code></pre></div><h1 id=data-loading-and-preprocessing>Data Loading and preprocessing</h1><p>We check for GPU accelaration and use it whenever available.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Check for GPU accelaration</span>
 </span></span><span style=display:flex><span>device <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>if </span>(<span style=color:#a6e22e>cuda_is_available</span>()) <span style=color:#a6e22e>torch_device</span>(<span style=color:#e6db74>&#34;cuda:0&#34;</span>) else <span style=color:#e6db74>&#34;cpu&#34;</span>
 </span></span></code></pre></div><h2 id=image-preprocessing>Image Preprocessing</h2><p>On the training set, most of the preprocessing involves image standardization, augmenting the data by adding noise, and normalization to comply with the <a href=https://www.geeksforgeeks.org/residual-networks-resnet-deep-learning/>ResNet</a> Artificial Neural Network architecture (often used for image classification) which we use in this tutorial.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Define Image transformation helper function</span>
@@ -30,14 +32,20 @@
 </span></span><span style=display:flex><span>    (<span style=color:#a6e22e>function</span>(x) x<span style=color:#f92672>$</span><span style=color:#a6e22e>to</span>(device <span style=color:#f92672>=</span> device)) <span style=color:#f92672>%&gt;%</span>
 </span></span><span style=display:flex><span>    <span style=color:#a6e22e>transform_color_jitter</span>() <span style=color:#f92672>%&gt;%</span>
 </span></span><span style=display:flex><span>    <span style=color:#a6e22e>transform_random_horizontal_flip</span>() <span style=color:#f92672>%&gt;%</span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>transform_normalize</span>(mean <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>0.485</span>, <span style=color:#ae81ff>0.456</span>, <span style=color:#ae81ff>0.406</span>), std <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>0.229</span>, <span style=color:#ae81ff>0.224</span>, <span style=color:#ae81ff>0.225</span>))
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>transform_normalize</span>(
+</span></span><span style=display:flex><span>      mean <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>0.485</span>, <span style=color:#ae81ff>0.456</span>, <span style=color:#ae81ff>0.406</span>), 
+</span></span><span style=display:flex><span>      std <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>0.229</span>, <span style=color:#ae81ff>0.224</span>, <span style=color:#ae81ff>0.225</span>)
+</span></span><span style=display:flex><span>    )
 </span></span><span style=display:flex><span>}
 </span></span></code></pre></div><p>For the validation and test sets, no noise was introduced in the data. Images are resized, and normalized accordingly.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>
 </span></span><span style=display:flex><span>test_transform <span style=color:#f92672>&lt;-</span> valid_transform <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>function</span>(img) {
 </span></span><span style=display:flex><span>  img <span style=color:#f92672>%&gt;%</span>
 </span></span><span style=display:flex><span>    <span style=color:#a6e22e>transform_to_tensor</span>() <span style=color:#f92672>%&gt;%</span>
 </span></span><span style=display:flex><span>    (<span style=color:#a6e22e>function</span>(x) x<span style=color:#f92672>$</span><span style=color:#a6e22e>to</span>(device <span style=color:#f92672>=</span> device)) <span style=color:#f92672>%&gt;%</span>
-</span></span><span style=display:flex><span>    <span style=color:#a6e22e>transform_normalize</span>(mean <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>0.485</span>, <span style=color:#ae81ff>0.456</span>, <span style=color:#ae81ff>0.406</span>), std <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>0.229</span>, <span style=color:#ae81ff>0.224</span>, <span style=color:#ae81ff>0.225</span>))
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>transform_normalize</span>(
+</span></span><span style=display:flex><span>      mean <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>0.485</span>, <span style=color:#ae81ff>0.456</span>, <span style=color:#ae81ff>0.406</span>), 
+</span></span><span style=display:flex><span>      std <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>0.229</span>, <span style=color:#ae81ff>0.224</span>, <span style=color:#ae81ff>0.225</span>)
+</span></span><span style=display:flex><span>    )
 </span></span><span style=display:flex><span>}
 </span></span></code></pre></div><p>To import and generate the image dataset for <code>torch</code>, we create the <code>mosquitospecies_dataset</code> utility which inherits from the <code>torchvision::image_folder_dataset</code> dataset utility generator.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Define Cats and Dogs dataset model</span>
 </span></span><span style=display:flex><span>mosquitospecies_dataset <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>dataset</span>(
@@ -73,15 +81,21 @@
 </span></span><span style=display:flex><span>train_indices <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>sample</span>(<span style=color:#ae81ff>1</span><span style=color:#f92672>:</span>num_imgs, num_imgs <span style=color:#f92672>*</span> <span style=color:#ae81ff>0.7</span>)
 </span></span><span style=display:flex><span>valid_indices <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>sample</span>(<span style=color:#a6e22e>setdiff</span>(<span style=color:#ae81ff>1</span><span style=color:#f92672>:</span>num_imgs, train_indices), num_imgs<span style=color:#f92672>*</span><span style=color:#ae81ff>0.2</span>)
 </span></span><span style=display:flex><span>test_indices <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>setdiff</span>(<span style=color:#a6e22e>setdiff</span>(<span style=color:#ae81ff>1</span><span style=color:#f92672>:</span>num_imgs, train_indices), valid_indices)
-</span></span></code></pre></div><p>Now, we use the dataset generator utility to create the training set and the validation set.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>train_ds <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>mosquitospecies_dataset</span>(root_dir, train_indices, transform <span style=color:#f92672>=</span> train_transform)
+</span></span></code></pre></div><p>Now, we use the dataset generator utility to create the training set and the validation set.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>train_ds <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>mosquitospecies_dataset</span>(
+</span></span><span style=display:flex><span>  root_dir, train_indices, transform <span style=color:#f92672>=</span> train_transform
+</span></span><span style=display:flex><span>)
 </span></span><span style=display:flex><span>train_ds<span style=color:#f92672>$</span><span style=color:#a6e22e>.length</span>()
 </span></span><span style=display:flex><span><span style=color:#75715e>#&gt; [1] 1847</span>
 </span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>valid_ds <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>mosquitospecies_dataset</span>(root_dir, valid_indices, transform <span style=color:#f92672>=</span> valid_transform)
+</span></span><span style=display:flex><span>valid_ds <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>mosquitospecies_dataset</span>(
+</span></span><span style=display:flex><span>  root_dir, valid_indices, transform <span style=color:#f92672>=</span> valid_transform
+</span></span><span style=display:flex><span>)
 </span></span><span style=display:flex><span>valid_ds<span style=color:#f92672>$</span><span style=color:#a6e22e>.length</span>()
 </span></span><span style=display:flex><span><span style=color:#75715e>#&gt; [1] 528</span>
 </span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>test_ds <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>mosquitospecies_dataset</span>(root_dir, test_indices, transform <span style=color:#f92672>=</span> test_transform)
+</span></span><span style=display:flex><span>test_ds <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>mosquitospecies_dataset</span>(
+</span></span><span style=display:flex><span>  root_dir, test_indices, transform <span style=color:#f92672>=</span> test_transform
+</span></span><span style=display:flex><span>)
 </span></span><span style=display:flex><span>test_ds<span style=color:#f92672>$</span><span style=color:#a6e22e>.length</span>()
 </span></span><span style=display:flex><span><span style=color:#75715e>#&gt; [1] 265</span>
 </span></span></code></pre></div><p>The generated datasets contain 1847, 528 and 265 images data respectively for the training, validation and test sets.</p><p>Let&rsquo;s check whether each set contains the same number of classes:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#a6e22e>length</span>(train_ds<span style=color:#f92672>$</span>classes)
@@ -89,7 +103,10 @@
 </span></span><span style=display:flex><span><span style=color:#a6e22e>length</span>(test_ds<span style=color:#f92672>$</span>classes)
 </span></span><span style=display:flex><span>class_names <span style=color:#f92672>&lt;-</span> test_ds<span style=color:#f92672>$</span>classes
 </span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>cli<span style=color:#f92672>::</span><span style=color:#a6e22e>cli_alert</span>(<span style=color:#a6e22e>paste0</span>(<span style=color:#a6e22e>length</span>(class_names), <span style=color:#e6db74>&#34; classes identified. Classes are: &#34;</span>, <span style=color:#a6e22e>paste</span>(class_names, collapse <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;, &#34;</span>),<span style=color:#e6db74>&#34;.&#34;</span>))
+</span></span><span style=display:flex><span>cli<span style=color:#f92672>::</span><span style=color:#a6e22e>cli_alert</span>(
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>paste0</span>(<span style=color:#a6e22e>length</span>(class_names), <span style=color:#e6db74>&#34; classes identified. Classes are: &#34;</span>, 
+</span></span><span style=display:flex><span>         <span style=color:#a6e22e>paste</span>(class_names, collapse <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;, &#34;</span>),<span style=color:#e6db74>&#34;.&#34;</span>)
+</span></span><span style=display:flex><span>)
 </span></span></code></pre></div><p>Good news, our classes are equally represented in the training, validation and training sets.</p><h2 id=data-loader>Data Loader</h2><p>We create a dataloader for each set with a batch size of 16 images.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>batch_size <span style=color:#f92672>&lt;-</span> <span style=color:#ae81ff>16</span>
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span>train_dl <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>dataloader</span>(train_ds, batch_size <span style=color:#f92672>=</span> batch_size, shuffle <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
@@ -124,11 +141,15 @@
 </span></span><span style=display:flex><span>  <span style=color:#a6e22e>set_names</span>(class_names<span style=color:#a6e22e>[as_array</span>(targets)]) <span style=color:#f92672>%&gt;%</span>
 </span></span><span style=display:flex><span>  <span style=color:#a6e22e>map</span>(as.raster, max <span style=color:#f92672>=</span> <span style=color:#ae81ff>255</span>) <span style=color:#f92672>%&gt;%</span>
 </span></span><span style=display:flex><span>  <span style=color:#a6e22e>iwalk</span>(<span style=color:#f92672>~</span>{<span style=color:#a6e22e>plot</span>(.x); <span style=color:#a6e22e>title</span>(.y)})
-</span></span></code></pre></div><p><img src=images/visualize_train_batch_images-1.png alt></p><h1 id=classifying-mosquitoes-by-species---the-model>Classifying Mosquitoes by Species - the Model</h1><p>We use the <a href=https://www.geeksforgeeks.org/residual-networks-resnet-deep-learning/>ResNet</a> Artificial Neural Network architecture which is often used for image classification. We replace the output layer of the architecture to match our number of classes, which is 3 in this tutorial.</p><p>We also use the cross entropy loss as our loss function, and choose the <a href=https://en.wikipedia.org/wiki/Stochastic_gradient_descent#Adam>Adam optimizer</a> to update the parameters (weights and biases) of the model in order to minimize the loss function during the training process.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>model <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>model_resnet18</span>(pretrained <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
+</span></span></code></pre></div><p><img src=visualize_train_batch_images-1.png alt></p><h1 id=classifying-mosquitoes-by-species---the-model>Classifying Mosquitoes by Species - the Model</h1><p>We use the <a href=https://www.geeksforgeeks.org/residual-networks-resnet-deep-learning/>ResNet</a> Artificial Neural Network architecture which is often used for image classification. We replace the output layer of the architecture to match our number of classes, which is 3 in this tutorial.</p><p>We also use the cross entropy loss as our loss function, and choose the <a href=https://en.wikipedia.org/wiki/Stochastic_gradient_descent#Adam>Adam optimizer</a> to update the parameters (weights and biases) of the model in order to minimize the loss function during the training process.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>model <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>model_resnet18</span>(pretrained <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
 </span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>model<span style=color:#f92672>$</span>parameters <span style=color:#f92672>%&gt;%</span> purrr<span style=color:#f92672>::</span><span style=color:#a6e22e>walk</span>(<span style=color:#a6e22e>function</span>(param) param<span style=color:#f92672>$</span><span style=color:#a6e22e>requires_grad_</span>(<span style=color:#66d9ef>FALSE</span>))
+</span></span><span style=display:flex><span>model<span style=color:#f92672>$</span>parameters <span style=color:#f92672>%&gt;%</span> 
+</span></span><span style=display:flex><span>  purrr<span style=color:#f92672>::</span><span style=color:#a6e22e>walk</span>(<span style=color:#a6e22e>function</span>(param) param<span style=color:#f92672>$</span><span style=color:#a6e22e>requires_grad_</span>(<span style=color:#66d9ef>FALSE</span>))
 </span></span><span style=display:flex><span>
-</span></span><span style=display:flex><span>model<span style=color:#f92672>$</span>fc <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>nn_linear</span>(in_features <span style=color:#f92672>=</span> model<span style=color:#f92672>$</span>fc<span style=color:#f92672>$</span>in_features, out_features <span style=color:#f92672>=</span> <span style=color:#a6e22e>length</span>(class_names))
+</span></span><span style=display:flex><span>model<span style=color:#f92672>$</span>fc <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>nn_linear</span>(
+</span></span><span style=display:flex><span>  in_features <span style=color:#f92672>=</span> model<span style=color:#f92672>$</span>fc<span style=color:#f92672>$</span>in_features, 
+</span></span><span style=display:flex><span>  out_features <span style=color:#f92672>=</span> <span style=color:#a6e22e>length</span>(class_names)
+</span></span><span style=display:flex><span>)
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span>model <span style=color:#f92672>&lt;-</span> model<span style=color:#f92672>$</span><span style=color:#a6e22e>to</span>(device <span style=color:#f92672>=</span> device)
 </span></span><span style=display:flex><span>
@@ -158,7 +179,11 @@
 </span></span></code></pre></div><p>Let&rsquo;s instantiate the scheduler:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>num_epochs <span style=color:#f92672>=</span> <span style=color:#ae81ff>10</span>
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span>scheduler <span style=color:#f92672>&lt;-</span> optimizer <span style=color:#f92672>%&gt;%</span> 
-</span></span><span style=display:flex><span>  <span style=color:#a6e22e>lr_one_cycle</span>(max_lr <span style=color:#f92672>=</span> <span style=color:#ae81ff>0.05</span>, epochs <span style=color:#f92672>=</span> num_epochs, steps_per_epoch <span style=color:#f92672>=</span> train_dl<span style=color:#f92672>$</span><span style=color:#a6e22e>.length</span>())
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>lr_one_cycle</span>(
+</span></span><span style=display:flex><span>    max_lr <span style=color:#f92672>=</span> <span style=color:#ae81ff>0.05</span>, 
+</span></span><span style=display:flex><span>    epochs <span style=color:#f92672>=</span> num_epochs, 
+</span></span><span style=display:flex><span>    steps_per_epoch <span style=color:#f92672>=</span> train_dl<span style=color:#f92672>$</span><span style=color:#a6e22e>.length</span>()
+</span></span><span style=display:flex><span>  )
 </span></span></code></pre></div><h1 id=train-the-model>Train the Model</h1><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>train_batch <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>function</span>(b) {
 </span></span><span style=display:flex><span>  
 </span></span><span style=display:flex><span>  optimizer<span style=color:#f92672>$</span><span style=color:#a6e22e>zero_grad</span>()
@@ -196,7 +221,10 @@
 </span></span><span style=display:flex><span>    valid_losses <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>c</span>(valid_losses, loss)
 </span></span><span style=display:flex><span>  })
 </span></span><span style=display:flex><span>  
-</span></span><span style=display:flex><span>  <span style=color:#a6e22e>cat</span>(<span style=color:#a6e22e>sprintf</span>(<span style=color:#e6db74>&#34;\nLoss at epoch %d: training: %3f, validation: %3f\n&#34;</span>, epoch, <span style=color:#a6e22e>mean</span>(train_losses), <span style=color:#a6e22e>mean</span>(valid_losses)))
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>cat</span>(
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>sprintf</span>(<span style=color:#e6db74>&#34;\nLoss at epoch %d: training: %3f, validation: %3f\n&#34;</span>, 
+</span></span><span style=display:flex><span>      epoch, <span style=color:#a6e22e>mean</span>(train_losses), <span style=color:#a6e22e>mean</span>(valid_losses))
+</span></span><span style=display:flex><span>  )
 </span></span><span style=display:flex><span>}
 </span></span><span style=display:flex><span><span style=color:#75715e>#&gt; </span>
 </span></span><span style=display:flex><span><span style=color:#75715e>#&gt; Loss at epoch 1: training: 0.691431, validation: 0.347098</span>
@@ -243,23 +271,26 @@
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#a6e22e>mean</span>(test_losses)
 </span></span><span style=display:flex><span><span style=color:#75715e>#&gt; [1] 0.2414807</span>
-</span></span></code></pre></div><p>We therefore calculate the accuracy of our model:</p><pre tabindex=0><code>test_accuracy &lt;-  correct/total
-test_accuracy
-#&gt; [1] 0.9509434
-</code></pre><p>Impressive, our model correctly identifies the correct species 95.1% of the time.</p><h1 id=run-inference-on-new-image>Run inference on new image</h1><p>Let&rsquo;s put our newly built model to the task by predicting the species of a mosquito from its image. For this task, we choose a new image and try to predict the mosquito species in the image.</p><p><img src=images/unknown_mosquito_species.jpg alt></p><p>The above picture has a 3000 \times 4000 picture which was not included in the training, testing or even the validation set. We know that the mosquito in the picture belongs to the <em>Anopheles stephensi</em> species.</p><p>To predict new images, we write the function below which takes an image path, a model, and a class names vector, and output the predicted class name:</p><pre tabindex=0><code>predict_species &lt;- function(path, dl_model = model, all_classes = class_names){
-  img_tensor &lt;- path %&gt;% 
-    jpeg::readJPEG() %&gt;% 
-    transform_to_tensor() %&gt;%
-    (function(x) x$to(device = device)) %&gt;% 
-    transform_resize(size = c(256, 256)) %&gt;% 
-    transform_normalize(mean = c(0.485, 0.456, 0.406), std = c(0.229, 0.224, 0.225))
-  
-  prediction &lt;- img_tensor$unsqueeze(dim = 1) %&gt;% 
-    dl_model() %&gt;% 
-    torch_max(dim = 2)
-  
-  all_classes[prediction[[2]] %&gt;% as.numeric]
-}
-</code></pre><p>We now use the custom function defined above to predict the species of the mosquito in the picture above:</p><pre tabindex=0><code>predict_species(&#34;unknown_mosquito_species.jpg&#34;)
-#&gt; [1] &#34;Anopheles Stephensi&#34;
-</code></pre><p>Our model accurately predicts that the species of the mosquito in the picture above is <em>Anopheles stephensi</em>.</p><h1 id=conclusion>Conclusion</h1><p>In this tutorial, we built a Deep Learning model to draw inference on a specie of a mosquito given its image. The model&rsquo;s performance can be improved by training with a lower learning rate, or increasing the training epochs. Our model is quite limitted as it can only identifies 3 different species of mosquitoes. A large dataset from a large number of mosquito species would be an interesting project to pursue. The deployment of a more capable model (as a webapp or a smartphone app) may supplement morphological keys in the identification of mosquito species. Furthermore, such a tool may serve as an important leverage to entomologic surveillance programs and systems particularly in countries where vector-borne diseases are endemic.</p></p></div></div></main><footer class=footer><span>&copy; 2023 Roseric Azondekon</span></footer></body></html>
+</span></span></code></pre></div><p>We therefore calculate the accuracy of our model:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>test_accuracy <span style=color:#f92672>&lt;-</span>  correct<span style=color:#f92672>/</span>total
+</span></span><span style=display:flex><span>test_accuracy
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; [1] 0.9509434</span>
+</span></span></code></pre></div><p>Impressive, our model correctly identifies the correct species 95.1% of the time.</p><h1 id=run-inference-on-new-image>Run inference on new image</h1><p>Let&rsquo;s put our newly built model to the task by predicting the species of a mosquito from its image. For this task, we choose a new image and try to predict the mosquito species in the image.</p><p><img src=unknown_mosquito_species.jpg alt></p><p>The above picture has a 3000 by 4000 picture which was not included in the training, testing or even the validation set. We know that the mosquito in the picture belongs to the <em>Anopheles stephensi</em> species.</p><p>To predict new images, we write the function below which takes an image path, a model, and a class names vector, and output the predicted class name:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>predict_species <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>function</span>(path, dl_model <span style=color:#f92672>=</span> model, all_classes <span style=color:#f92672>=</span> class_names){
+</span></span><span style=display:flex><span>  img_tensor <span style=color:#f92672>&lt;-</span> path <span style=color:#f92672>%&gt;%</span> 
+</span></span><span style=display:flex><span>    jpeg<span style=color:#f92672>::</span><span style=color:#a6e22e>readJPEG</span>() <span style=color:#f92672>%&gt;%</span> 
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>transform_to_tensor</span>() <span style=color:#f92672>%&gt;%</span>
+</span></span><span style=display:flex><span>    (<span style=color:#a6e22e>function</span>(x) x<span style=color:#f92672>$</span><span style=color:#a6e22e>to</span>(device <span style=color:#f92672>=</span> device)) <span style=color:#f92672>%&gt;%</span> 
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>transform_resize</span>(size <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>256</span>, <span style=color:#ae81ff>256</span>)) <span style=color:#f92672>%&gt;%</span> 
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>transform_normalize</span>(
+</span></span><span style=display:flex><span>      mean <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>0.485</span>, <span style=color:#ae81ff>0.456</span>, <span style=color:#ae81ff>0.406</span>), 
+</span></span><span style=display:flex><span>      std <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>0.229</span>, <span style=color:#ae81ff>0.224</span>, <span style=color:#ae81ff>0.225</span>)
+</span></span><span style=display:flex><span>    )
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>  prediction <span style=color:#f92672>&lt;-</span> img_tensor<span style=color:#f92672>$</span><span style=color:#a6e22e>unsqueeze</span>(dim <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>) <span style=color:#f92672>%&gt;%</span> 
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>dl_model</span>() <span style=color:#f92672>%&gt;%</span> 
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>torch_max</span>(dim <span style=color:#f92672>=</span> <span style=color:#ae81ff>2</span>)
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>  all_classes[prediction[[2]] <span style=color:#f92672>%&gt;%</span> as.numeric]
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>We now use the custom function defined above to predict the species of the mosquito in the picture above:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#a6e22e>predict_species</span>(<span style=color:#e6db74>&#34;unknown_mosquito_species.jpg&#34;</span>)
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; [1] &#34;Anopheles Stephensi&#34;</span>
+</span></span></code></pre></div><p>Our model accurately predicts that the species of the mosquito in the picture above is <em>Anopheles stephensi</em>.</p><h1 id=conclusion>Conclusion</h1><p>In this tutorial, we built a Deep Learning model to draw inference on a specie of a mosquito given its image. The model&rsquo;s performance can be improved by training with a lower learning rate, or increasing the training epochs. Our model is quite limitted as it can only identifies 3 different species of mosquitoes. A large dataset from a large number of mosquito species would be an interesting project to pursue. The deployment of a more capable model (as a webapp or a smartphone app) may supplement morphological keys in the identification of mosquito species. Furthermore, such a tool may serve as an important leverage to entomologic surveillance programs and systems particularly in countries where vector-borne diseases are endemic.</p></p></div></div></main><footer class=footer><span>&copy; 2023 Roseric Azondekon</span></footer></body></html>

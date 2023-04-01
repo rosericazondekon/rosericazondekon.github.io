@@ -1,0 +1,265 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><script async src="https://www.googletagmanager.com/gtag/js?id=G-3TBYJJHRP3"></script>
+<script>var doNotTrack=!1;if(!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-3TBYJJHRP3",{anonymize_ip:!1})}</script><style>:root{--accent-color:#FF4D4D}</style><title>Mosquito Species Image Classification using the torch R package</title><meta name=description content="An attempt to build a deep learning model to classify mosquito species."><meta name=keywords content="blog,rosericazondekon,gazondekon,razondekon,gbedegnon,roseric,azondekon,deep learning,neural network,mosquito,vector,species,vector-borne,diseases,identification,artificial intelligence"><meta property="og:url" content="https://rosericazondekon.github.io/posts/mosquito-image-classification-with-torch/"><meta property="og:type" content="website"><meta property="og:title" content="Mosquito Species Image Classification using the torch R package"><meta property="og:description" content="An attempt to build a deep learning model to classify mosquito species."><meta property="og:image" content="/images/roz.webp"><meta name=twitter:card content="summary_large_image"><meta name=twitter:title content="Mosquito Species Image Classification using the torch R package"><meta name=twitter:description content="An attempt to build a deep learning model to classify mosquito species."><meta property="twitter:domain" content="https://rosericazondekon.github.io/posts/mosquito-image-classification-with-torch/"><meta property="twitter:url" content="https://rosericazondekon.github.io/posts/mosquito-image-classification-with-torch/"><meta name=twitter:image content="/images/roz.webp"><link rel=canonical href=https://rosericazondekon.github.io/posts/mosquito-image-classification-with-torch/><link rel=stylesheet type=text/css href=/css/normalize.min.css media=print onload='this.media="all"'><link rel=stylesheet type=text/css href=/css/main.css><link disabled id=dark-theme rel=stylesheet href=/css/dark.css><script src=/js/svg-injector.min.js></script>
+<script src=/js/feather-icons.min.js></script>
+<script src=/js/main.js></script>
+<link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.13.16/dist/katex.min.css integrity=sha384-6LkG2wmY8FK9E0vU9OOr8UvLwsaqUg9SETfpq4uTCN1agNe8HRdE9ABlk+fVx6gZ crossorigin=anonymous><script defer src=https://cdn.jsdelivr.net/npm/katex@0.13.16/dist/katex.min.js integrity=sha384-31El76TwmbHj4rF9DyLsygbq6xoIobG0W+jqXim+a3dU9W53tdH3A/ngRPxOzzaB crossorigin=anonymous></script>
+<script defer src=https://cdn.jsdelivr.net/npm/katex@0.13.16/dist/contrib/auto-render.min.js integrity=sha384-vZTG03m+2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl crossorigin=anonymous onload=renderMathInElement(document.body)></script></head><body><script type=text/javascript>setThemeByUserPref()</script><header class=header><nav class=header-nav><div class=avatar><a href=https://rosericazondekon.github.io/><img src=/images/roz.webp alt=avatar></a></div><div class=nav-title><a class=nav-brand href=https://rosericazondekon.github.io/>Gbedegnon Roseric Azondekon</a></div><div class=nav-links><div class=nav-link><a href=/>Home</a></div><div class=nav-link><a href=/posts/>Posts</a></div><div class=nav-link><a href=/projects/>Projects</a></div><div class=nav-link><a href=/cv/>CV</a></div><div class=nav-link><a href=/tags/>Tags</a></div><div class=nav-link><a href=/about/>About</a></div><div class=nav-link><a href=https://github.com/rosericazondekon><span data-feather=github></span></a></div><div class=nav-link><a href=https://www.buymeacoffee.com/gazondekon><span data-feather=coffee></span></a></div><div class=nav-link><a href=/index.xml><span data-feather=rss></span></a></div><span class=nav-icons-divider></span><div class="nav-link dark-theme-toggle"><a><span id=theme-toggle-icon data-feather=moon></span></a></div><div class=nav-link id=hamburger-menu-toggle><a><span data-feather=menu></span></a></div><ul class="nav-hamburger-list visibility-hidden"><li class=nav-item><a href=/>Home</a></li><li class=nav-item><a href=/posts/>Posts</a></li><li class=nav-item><a href=/projects/>Projects</a></li><li class=nav-item><a href=/cv/>CV</a></li><li class=nav-item><a href=/tags/>Tags</a></li><li class=nav-item><a href=/about/>About</a></li><li class=nav-item><a href=https://github.com/rosericazondekon><span data-feather=github></span></a></li><li class=nav-item><a href=https://www.buymeacoffee.com/gazondekon><span data-feather=coffee></span></a></li><li class=nav-item><a href=/index.xml><span data-feather=rss></span></a></li><li class="nav-item dark-theme-toggle"><a><span id=theme-toggle-icon data-feather=moon></span></a></li></ul></div></nav></header><main id=content><div class="post container"><div class=post-header-section><h1>Mosquito Species Image Classification using the torch R package</h1><small role=doc-subtitle>An attempt to build a deep learning model to classify mosquito species.</small><p class=post-date>April 1, 2023</p><ul class=post-tags><li class=post-tag><a href=/tags/deep-learning>deep learning</a></li><li class=post-tag><a href=/tags/neural-network>neural network</a></li><li class=post-tag><a href=/tags/mosquito>mosquito</a></li><li class=post-tag><a href=/tags/vector>vector</a></li><li class=post-tag><a href=/tags/species>species</a></li><li class=post-tag><a href=/tags/vector-borne>vector-borne</a></li><li class=post-tag><a href=/tags/diseases>diseases</a></li><li class=post-tag><a href=/tags/identification>identification</a></li><li class=post-tag><a href=/tags/artificial-intelligence>artificial intelligence</a></li></ul></div><div class=post-content><p><p>In this tutorial, we will build an image classification Deep Learning model using the <code>torch</code> R package. The dataset for this tutorial is the <a href=https://data.mendeley.com/datasets/88s6fvgg2p/4>Dataset of Vector Mosquito Images</a> published by Pise and contributors in Mendeley Data (DOI:10.17632/88s6fvgg2p.4). We downloaded the <a href=https://data.mendeley.com/datasets/88s6fvgg2p/4/files/aa5e5905-de51-42ab-9d57-f2422468d3d2><code>Mosquito Images Augmented.zip</code></a> for the purposes of this tutorial.</p><p>By the end of this tutorial, you should be able to:</p><ul><li>load and preprocess your own images into <code>torch</code> tensors</li><li>import a prebuilt Artificial Neural Network architecture</li><li>fit an Artificial Neural Network model to your data</li><li>evaluate a deep learning model and</li><li>draw inference on a new image (predict a mosquito specie from an image)</li></ul><p>We first load the <code>tidyverse</code> package, then load the <code>torch</code>, <code>torchvision</code>, and <code>luz</code> packages which are all part of the <a href=https://github.com/mlverse><code>mlverse</code></a>, a collection of open source libraries to scale Data Science.</p><p>All packages are published on the Comprehensive R Archive Network (CRAN) and can therefore be installed with the <code>install.packages()</code> function provided by base R.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#a6e22e>library</span>(tidyverse)
+</span></span><span style=display:flex><span><span style=color:#a6e22e>library</span>(torch)
+</span></span><span style=display:flex><span><span style=color:#a6e22e>library</span>(torchvision)
+</span></span><span style=display:flex><span><span style=color:#a6e22e>library</span>(luz)
+</span></span></code></pre></div><p>Let&rsquo;s set a seed for R and <code>torch</code> for reproducible results:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#a6e22e>set.seed</span>(<span style=color:#ae81ff>1234</span>)
+</span></span><span style=display:flex><span><span style=color:#a6e22e>torch_manual_seed</span>(<span style=color:#ae81ff>1234</span>)
+</span></span></code></pre></div><h1 id=unzipping-the-images>Unzipping the images</h1><p>After moving the <code>Mosquito Images Augmented.zip</code> archive to our working directory, we unzip the image files into a folder named <code>mosquitospecies</code> as follows:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#a6e22e>unzip</span>(<span style=color:#e6db74>&#34;Mosquito Images Augmented.zip&#34;</span>, exdir <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;mosquitospecies&#34;</span>)
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>root_dir <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>file.path</span>(<span style=color:#a6e22e>getwd</span>(), <span style=color:#e6db74>&#34;mosquitospecies&#34;</span>)
+</span></span></code></pre></div><p>Let&rsquo;s identify and clean out corrupt image files.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>deleted_files <span style=color:#f92672>&lt;-</span> <span style=color:#ae81ff>0</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>for</span>(path in <span style=color:#a6e22e>list.files</span>(root_dir, recursive <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>, full.names <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)){
+</span></span><span style=display:flex><span>  img <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>try</span>(jpeg<span style=color:#f92672>::</span><span style=color:#a6e22e>readJPEG</span>(path), silent <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>if</span>(<span style=color:#a6e22e>any</span>(<span style=color:#a6e22e>class</span>(img) <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;try-error&#34;</span>)){
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>print</span>(path)
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>file.remove</span>(path)
+</span></span><span style=display:flex><span>    deleted_files <span style=color:#f92672>&lt;-</span> deleted_files <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span>
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>cli<span style=color:#f92672>::</span><span style=color:#a6e22e>cli_alert</span>(<span style=color:#a6e22e>paste</span>(deleted_files, <span style=color:#e6db74>&#34;corrupt files have been identified and deleted.&#34;</span>))
+</span></span></code></pre></div><h1 id=data-loading-and-preprocessing>Data Loading and preprocessing</h1><p>We check for GPU accelaration and use it whenever available.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Check for GPU accelaration</span>
+</span></span><span style=display:flex><span>device <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>if </span>(<span style=color:#a6e22e>cuda_is_available</span>()) <span style=color:#a6e22e>torch_device</span>(<span style=color:#e6db74>&#34;cuda:0&#34;</span>) else <span style=color:#e6db74>&#34;cpu&#34;</span>
+</span></span></code></pre></div><h2 id=image-preprocessing>Image Preprocessing</h2><p>On the training set, most of the preprocessing involves image standardization, augmenting the data by adding noise, and normalization to comply with the <a href=https://www.geeksforgeeks.org/residual-networks-resnet-deep-learning/>ResNet</a> Artificial Neural Network architecture (often used for image classification) which we use in this tutorial.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Define Image transformation helper function</span>
+</span></span><span style=display:flex><span>train_transform <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>function</span>(img) {
+</span></span><span style=display:flex><span>  img <span style=color:#f92672>%&gt;%</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>transform_to_tensor</span>() <span style=color:#f92672>%&gt;%</span>
+</span></span><span style=display:flex><span>    (<span style=color:#a6e22e>function</span>(x) x<span style=color:#f92672>$</span><span style=color:#a6e22e>to</span>(device <span style=color:#f92672>=</span> device)) <span style=color:#f92672>%&gt;%</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>transform_color_jitter</span>() <span style=color:#f92672>%&gt;%</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>transform_random_horizontal_flip</span>() <span style=color:#f92672>%&gt;%</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>transform_normalize</span>(mean <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>0.485</span>, <span style=color:#ae81ff>0.456</span>, <span style=color:#ae81ff>0.406</span>), std <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>0.229</span>, <span style=color:#ae81ff>0.224</span>, <span style=color:#ae81ff>0.225</span>))
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>For the validation and test sets, no noise was introduced in the data. Images are resized, and normalized accordingly.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>
+</span></span><span style=display:flex><span>test_transform <span style=color:#f92672>&lt;-</span> valid_transform <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>function</span>(img) {
+</span></span><span style=display:flex><span>  img <span style=color:#f92672>%&gt;%</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>transform_to_tensor</span>() <span style=color:#f92672>%&gt;%</span>
+</span></span><span style=display:flex><span>    (<span style=color:#a6e22e>function</span>(x) x<span style=color:#f92672>$</span><span style=color:#a6e22e>to</span>(device <span style=color:#f92672>=</span> device)) <span style=color:#f92672>%&gt;%</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>transform_normalize</span>(mean <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>0.485</span>, <span style=color:#ae81ff>0.456</span>, <span style=color:#ae81ff>0.406</span>), std <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>0.229</span>, <span style=color:#ae81ff>0.224</span>, <span style=color:#ae81ff>0.225</span>))
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>To import and generate the image dataset for <code>torch</code>, we create the <code>mosquitospecies_dataset</code> utility which inherits from the <code>torchvision::image_folder_dataset</code> dataset utility generator.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#75715e># Define Cats and Dogs dataset model</span>
+</span></span><span style=display:flex><span>mosquitospecies_dataset <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>dataset</span>(
+</span></span><span style=display:flex><span>  <span style=color:#e6db74>&#34;mosquitospecies_folder&#34;</span>,
+</span></span><span style=display:flex><span>  inherit <span style=color:#f92672>=</span> torchvision<span style=color:#f92672>::</span>image_folder_dataset,
+</span></span><span style=display:flex><span>  initialize <span style=color:#f92672>=</span> <span style=color:#a6e22e>function</span>(root, indices, transform<span style=color:#f92672>=</span><span style=color:#66d9ef>NULL</span>, target_transform<span style=color:#f92672>=</span><span style=color:#66d9ef>NULL</span>,
+</span></span><span style=display:flex><span>                        loader<span style=color:#f92672>=</span><span style=color:#66d9ef>NULL</span>, is_valid_file<span style=color:#f92672>=</span><span style=color:#66d9ef>NULL</span>) {
+</span></span><span style=display:flex><span>    super<span style=color:#f92672>$</span><span style=color:#a6e22e>initialize</span>(root, transform<span style=color:#f92672>=</span>transform,
+</span></span><span style=display:flex><span>                     target_transform<span style=color:#f92672>=</span>target_transform, loader <span style=color:#f92672>=</span> loader,
+</span></span><span style=display:flex><span>                     is_valid_file<span style=color:#f92672>=</span>is_valid_file)
+</span></span><span style=display:flex><span>    self<span style=color:#f92672>$</span>indices <span style=color:#f92672>&lt;-</span> indices
+</span></span><span style=display:flex><span>  },
+</span></span><span style=display:flex><span>  .getitem <span style=color:#f92672>=</span> <span style=color:#a6e22e>function</span>(index) {
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    path <span style=color:#f92672>&lt;-</span> self<span style=color:#f92672>$</span>samples[[1]][self<span style=color:#f92672>$</span>indices[index]]
+</span></span><span style=display:flex><span>    target <span style=color:#f92672>&lt;-</span> self<span style=color:#f92672>$</span>samples[[2]][self<span style=color:#f92672>$</span>indices[index]]
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    sample <span style=color:#f92672>&lt;-</span> self<span style=color:#f92672>$</span><span style=color:#a6e22e>loader</span>(path)
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>if </span>(<span style=color:#f92672>!</span><span style=color:#a6e22e>is.null</span>(self<span style=color:#f92672>$</span>transform))
+</span></span><span style=display:flex><span>      sample <span style=color:#f92672>&lt;-</span> self<span style=color:#f92672>$</span><span style=color:#a6e22e>transform</span>(sample)
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>if </span>(<span style=color:#f92672>!</span><span style=color:#a6e22e>is.null</span>(self<span style=color:#f92672>$</span>target_transform))
+</span></span><span style=display:flex><span>      target <span style=color:#f92672>&lt;-</span> self<span style=color:#f92672>$</span><span style=color:#a6e22e>target_transform</span>(target)
+</span></span><span style=display:flex><span>    
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>list</span>(x <span style=color:#f92672>=</span> sample, y <span style=color:#f92672>=</span> target)
+</span></span><span style=display:flex><span>  },
+</span></span><span style=display:flex><span>  .length <span style=color:#f92672>=</span> <span style=color:#a6e22e>function</span>() {
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>length</span>(self<span style=color:#f92672>$</span>indices)
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>)
+</span></span></code></pre></div><p>Now, let&rsquo;s randomly split the data into training (70%), validation (20%), and test (10%) sets:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>num_imgs <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>length</span>(<span style=color:#a6e22e>list.files</span>(root_dir, recursive <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>))
+</span></span><span style=display:flex><span>train_indices <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>sample</span>(<span style=color:#ae81ff>1</span><span style=color:#f92672>:</span>num_imgs, num_imgs <span style=color:#f92672>*</span> <span style=color:#ae81ff>0.7</span>)
+</span></span><span style=display:flex><span>valid_indices <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>sample</span>(<span style=color:#a6e22e>setdiff</span>(<span style=color:#ae81ff>1</span><span style=color:#f92672>:</span>num_imgs, train_indices), num_imgs<span style=color:#f92672>*</span><span style=color:#ae81ff>0.2</span>)
+</span></span><span style=display:flex><span>test_indices <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>setdiff</span>(<span style=color:#a6e22e>setdiff</span>(<span style=color:#ae81ff>1</span><span style=color:#f92672>:</span>num_imgs, train_indices), valid_indices)
+</span></span></code></pre></div><p>Now, we use the dataset generator utility to create the training set and the validation set.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>train_ds <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>mosquitospecies_dataset</span>(root_dir, train_indices, transform <span style=color:#f92672>=</span> train_transform)
+</span></span><span style=display:flex><span>train_ds<span style=color:#f92672>$</span><span style=color:#a6e22e>.length</span>()
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; [1] 1847</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>valid_ds <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>mosquitospecies_dataset</span>(root_dir, valid_indices, transform <span style=color:#f92672>=</span> valid_transform)
+</span></span><span style=display:flex><span>valid_ds<span style=color:#f92672>$</span><span style=color:#a6e22e>.length</span>()
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; [1] 528</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>test_ds <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>mosquitospecies_dataset</span>(root_dir, test_indices, transform <span style=color:#f92672>=</span> test_transform)
+</span></span><span style=display:flex><span>test_ds<span style=color:#f92672>$</span><span style=color:#a6e22e>.length</span>()
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; [1] 265</span>
+</span></span></code></pre></div><p>The generated datasets contain 1847, 528 and 265 images data respectively for the training, validation and test sets.</p><p>Let&rsquo;s check whether each set contains the same number of classes:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#a6e22e>length</span>(train_ds<span style=color:#f92672>$</span>classes)
+</span></span><span style=display:flex><span><span style=color:#a6e22e>length</span>(valid_ds<span style=color:#f92672>$</span>classes)
+</span></span><span style=display:flex><span><span style=color:#a6e22e>length</span>(test_ds<span style=color:#f92672>$</span>classes)
+</span></span><span style=display:flex><span>class_names <span style=color:#f92672>&lt;-</span> test_ds<span style=color:#f92672>$</span>classes
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>cli<span style=color:#f92672>::</span><span style=color:#a6e22e>cli_alert</span>(<span style=color:#a6e22e>paste0</span>(<span style=color:#a6e22e>length</span>(class_names), <span style=color:#e6db74>&#34; classes identified. Classes are: &#34;</span>, <span style=color:#a6e22e>paste</span>(class_names, collapse <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;, &#34;</span>),<span style=color:#e6db74>&#34;.&#34;</span>))
+</span></span></code></pre></div><p>Good news, our classes are equally represented in the training, validation and training sets.</p><h2 id=data-loader>Data Loader</h2><p>We create a dataloader for each set with a batch size of 16 images.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>batch_size <span style=color:#f92672>&lt;-</span> <span style=color:#ae81ff>16</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>train_dl <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>dataloader</span>(train_ds, batch_size <span style=color:#f92672>=</span> batch_size, shuffle <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
+</span></span><span style=display:flex><span>valid_dl <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>dataloader</span>(valid_ds, batch_size <span style=color:#f92672>=</span> batch_size)
+</span></span><span style=display:flex><span>test_dl <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>dataloader</span>(test_ds, batch_size <span style=color:#f92672>=</span> batch_size)
+</span></span></code></pre></div><p>Let&rsquo;s check the number of batches in each loader:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>train_dl<span style=color:#f92672>$</span><span style=color:#a6e22e>.length</span>() 
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; [1] 116</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>valid_dl<span style=color:#f92672>$</span><span style=color:#a6e22e>.length</span>() 
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; [1] 33</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>test_dl<span style=color:#f92672>$</span><span style=color:#a6e22e>.length</span>()  
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; [1] 17 </span>
+</span></span></code></pre></div><h2 id=visualizing-the-data>Visualizing the data</h2><p>Here, we visualize the 16 images in the first batch of the training set.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>b <span style=color:#f92672>&lt;-</span> train_dl<span style=color:#f92672>$</span><span style=color:#a6e22e>.iter</span>()<span style=color:#f92672>$</span><span style=color:#a6e22e>.next</span>() <span style=color:#75715e># take one batch in the training set</span>
+</span></span><span style=display:flex><span>targets <span style=color:#f92672>&lt;-</span> b<span style=color:#f92672>$</span>y
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>images <span style=color:#f92672>&lt;-</span> b<span style=color:#f92672>$</span>x <span style=color:#f92672>%&gt;%</span> 
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>as_array</span>() <span style=color:#f92672>%&gt;%</span> 
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>aperm</span>(perm <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>3</span>, <span style=color:#ae81ff>4</span>, <span style=color:#ae81ff>2</span>))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>mean <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>0.485</span>, <span style=color:#ae81ff>0.456</span>, <span style=color:#ae81ff>0.406</span>)
+</span></span><span style=display:flex><span>std <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>0.229</span>, <span style=color:#ae81ff>0.224</span>, <span style=color:#ae81ff>0.225</span>)
+</span></span><span style=display:flex><span>images <span style=color:#f92672>&lt;-</span> std <span style=color:#f92672>*</span> images <span style=color:#f92672>+</span> mean
+</span></span><span style=display:flex><span>images <span style=color:#f92672>&lt;-</span> images <span style=color:#f92672>*</span> <span style=color:#ae81ff>255</span>
+</span></span><span style=display:flex><span>images[images <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>255</span>] <span style=color:#f92672>&lt;-</span> <span style=color:#ae81ff>255</span>
+</span></span><span style=display:flex><span>images[images <span style=color:#f92672>&lt;</span> <span style=color:#ae81ff>0</span>] <span style=color:#f92672>&lt;-</span> <span style=color:#ae81ff>0</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>par</span>(mfcol <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>4</span>,<span style=color:#ae81ff>4</span>), mar <span style=color:#f92672>=</span> <span style=color:#a6e22e>rep</span>(<span style=color:#ae81ff>1</span>, <span style=color:#ae81ff>4</span>))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>images <span style=color:#f92672>%&gt;%</span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>array_tree</span>(<span style=color:#ae81ff>1</span>) <span style=color:#f92672>%&gt;%</span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>set_names</span>(class_names<span style=color:#a6e22e>[as_array</span>(targets)]) <span style=color:#f92672>%&gt;%</span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>map</span>(as.raster, max <span style=color:#f92672>=</span> <span style=color:#ae81ff>255</span>) <span style=color:#f92672>%&gt;%</span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>iwalk</span>(<span style=color:#f92672>~</span>{<span style=color:#a6e22e>plot</span>(.x); <span style=color:#a6e22e>title</span>(.y)})
+</span></span></code></pre></div><p><img src=images/visualize_train_batch_images-1.png alt></p><h1 id=classifying-mosquitoes-by-species---the-model>Classifying Mosquitoes by Species - the Model</h1><p>We use the <a href=https://www.geeksforgeeks.org/residual-networks-resnet-deep-learning/>ResNet</a> Artificial Neural Network architecture which is often used for image classification. We replace the output layer of the architecture to match our number of classes, which is 3 in this tutorial.</p><p>We also use the cross entropy loss as our loss function, and choose the <a href=https://en.wikipedia.org/wiki/Stochastic_gradient_descent#Adam>Adam optimizer</a> to update the parameters (weights and biases) of the model in order to minimize the loss function during the training process.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>model <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>model_resnet18</span>(pretrained <span style=color:#f92672>=</span> <span style=color:#66d9ef>TRUE</span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>model<span style=color:#f92672>$</span>parameters <span style=color:#f92672>%&gt;%</span> purrr<span style=color:#f92672>::</span><span style=color:#a6e22e>walk</span>(<span style=color:#a6e22e>function</span>(param) param<span style=color:#f92672>$</span><span style=color:#a6e22e>requires_grad_</span>(<span style=color:#66d9ef>FALSE</span>))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>model<span style=color:#f92672>$</span>fc <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>nn_linear</span>(in_features <span style=color:#f92672>=</span> model<span style=color:#f92672>$</span>fc<span style=color:#f92672>$</span>in_features, out_features <span style=color:#f92672>=</span> <span style=color:#a6e22e>length</span>(class_names))
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>model <span style=color:#f92672>&lt;-</span> model<span style=color:#f92672>$</span><span style=color:#a6e22e>to</span>(device <span style=color:#f92672>=</span> device)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>criterion <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>nn_cross_entropy_loss</span>()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>optimizer <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>optim_adam</span>(model<span style=color:#f92672>$</span>parameters, lr <span style=color:#f92672>=</span> <span style=color:#ae81ff>0.05</span>)
+</span></span></code></pre></div><p>To make sure that we have all shapes matching up, let&rsquo;s call the model on a batch of our data:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#a6e22e>model</span>(b<span style=color:#f92672>$</span>x)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; torch_tensor</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt;  0.2884 -0.9359  1.3895</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; -0.0359 -0.2018  0.8943</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt;  0.5630 -1.4051  0.7087</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt;  0.3417 -0.6062  0.8235</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt;  0.4191 -1.5016  1.2196</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt;  0.4454 -1.7770 -0.0628</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt;  0.7498 -1.6461  0.7906</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt;  1.2950 -1.5470  0.9477</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; -0.0840 -1.0470  0.8228</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt;  1.0521 -0.8955  0.1835</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt;  0.2959 -1.0010  1.1621</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt;  0.4893 -0.8946  0.7766</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt;  0.2516 -1.3598  1.1719</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt;  0.0574 -0.4127  0.9373</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; -0.2904 -0.8852  1.3795</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt;  0.8048 -1.8014 -0.1916</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; [ CPUFloatType{16,3} ][ grad_fn = &lt;AddmmBackward0&gt; ]</span>
+</span></span></code></pre></div><p>Let&rsquo;s instantiate the scheduler:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>num_epochs <span style=color:#f92672>=</span> <span style=color:#ae81ff>10</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>scheduler <span style=color:#f92672>&lt;-</span> optimizer <span style=color:#f92672>%&gt;%</span> 
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>lr_one_cycle</span>(max_lr <span style=color:#f92672>=</span> <span style=color:#ae81ff>0.05</span>, epochs <span style=color:#f92672>=</span> num_epochs, steps_per_epoch <span style=color:#f92672>=</span> train_dl<span style=color:#f92672>$</span><span style=color:#a6e22e>.length</span>())
+</span></span></code></pre></div><h1 id=train-the-model>Train the Model</h1><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>train_batch <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>function</span>(b) {
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>  optimizer<span style=color:#f92672>$</span><span style=color:#a6e22e>zero_grad</span>()
+</span></span><span style=display:flex><span>  output <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>model</span>(b<span style=color:#f92672>$</span>x)
+</span></span><span style=display:flex><span>  loss <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>criterion</span>(output, b<span style=color:#f92672>$</span>y<span style=color:#f92672>$</span><span style=color:#a6e22e>to</span>(device <span style=color:#f92672>=</span> device))
+</span></span><span style=display:flex><span>  loss<span style=color:#f92672>$</span><span style=color:#a6e22e>backward</span>()
+</span></span><span style=display:flex><span>  optimizer<span style=color:#f92672>$</span><span style=color:#a6e22e>step</span>()
+</span></span><span style=display:flex><span>  scheduler<span style=color:#f92672>$</span><span style=color:#a6e22e>step</span>()
+</span></span><span style=display:flex><span>  loss<span style=color:#f92672>$</span><span style=color:#a6e22e>item</span>()
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>valid_batch <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>function</span>(b) {
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>  output <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>model</span>(b<span style=color:#f92672>$</span>x)
+</span></span><span style=display:flex><span>  loss <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>criterion</span>(output, b<span style=color:#f92672>$</span>y<span style=color:#f92672>$</span><span style=color:#a6e22e>to</span>(device <span style=color:#f92672>=</span> device))
+</span></span><span style=display:flex><span>  loss<span style=color:#f92672>$</span><span style=color:#a6e22e>item</span>()
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>for </span>(epoch in <span style=color:#ae81ff>1</span><span style=color:#f92672>:</span>num_epochs) {
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>  model<span style=color:#f92672>$</span><span style=color:#a6e22e>train</span>()
+</span></span><span style=display:flex><span>  train_losses <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>c</span>()
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>  coro<span style=color:#f92672>::</span><span style=color:#a6e22e>loop</span>(<span style=color:#a6e22e>for </span>(b in train_dl) {
+</span></span><span style=display:flex><span>    loss <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>train_batch</span>(b)
+</span></span><span style=display:flex><span>    train_losses <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>c</span>(train_losses, loss)
+</span></span><span style=display:flex><span>  })
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>  model<span style=color:#f92672>$</span><span style=color:#a6e22e>eval</span>()
+</span></span><span style=display:flex><span>  valid_losses <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>c</span>()
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>  coro<span style=color:#f92672>::</span><span style=color:#a6e22e>loop</span>(<span style=color:#a6e22e>for </span>(b in valid_dl) {
+</span></span><span style=display:flex><span>    loss <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>valid_batch</span>(b)
+</span></span><span style=display:flex><span>    valid_losses <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>c</span>(valid_losses, loss)
+</span></span><span style=display:flex><span>  })
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>cat</span>(<span style=color:#a6e22e>sprintf</span>(<span style=color:#e6db74>&#34;\nLoss at epoch %d: training: %3f, validation: %3f\n&#34;</span>, epoch, <span style=color:#a6e22e>mean</span>(train_losses), <span style=color:#a6e22e>mean</span>(valid_losses)))
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; </span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; Loss at epoch 1: training: 0.691431, validation: 0.347098</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; </span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; Loss at epoch 2: training: 0.801611, validation: 2.819351</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; </span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; Loss at epoch 3: training: 1.176880, validation: 0.266920</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; </span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; Loss at epoch 4: training: 1.017648, validation: 3.553514</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; </span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; Loss at epoch 5: training: 1.211209, validation: 0.210213</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; </span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; Loss at epoch 6: training: 0.957843, validation: 0.179759</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; </span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; Loss at epoch 7: training: 0.495530, validation: 0.457704</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; </span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; Loss at epoch 8: training: 0.305884, validation: 0.217924</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; </span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; Loss at epoch 9: training: 0.419141, validation: 0.354136</span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; </span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; Loss at epoch 10: training: 0.242781, validation: 0.189291</span>
+</span></span></code></pre></div><h1 id=test-set-accuracy>Test set accuracy</h1><p>We assess the accuracy of the model by evaluating it on the test set as follows:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>model<span style=color:#f92672>$</span><span style=color:#a6e22e>eval</span>()
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>test_losses <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>c</span>()
+</span></span><span style=display:flex><span>total <span style=color:#f92672>&lt;-</span> <span style=color:#ae81ff>0</span>
+</span></span><span style=display:flex><span>correct <span style=color:#f92672>&lt;-</span> <span style=color:#ae81ff>0</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>test_batch <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>function</span>(b) {
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>  output <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>model</span>(b<span style=color:#f92672>$</span>x)
+</span></span><span style=display:flex><span>  labels <span style=color:#f92672>&lt;-</span> b<span style=color:#f92672>$</span>y<span style=color:#f92672>$</span><span style=color:#a6e22e>to</span>(device <span style=color:#f92672>=</span> device)
+</span></span><span style=display:flex><span>  loss <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>criterion</span>(output, labels)
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>  test_losses <span style=color:#f92672>&lt;&lt;-</span> <span style=color:#a6e22e>c</span>(test_losses, loss<span style=color:#f92672>$</span><span style=color:#a6e22e>item</span>())
+</span></span><span style=display:flex><span>  predicted <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>torch_max</span>(output<span style=color:#f92672>$</span><span style=color:#a6e22e>data</span>(), dim <span style=color:#f92672>=</span> <span style=color:#ae81ff>2</span>)[[2]]
+</span></span><span style=display:flex><span>  total <span style=color:#f92672>&lt;&lt;-</span> total <span style=color:#f92672>+</span> labels<span style=color:#f92672>$</span><span style=color:#a6e22e>size</span>(<span style=color:#ae81ff>1</span>)
+</span></span><span style=display:flex><span>  correct <span style=color:#f92672>&lt;&lt;-</span> correct <span style=color:#f92672>+</span> (predicted <span style=color:#f92672>==</span> labels)<span style=color:#f92672>$</span><span style=color:#a6e22e>sum</span>()<span style=color:#f92672>$</span><span style=color:#a6e22e>item</span>()
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>coro<span style=color:#f92672>::</span><span style=color:#a6e22e>loop</span>(<span style=color:#a6e22e>for </span>(b in test_dl) {
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>test_batch</span>(b)
+</span></span><span style=display:flex><span>})
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>mean</span>(test_losses)
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; [1] 0.2414807</span>
+</span></span></code></pre></div><p>We therefore calculate the accuracy of our model:</p><pre tabindex=0><code>test_accuracy &lt;-  correct/total
+test_accuracy
+#&gt; [1] 0.9509434
+</code></pre><p>Impressive, our model correctly identifies the correct species 95.1% of the time.</p><h1 id=run-inference-on-new-image>Run inference on new image</h1><p>Let&rsquo;s put our newly built model to the task by predicting the species of a mosquito from its image. For this task, we choose a new image and try to predict the mosquito species in the image.</p><p><img src=images/unknown_mosquito_species.jpg alt></p><p>The above picture has a 3000 \times 4000 picture which was not included in the training, testing or even the validation set. We know that the mosquito in the picture belongs to the <em>Anopheles stephensi</em> species.</p><p>To predict new images, we write the function below which takes an image path, a model, and a class names vector, and output the predicted class name:</p><pre tabindex=0><code>predict_species &lt;- function(path, dl_model = model, all_classes = class_names){
+  img_tensor &lt;- path %&gt;% 
+    jpeg::readJPEG() %&gt;% 
+    transform_to_tensor() %&gt;%
+    (function(x) x$to(device = device)) %&gt;% 
+    transform_resize(size = c(256, 256)) %&gt;% 
+    transform_normalize(mean = c(0.485, 0.456, 0.406), std = c(0.229, 0.224, 0.225))
+  
+  prediction &lt;- img_tensor$unsqueeze(dim = 1) %&gt;% 
+    dl_model() %&gt;% 
+    torch_max(dim = 2)
+  
+  all_classes[prediction[[2]] %&gt;% as.numeric]
+}
+</code></pre><p>We now use the custom function defined above to predict the species of the mosquito in the picture above:</p><pre tabindex=0><code>predict_species(&#34;unknown_mosquito_species.jpg&#34;)
+#&gt; [1] &#34;Anopheles Stephensi&#34;
+</code></pre><p>Our model accurately predicts that the species of the mosquito in the picture above is <em>Anopheles stephensi</em>.</p><h1 id=conclusion>Conclusion</h1><p>In this tutorial, we built a Deep Learning model to draw inference on a specie of a mosquito given its image. The model&rsquo;s performance can be improved by training with a lower learning rate, or increasing the training epochs. Our model is quite limitted as it can only identifies 3 different species of mosquitoes. A large dataset from a large number of mosquito species would be an interesting project to pursue. The deployment of a more capable model (as a webapp or a smartphone app) may supplement morphological keys in the identification of mosquito species. Furthermore, such a tool may serve as an important leverage to entomologic surveillance programs and systems particularly in countries where vector-borne diseases are endemic.</p></p></div></div></main><footer class=footer><span>&copy; 2023 Roseric Azondekon</span></footer></body></html>

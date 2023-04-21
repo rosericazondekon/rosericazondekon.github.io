@@ -254,26 +254,26 @@
 </span></span><span style=display:flex><span>
 </span></span><span style=display:flex><span><span style=color:#a6e22e>mean</span>(test_losses)
 </span></span><span style=display:flex><span><span style=color:#75715e>#&gt; [1] 0.2414807</span>
-</span></span></code></pre></div><p>We therefore calculate the accuracy of our model:</p><pre tabindex=0><code>test_accuracy &lt;-  correct/total
-test_accuracy
-#&gt; [1] 0.9509434
-</code></pre><p>Impressive, our model correctly identifies the correct species 95.1% of the time.</p><h1 id=run-inference-on-new-image>Run inference on new image</h1><p>Let&rsquo;s put our newly built model to the task by predicting the species of a mosquito from its image. For this task, we choose a new image and try to predict the mosquito species in the image.</p><p><img src=images/unknown_mosquito_species.jpg alt></p><p>The above picture has a 3000 by 4000 picture which was not included in the training, testing or even the validation set. We know that the mosquito in the picture belongs to the <em>Anopheles stephensi</em> species.</p><p>To predict new images, we write the function below which takes an image path, a model, and a class names vector, and output the predicted class name:</p><pre tabindex=0><code>predict_species &lt;- function(path, dl_model = model, all_classes = class_names){
-  img_tensor &lt;- path %&gt;% 
-    jpeg::readJPEG() %&gt;% 
-    transform_to_tensor() %&gt;%
-    (function(x) x$to(device = device)) %&gt;% 
-    transform_resize(size = c(256, 256)) %&gt;% 
-    transform_normalize(
-      mean = c(0.485, 0.456, 0.406), 
-      std = c(0.229, 0.224, 0.225)
-    )
-  
-  prediction &lt;- img_tensor$unsqueeze(dim = 1) %&gt;% 
-    dl_model() %&gt;% 
-    torch_max(dim = 2)
-  
-  all_classes[prediction[[2]] %&gt;% as.numeric]
-}
-</code></pre><p>We now use the custom function defined above to predict the species of the mosquito in the picture above:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#a6e22e>predict_species</span>(<span style=color:#e6db74>&#34;unknown_mosquito_species.jpg&#34;</span>)
+</span></span></code></pre></div><p>We therefore calculate the accuracy of our model:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>test_accuracy <span style=color:#f92672>&lt;-</span>  correct<span style=color:#f92672>/</span>total
+</span></span><span style=display:flex><span>test_accuracy
+</span></span><span style=display:flex><span><span style=color:#75715e>#&gt; [1] 0.9509434</span>
+</span></span></code></pre></div><p>Impressive, our model correctly identifies the correct species 95.1% of the time.</p><h1 id=run-inference-on-new-image>Run inference on new image</h1><p>Let&rsquo;s put our newly built model to the task by predicting the species of a mosquito from its image. For this task, we choose a new image and try to predict the mosquito species in the image.</p><p><img src=images/unknown_mosquito_species.jpg alt></p><p>The above picture has a 3000 by 4000 picture which was not included in the training, testing or even the validation set. We know that the mosquito in the picture belongs to the <em>Anopheles stephensi</em> species.</p><p>To predict new images, we write the function below which takes an image path, a model, and a class names vector, and output the predicted class name:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span>predict_species <span style=color:#f92672>&lt;-</span> <span style=color:#a6e22e>function</span>(path, dl_model <span style=color:#f92672>=</span> model, all_classes <span style=color:#f92672>=</span> class_names){
+</span></span><span style=display:flex><span>  img_tensor <span style=color:#f92672>&lt;-</span> path <span style=color:#f92672>%&gt;%</span> 
+</span></span><span style=display:flex><span>    jpeg<span style=color:#f92672>::</span><span style=color:#a6e22e>readJPEG</span>() <span style=color:#f92672>%&gt;%</span> 
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>transform_to_tensor</span>() <span style=color:#f92672>%&gt;%</span>
+</span></span><span style=display:flex><span>    (<span style=color:#a6e22e>function</span>(x) x<span style=color:#f92672>$</span><span style=color:#a6e22e>to</span>(device <span style=color:#f92672>=</span> device)) <span style=color:#f92672>%&gt;%</span> 
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>transform_resize</span>(size <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>256</span>, <span style=color:#ae81ff>256</span>)) <span style=color:#f92672>%&gt;%</span> 
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>transform_normalize</span>(
+</span></span><span style=display:flex><span>      mean <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>0.485</span>, <span style=color:#ae81ff>0.456</span>, <span style=color:#ae81ff>0.406</span>), 
+</span></span><span style=display:flex><span>      std <span style=color:#f92672>=</span> <span style=color:#a6e22e>c</span>(<span style=color:#ae81ff>0.229</span>, <span style=color:#ae81ff>0.224</span>, <span style=color:#ae81ff>0.225</span>)
+</span></span><span style=display:flex><span>    )
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>  prediction <span style=color:#f92672>&lt;-</span> img_tensor<span style=color:#f92672>$</span><span style=color:#a6e22e>unsqueeze</span>(dim <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>) <span style=color:#f92672>%&gt;%</span> 
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>dl_model</span>() <span style=color:#f92672>%&gt;%</span> 
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>torch_max</span>(dim <span style=color:#f92672>=</span> <span style=color:#ae81ff>2</span>)
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>  all_classes[prediction[[2]] <span style=color:#f92672>%&gt;%</span> as.numeric]
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>We now use the custom function defined above to predict the species of the mosquito in the picture above:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-r data-lang=r><span style=display:flex><span><span style=color:#a6e22e>predict_species</span>(<span style=color:#e6db74>&#34;unknown_mosquito_species.jpg&#34;</span>)
 </span></span><span style=display:flex><span><span style=color:#75715e>#&gt; [1] &#34;Anopheles Stephensi&#34;</span>
 </span></span></code></pre></div><p>Our model accurately predicts that the species of the mosquito in the picture above is <em>Anopheles stephensi</em>.</p><h1 id=conclusion>Conclusion</h1><p>In this tutorial, we built a Deep Learning model to draw inference on a specie of a mosquito given its image. The model&rsquo;s performance can be improved by training with a lower learning rate, or increasing the training epochs. Our model is quite limitted as it can only identifies 3 different species of mosquitoes. A large dataset from a large number of mosquito species would be an interesting project to pursue. The deployment of a more capable model (as a webapp or a smartphone app) may supplement morphological keys in the identification of mosquito species. Furthermore, such a tool may serve as an important leverage to entomologic surveillance programs and systems particularly in countries where vector-borne diseases are endemic.</p></p></div></div></main><footer class=footer><span>&copy; 2023 Roseric Azondekon</span></footer></body></html>
